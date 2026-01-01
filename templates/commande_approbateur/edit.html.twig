@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+
+<title>Edit CommandeApprobateur</title>
+
+{% block body %}
+    <h1>Edit CommandeApprobateur</h1>
+
+    {{ include('commande_approbateur/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_commande_approbateur_index') }}">back to list</a>
+
+    {{ include('commande_approbateur/_delete_form.html.twig') }}
+{% endblock %}

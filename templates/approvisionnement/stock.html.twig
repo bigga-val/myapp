@@ -1,0 +1,122 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
+    <div class="panel">
+        <div class="panel-body">
+{#            <label>#}
+{#                <input type="text" class="form-input">#}
+{#            </label>#}
+        </div>
+    </div>
+    <br>
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Stock des produits</h1>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_approvisionnement_new') }}">Approvisionner</a>
+
+    </div>
+    <div class="panel-body">
+        <input type="text" class="form-input mb-3" id="myInput" placeholder="Rechercher..." title="Tapez ici pour rechercher">
+
+        <table  id="datatable" class="table table-responsive">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Produit</th>
+                <th>Preemption</th>
+                <th>Fabricant</th>
+                <th>Cout</th>
+                <th>Entrée</th>
+                <th>Sortie</th>
+                <th>Reserve</th>
+                <th>Balance</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody class="myTable">
+        {% set counter = 0 %}
+        {% set totalIN = 0 %}
+        {% set lineColor = "" %}
+        {% for appro in appros %}
+            {% set counter = counter + 1 %}
+            {% set totalIN = totalIN + appro.cout %}
+            {% set balance = appro.totalEntree - (appro.totalSortie + appro.totalReserve) %}
+            {% if( balance > appro.minimum) %}
+                <tr>
+                {% elseif(((appro.minimum * 10/100)+appro.minimum) > balance and appro.minimum > balance) %} {# si la quantite disponible en stock est dans l'interval de 10 pourcent de la quantite minimale du produit en stock #}
+                <tr class="text-warning" title="la quantité minimale du produit {{ appro.designation }} sera atteinte bientot. Pensez à réapprovisionner.">
+                {% elseif balance <= appro.minimum %}{# si la quantité minimale du produit est atteinte ou depassee #}
+                <tr class="text-danger" title="la quantité minimale est atteinte, veuillez approvisionner le produit {{ appro.designation }}">
+            {% endif %}{# si tout est ok #}
+                <td>{{ counter }}</td>
+                <td>{{ appro.designation | capitalize }}</td>
+                <th>{{ appro.preemption  ? appro.preemption|date('d-m-Y') : '' }}</th>
+                <th>{{ appro.fabricant | capitalize }}</th>
+                <td>{{ appro.cout }}</td>
+                <td>{{ appro.totalEntree }}</td>
+                <td>{{ appro.totalSortie }}</td>
+                <td>{{ appro.totalReserve }}</td>
+                <td>{{ balance }}</td>
+                <td>
+{#                    <a href="{{ path('app_approvisionnement_show', {'id': appro.produitID}) }}">show</a>#}
+{#                    <a href="{{ path('app_approvisionnement_new', {'id': appro.produitID}) }}">edit</a>#}
+                    <button class="btn btn-sm btn-primary">Commander</button>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+    </div>
+    <div class="flex my-3">
+        <h3 class="btn btn-outline-info">Cout Total: {{ totalIN }} FC</h3>
+        <h3></h3>
+    </div>
+</div>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables.js') }}"></script>
+    <script src="{{ asset('assets/js/buttons.datatables.js') }}"></script>
+
+
+    <!-- JavaScript -->
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+
+{#    <script>#}
+{#        let table = new DataTable('#datatable', {#}
+{#            order: [[0, 'desc']],#}
+{#            language: {#}
+{#                info: 'Page _PAGE_ / _PAGES_',#}
+{#                infoEmpty: 'No records available',#}
+{#                infoFiltered: '(filtered from _MAX_ total records)',#}
+{#                lengthMenu: 'Afficher _MENU_ lignes par page',#}
+{#                zeroRecords: 'Nothing found - sorry'#}
+{#            },#}
+{#            layout: {#}
+{#                topStart: {#}
+{#                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']#}
+{#                }#}
+{#            }#}
+{#        });#}
+{#    </script>#}
+
+    <script>
+        $(document).ready(function() {
+            $('#datatable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'excel', 'pdf', 'csv'
+                ]
+            });
+        });
+    </script>
+{% endblock %}

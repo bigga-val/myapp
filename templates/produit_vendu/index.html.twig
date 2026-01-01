@@ -1,0 +1,39 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<div class="panel">
+    <h1>ProduitVendu index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Vente No</th>
+                <th>Produit</th>
+                <th>Qty</th>
+                <th>Date et heure</th>
+                <th>Utilisateur</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for produit_vendu in produit_vendus %}
+            <tr>
+                <td>{{ produit_vendu.vente.numeroVente }}</td>
+                <td>{{ produit_vendu.produit.designation }}</td>
+                <td>{{ produit_vendu.qty }}</td>
+                <td>{{ produit_vendu.createdAt ? produit_vendu.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ produit_vendu.createdBy }}</td>
+                <td>
+                    <a href="{{ path('app_produit_vendu_show', {'id': produit_vendu.id}) }}">show</a>
+                    <a href="{{ path('app_produit_vendu_edit', {'id': produit_vendu.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_produit_vendu_new') }}">Create new</a>
+{% endblock %}

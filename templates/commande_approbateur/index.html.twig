@@ -1,0 +1,48 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block title %}Liste des Approbateurs{% endblock %}
+{% block content %}
+    <div class="panel">
+        <h1>Ajouter un approbateur</h1>
+
+        {{ include('commande_approbateur/_form.html.twig') }}
+    </div>
+    <br>
+    <div class="panel">
+        <h1>Approbateurs des Commandes</h1>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Utilisateur </th>
+                <th>IsActive</th>
+                <th>actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = 0 %}
+            {% for commande_approbateur in commande_approbateurs %}
+                {% set counter = counter + 1 %}
+                <tr>
+                    <td>{{ counter }}</td>
+                    <td><a href="{{ path('app_user_profile', { 'id':commande_approbateur.user.id }) }}">{{ commande_approbateur.user.username }}</a></td>
+                    <td>{{ commande_approbateur.isActive ? 'Yes' : 'No' }}</td>
+                    <td>
+                        {% if commande_approbateur.isActive %}
+                            <a class="btn btn-sm btn-outline-danger" href="{{ path('app_commande_approbateur_activer', {'id': commande_approbateur.id}) }}">Desactiver</a>
+                        {% else %}
+                            <a class="btn btn-primary" href="{{ path('app_commande_approbateur_activer', {'id': commande_approbateur.id}) }}">Activer</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="3">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}

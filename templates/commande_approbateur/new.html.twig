@@ -1,0 +1,9 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block title %}Ajouter un Approbateur{% endblock %}
+{% block content %}
+    <h1>Create new CommandeApprobateur</h1>
+
+    {{ include('commande_approbateur/_form.html.twig') }}
+
+    <a href="{{ path('app_commande_approbateur_index') }}">back to list</a>
+{% endblock %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<title>CommandeProduit index</title>
+
+{% block body %}
+    <h1>CommandeProduit index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Quantite</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for commande_produit in commande_produits %}
+            <tr>
+                <td>{{ commande_produit.id }}</td>
+                <td>{{ commande_produit.Quantite }}</td>
+                <td>
+                    <a href="{{ path('app_commande_produit_show', {'id': commande_produit.id}) }}">show</a>
+                    <a href="{{ path('app_commande_produit_edit', {'id': commande_produit.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_commande_produit_new') }}">Create new</a>
+{% endblock %}

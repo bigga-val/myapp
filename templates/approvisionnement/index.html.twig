@@ -1,0 +1,83 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Recents Approvisionnements</h1>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_approvisionnement_new') }}">Approvisionner</a>
+
+    </div>
+    <div>
+{#        <input type="text" class="form-input mb-3" id="myInput" placeholder="Rechercher..." title="Tapez ici pour rechercher">#}
+
+        <table id="datatable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Designation</th>
+                <th>Unité de Mesure</th>
+                <th>Prix</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Qty</th>
+                <th>Coût(Fc)</th>
+                <th>Coût($)</th>
+                <th>Taux</th>
+                <th>Date</th>
+                <th>Ops</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody id="myTable">
+        {% for approvisionnement in approvisionnements %}
+            <tr>
+                <td>{{ approvisionnement.produit.code }}</td>
+                <td>{{ approvisionnement.produit.designation }}</td>
+                <td>{{ approvisionnement.produit.uniteMesure }}</td>
+                <td>{{ approvisionnement.produit.prix }}</td>
+                <td>{{ approvisionnement.produit.minimum }}</td>
+                <td>{{ approvisionnement.produit.maximum }}</td>
+                <td>{{ approvisionnement.qty }}</td>
+                <td>Fc {{ approvisionnement.cout }}</td>
+                {% if(approvisionnement.taux is not null or approvisionnement.taux != 0) %}
+                {% set convert = approvisionnement.cout / approvisionnement.taux %}
+                {% else %}
+                    {% set convert = 0 %}
+                {% endif %}
+                <td>$ {{ convert|number_format(2) }}</td>
+                <td>{{ approvisionnement.taux }}</td>
+                <td>{{ approvisionnement.createdAt ? approvisionnement.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ approvisionnement.createdBy | capitalize }}</td>
+                <td>
+{#                    <a href="{{ path('app_approvisionnement_show', {'id': approvisionnement.id}) }}">show</a>#}
+                    <a class="btn btn-sm btn-primary" href="{{ path('app_approvisionnement_edit', {'id': approvisionnement.id}) }}">Editer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables.js') }}"></script>
+
+
+    <script>
+        let table = new DataTable('#datatable', {
+            order: [[0, 'desc']],
+            language: {
+                info: 'Page _PAGE_ / _PAGES_',
+                infoEmpty: 'No records available',
+                infoFiltered: '(filtered from _MAX_ total records)',
+                lengthMenu: 'Afficher _MENU_ lignes par page',
+                zeroRecords: 'Nothing found - sorry'
+            },
+            buttons: [
+                'copy', 'excel', 'pdf'
+            ]
+        });
+    </script>
+{% endblock %}

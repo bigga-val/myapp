@@ -1,0 +1,9 @@
+{{ form_start(form,{ 'attr': {'class': 'flex justify-center'} }) }}
+{#    {{ form_widget(form) }}#}
+    {{ form_label(form.User) }}
+{#    {{ form_widget(form.User) }}#}
+    {{ form_widget(form.User, { 'attr': {'class': 'form-input col-sm-6 '} }) }}
+
+    {{ form_errors(form.User) }}
+    <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+{{ form_end(form) }}

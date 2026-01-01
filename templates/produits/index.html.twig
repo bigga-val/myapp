@@ -1,0 +1,80 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Liste des produits</h1>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_new') }}">Nouveau produit</a>
+{#        <a class="border border-2 p-2 m2 text-white rounded bg-success" href="{{ path('app_produits_excel') }}">Excel</a>#}
+
+    </div>
+        <div>
+{#            <input type="text" class="form-input mb-3" id="myInput" placeholder="Rechercher..." title="Tapez ici pour rechercher">#}
+
+            <table id="datatable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Designation</th>
+                    <th>Categorie</th>
+                    <th>Unité de Mesure</th>
+                    <th>Prix</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                    <th>Fabricant</th>
+                    <th>Preemption</th>
+                    <th>actions</th>
+                </tr>
+            </thead>
+            <tbody id="myTable">
+            {% set counter = 0 %}
+            {% for produit in produits %}
+                {% set counter = counter+1 %}
+                <tr>
+                    <td>{{ produit.code }}</td>
+                    <td>{{ produit.designation }}</td>
+                    <td>{{ produit.categorie? '-' ?produit.categorie.designation }}</td>
+                    <td>{{ produit.uniteMesure }}</td>
+                    <td>{{ produit.prix }}</td>
+                    <td>{{ produit.minimum }}</td>
+                    <td>{{ produit.maximum }}</td>
+                    <td>{{ produit.fabricant }}</td>
+                    <td>{{ produit.preemption ? produit.preemption|date('d-m-Y H:i:s') : '' }}</td>
+                    <td>
+{#                        <a href="{{ path('app_produits_show', {'id': produit.id}) }}">show</a>#}
+                        <a class="btn btn-sm btn-primary" href="{{ path('app_produits_edit', {'id': produit.id}) }}">Editer</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        </div>
+    </div>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables.js') }}"></script>
+
+
+    <script>
+
+        let table = new DataTable('#datatable', {
+            order: [[0, 'desc']],
+            language: {
+                info: 'Page _PAGE_ / _PAGES_',
+                infoEmpty: 'No records available',
+                infoFiltered: '(filtered from _MAX_ total records)',
+                lengthMenu: 'Afficher _MENU_ ligne par page',
+                zeroRecords: 'Nothing found - sorry'
+            },
+            buttons: [
+                'copy', 'excel', 'pdf'
+            ]
+        });
+    </script>
+
+{% endblock %}

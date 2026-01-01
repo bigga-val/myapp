@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<title>CommandeReception index</title>
+
+{% block body %}
+    <h1>CommandeReception index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>ReceptionDate</th>
+                <th>QuantiteRecue</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for commande_reception in commande_receptions %}
+            <tr>
+                <td>{{ commande_reception.id }}</td>
+                <td>{{ commande_reception.ReceptionDate ? commande_reception.ReceptionDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ commande_reception.QuantiteRecue }}</td>
+                <td>
+                    <a href="{{ path('app_commande_reception_show', {'id': commande_reception.id}) }}">show</a>
+                    <a href="{{ path('app_commande_reception_edit', {'id': commande_reception.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_commande_reception_new') }}">Create new</a>
+{% endblock %}

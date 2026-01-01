@@ -1,0 +1,61 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <div class="panel">
+        <div class="col-md-6">
+            {{ form_start(form) }}
+{#            {{ form_widget(form) }}#}
+            <div>
+                <label for="">Designation</label>
+                {{ form_widget(form.designation, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <div>
+                <label for="">Pourcentage</label>
+                {{ form_widget(form.Pourcentage, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <br>
+            <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-md-6"></div>
+
+    </div>
+    <br>
+    <div class="panel">
+        <h1>Liste des categories</h1>
+        <hr>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Designation</th>
+                <th>Pourcentage</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = 0 %}
+            {% for categorie_produit in categorie_produits %}
+                {% set counter = counter + 1 %}
+                <tr>
+                    <td>{{ counter }}</td>
+
+                    <td>{{ categorie_produit.designation }}</td>
+                    <td>{{ categorie_produit.Pourcentage }}</td>
+                    <td>
+                        <a href="{{ path('app_categorie_produit_show', {'id': categorie_produit.id}) }}">show</a>
+                        <a href="{{ path('app_categorie_produit_edit', {'id': categorie_produit.id}) }}">edit</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+    <a href="{{ path('app_categorie_produit_new') }}">Create new</a>
+{% endblock %}

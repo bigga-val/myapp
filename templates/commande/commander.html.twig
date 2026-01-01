@@ -1,0 +1,369 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <div class="panel">
+        <div class="flex justify-between mb-3">
+            <h1>Commande des produits</h1>
+
+            <h3>Taux: 1$ = {{ (app.session.get('tauxactif')) }} Fc</h3>
+            <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_index') }}">Voir Stock</a>
+        </div>
+        <hr>
+        <div>
+            <table class="table">
+                <tr>
+                    <td>Commande No: <span>{{ numeroCommande }}</span></td>
+                    <td> <span id="date"></span></td>
+                    <td> <span>Par: {{ app.user.username }}</span></td>
+
+                </tr>
+            </table>
+            <table>
+                <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Qté</th>
+                    <th>Qté Dispo</th>
+                    <th>Prix Unitaire</th>
+                    <th>Mesure</th>
+                    <th>Sous-Total</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody class="tbody">
+                </tbody>
+            </table>
+            <div class="sm:mb-0 mb-6 p-2">
+                <button id="add-row" class="btn btn-primary">Ajouter</button>
+            </div>
+            <hr>
+            <br>
+            <div class="sm:w-2/5 ">
+                <div class="">
+                    <div></div>
+                    <div class="border p-2 border-4 rounded">Total: <span id="subtotal">0</span></div>
+                </div>
+                {#            <div class="flex items-end justify-between mt-4">#}
+                {#                <div>TVA(%)</div>#}
+                {#                <div><input class="form-input" type="number" id="tax-input" value="16"   ></div>#}
+                {#            </div>#}
+            </div>
+            <br>
+            <span id="errorSpan" class="text-danger"></span>
+
+            <div class="flex">
+                <button id="btnSaveCommandeDraft" class="btn btn-success">
+                    Enregistrer brouillon
+                </button>
+
+                <button id="btnSaveCommande" class="btn btn-success  mx-3">
+                    Enregistrer et soumettre
+                </button>
+
+{#                <button id="btnSaveInvoicePrint" class="btn btn-success  mx-3">#}
+{#                    Vendre et Facturer#}
+{#                </button>#}
+            </div>
+
+
+        </div>
+    </div>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+
+    <script>
+        const date = new Date();
+        const element = document.getElementById("date");
+        element.textContent = date.toLocaleDateString();
+    </script>
+    <script>
+        $(document).ready(function() {
+            $("#btnSaveCommandeDraft").prop("disabled", true)
+            $("#btnSaveCommande").prop("disabled", true)
+            //$("#btnSaveInvoicePrint").prop("disabled", true)
+
+            // Ajouter une ligne
+            let counter = 0
+            var newRow = '<tr class="prod_Line">'+
+                '<td><select class="form-input item-product" name="select-'+counter+'">' +
+                '<option value="-1">Choisir un produit</option>'+
+                    {% for produit in produits %}
+                '<option value="{{ produit.produitID }}">{{ produit.designation }}</option>'+
+                    {% endfor %}
+                '</select></td>'+
+                '   <td><input type="number" class="form-input item-quantity" ></td>'+
+                '   <td><span class="item-dispo"></span></td>'+
+
+                '   <td><input type="number" class="form-input item-prix" readonly="true">' +
+                '   <td>' +
+                '<span class="item-unit">-</span>' +
+                '<span class="item-min hidden d-none"></span>' +
+                '<span class="item-max hidden d-none"></span>' +
+                '</td>'+
+                '   <td><span class="item-total">0</span></td>'+
+                '   <td><button class="remove-row btn btn-danger btn-sm">X</button></td>'+
+                '</tr>'
+            $('.tbody').append(newRow);
+            //console.log(newRow)
+            $('#add-row').click(function() {
+                counter++
+                $('.tbody').append(newRow);
+                setPrix()
+            });
+
+            // Supprimer une ligne
+            $('table').on('click', '.remove-row', function() {
+                counter--
+                $(this).closest('tr').remove();
+                //setting the subtotal and total when removed an invoice line
+                let subtotal = 0
+                $('.item-total').each(function(i, e){
+                    subtotal = subtotal+ parseFloat($(this).text())
+                })
+                $('#subtotal').text(subtotal)
+                setTotal()
+            });
+            setPrix()
+        });
+
+        //saving the commande as draft
+        $("#btnSaveCommandeDraft").click(function(e) {
+            $("a, button, span, input").attr("disabled", true)
+
+            console.log("clicked")
+
+            $(".tbody").find("tr").each(function(e, i){
+                console.log($(this).find("td").eq(0).find(".item-product").val())
+                console.log($(this).find("td").eq(1).find(".item-quantity").val())
+                console.log($(this).find("td").eq(2).find(".item-prix").val())
+            })
+
+            //console.log('debut')
+            $.ajax({
+                url: '/commande/jsonSaveCommandeDraft',
+                method: 'GET',
+                data: {
+                },
+                success: function (response) {
+                    console.log(response)
+                    if(response.etat){
+
+                        $(".tbody").find("tr").each(function(e, i){
+                            let commandeID = response.CommandeID
+                            let productID = $(this).find("td").eq(0).find(".item-product").val()
+                            let quantity = $(this).find("td").eq(1).find(".item-quantity").val()
+                            // let price = $(this).find("td").eq(2).find(".item-prix").val()
+
+                            if(productID != -1){
+                                // console.log("produit:"+productID+"-quantite:"+quantity+"-prix:"+price)
+                                $.ajax({
+                                    url: '/commande/produit/jsonSaveLigneCommande?' +
+                                        'commandeID=' +commandeID+
+                                        '&produitID='+ productID+
+                                        '&qty='+ quantity,
+                                    method: 'GET',
+                                    data: {
+                                    },
+                                    success: function (response) {
+                                        //console.log("bien ajoute")
+                                        // console.log(response)
+                                        raiseToastr('success', 'Commande enrégistrée avec succès !')
+                                        //-- On reload l'app apres l'enregistrement des produits vendu
+                                        window.location.href = "/commande";
+                                    },
+                                    error: function (e) {
+                                        console.log('Erreur lors de la requête AJAX.');
+                                        console.log(e)
+                                        // Autres actions à effectuer en cas d'erreur
+                                    }
+                                })
+                            }
+                        })
+                    }
+                },
+                error: function () {
+                    alert('Erreur lors de la requête AJAX.');
+                    // Autres actions à effectuer en cas d'erreur
+                }
+            })
+            console.log('fin')
+        })
+
+        //saving the commande as draft
+        $("#btnSaveCommande").click(function(e) {
+            $("a, button, span, input").attr("disabled", true)
+
+            console.log("clicked")
+
+            $(".tbody").find("tr").each(function(e, i){
+                console.log($(this).find("td").eq(0).find(".item-product").val())
+                console.log($(this).find("td").eq(1).find(".item-quantity").val())
+                console.log($(this).find("td").eq(2).find(".item-prix").val())
+            })
+
+            //console.log('debut')
+            $.ajax({
+                url: '/commande/jsonSaveCommande',
+                method: 'GET',
+                data: {
+                },
+                success: function (response) {
+                    console.log(response)
+                    if(response.etat){
+
+                        $(".tbody").find("tr").each(function(e, i){
+                            let commandeID = response.CommandeID
+                            let productID = $(this).find("td").eq(0).find(".item-product").val()
+                            let quantity = $(this).find("td").eq(1).find(".item-quantity").val()
+                            // let price = $(this).find("td").eq(2).find(".item-prix").val()
+
+                            if(productID != -1){
+                                // console.log("produit:"+productID+"-quantite:"+quantity+"-prix:"+price)
+                                $.ajax({
+                                    url: '/commande/produit/jsonSaveLigneCommande?' +
+                                        'commandeID=' +commandeID+
+                                        '&produitID='+ productID+
+                                        '&qty='+ quantity,
+                                    method: 'GET',
+                                    data: {
+                                    },
+                                    success: function (response) {
+                                        //console.log("bien ajoute")
+                                        // console.log(response)
+                                        raiseToastr('success', 'Commande enrégistrée avec succès !')
+                                        //-- On reload l'app apres l'enregistrement des produits vendu
+                                        window.location.href = "/commande";
+                                    },
+                                    error: function (e) {
+                                        console.log('Erreur lors de la requête AJAX.');
+                                        console.log(e)
+                                        // Autres actions à effectuer en cas d'erreur
+                                    }
+                                })
+                            }
+                        })
+                    }
+                },
+                error: function () {
+                    alert('Erreur lors de la requête AJAX.');
+                    // Autres actions à effectuer en cas d'erreur
+                }
+            })
+            console.log('fin')
+        })
+
+
+
+        //Automatizing the calculations on fields for creation
+        function setPrix(){
+            let selectElement = $('select[name^="select-"]');
+            $(".item-product").each(function(i, e){
+                $(this).on("change", function(e){
+                    console.log($(this).val())
+                    if($(this).val() != -1){
+
+                        let qty = $(this).parent("td").siblings("td").children(".item-quantity")
+
+                        let amount = $(this).parent("td").siblings("td").children(".item-prix")
+                        let totalAmount = $(this).parent("td").siblings("td").children(".item-total")
+                        let unit = $(this).parent("td").siblings("td").children(".item-unit")
+                        let min = $(this).parent("td").siblings("td").children(".item-min")
+                        let max = $(this).parent("td").siblings("td").children(".item-max")
+                        let reserve = $(this).parent("td").siblings("td").children(".item-reserve")
+                        let dispo = $(this).parent("td").siblings("td").children(".item-dispo")
+                        let reel = 0
+                        $.ajax({
+                            url: '/vente/jsonGetProductCommande?' +
+                                'productID=' + $(this).val(),
+                            method: 'GET',
+                            data: {},
+                            success: function (response) {
+                                console.log(response)
+                                var ts = response["data"][0]["totalSortie"] != null?response["data"][0]["totalSortie"]:0
+                                var tr = response["data"][0]["totalReserve"] != null?response["data"][0]["totalReserve"]:0
+                                var te = response["data"][0]["totalEntree"] != null? response["data"][0]["totalEntree"]:0
+
+                                reel = te-(tr+ts)
+                                if(isNaN(reel)){
+                                    reel = 0
+                                }else{
+
+                                }
+                                console.log(te, ts, tr, reel)
+                                console.log(response["data"][0]["prix"])
+                                amount.val(response["data"][0]["prixTotal"])
+                                unit.text(response["data"][0]["uniteMesure"])
+                                min.text(response["data"][0]["minimum"])
+                                max.text(response["data"][0]["maximum"])
+                                dispo.text(reel)
+                                // qty.attr('readonly', false)
+                                // qty.val(1)
+                                // totalAmount.text(response["prix"])
+                                // --- Set the subtotal value --- \\
+                                let subtotal = 0
+                                $('.item-total').each(function(i, e){
+                                    subtotal = subtotal+ parseFloat($(this).text())
+                                })
+
+                                $('#subtotal').text(subtotal)
+                                setTotal()
+                            },
+                            error: function () {
+                                alert('Erreur lors de la requête AJAX.');
+                                // Autres actions à effectuer en cas d'erreur
+                            }
+                            //let qty = $(this).parent("td").siblings("td").children("input[x-model='item.quantity']")
+                        })
+
+                        qty.on("keyup", function(e){
+                            //console.log($(this).val(), min.text(), max.text())
+                            if($(this).val() <= 0) {
+                                $("#btnSaveCommandeDraft").prop("disabled", true)
+                                $("#btnSaveCommande").prop("disabled", true)
+                                //$("#btnSaveInvoicePrint").prop("disabled", true)
+                                $("#errorSpan").text("Valeur incorrecte fournie")
+                            }else if($(this).val() > parseFloat(dispo.text())) {
+                               // $("#btnSaveCommandeDraft").prop("disabled", true)
+                               // $("#btnSaveCommande").prop("disabled", true)
+                                //$("#btnSaveInvoicePrint").prop("disabled", true)
+                                //$("#errorSpan").text("Valeur maximale depassee: "+ dispo.text())
+
+                            }else{
+                                $("#btnSaveCommandeDraft").prop("disabled", false)
+                                $("#btnSaveCommande").prop("disabled", false)
+                                //$("#btnSaveInvoicePrint").prop("disabled", false)
+                                $("#errorSpan").text("")
+
+                                let total = amount.val() * $(this).val()
+                                totalAmount.text(total)
+                                $(".item-total").each(function(i, e){
+                                    let subtotal = 0
+                                    $('.item-total').each(function(i, e){
+                                        subtotal = subtotal+ parseFloat($(this).text())
+                                    })
+                                    $('#subtotal').text(subtotal)
+                                    setTotal()
+                                })
+                            }
+                        })
+                    }
+                })
+            })
+
+        }
+
+
+
+        function setTotal(){
+            let subtotal = parseFloat($('#subtotal').text())
+            let tax = parseFloat($('#tax-input').val())
+            let discount = parseFloat($('#discount-input').val())
+            let reductible = ((parseFloat(subtotal) * discount)/100)
+            //console.log(subtotal, tax, discount)
+            let taxable = (subtotal + ((parseFloat(subtotal) * tax)/100) )
+            let total = taxable - reductible
+            // console.log('settotal')
+
+            $('#grand-total').text(total)
+        }
+    </script>
+
+{% endblock %}

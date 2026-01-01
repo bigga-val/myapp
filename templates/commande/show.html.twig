@@ -1,0 +1,244 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<div class="panel">
+    <div class=" mb-3">
+        <div class="flex justify-between">
+            <div>
+                <h1 >Details de la Commande <strong> {{ commande.CommandeNumber }} </strong>{{ isApprover }}</h1>
+
+            </div>
+            <div class="flex justify-between">
+
+
+                <a href="{{ path('app_commande_index') }}" class="btn btn-sm btn-primary">Voir liste</a>
+            </div>
+
+        </div>
+{#        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_vente_new') }}">Nouvelle vente</a>#}
+
+        {#        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_index') }}">Liste des produits</a>#}
+        <table>
+            <tbody>
+
+            <tr>
+                <th>Par</th>
+                <td>:{{ commande.CommandePar.username }}</td>
+                <th>CommandeDate</th>
+                <td>:{{ commande.CommandeDate ? commande.CommandeDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>:{{ commande.Status }}</td>
+                <th>Approuve Par</th>
+                <td>:
+                    {% if commande.ApprovedBy is not null and commande.ApprovedBy.Username is not null %}
+                    {{ commande.ApprovedBy.username }}
+                    {% else %}
+                    —
+                    {% endif %}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Produit</th>
+                <th>Quantite</th>
+                <th>Recu</th>
+                <th>Prix Unitaire</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set counter = 0 %}
+        {% for line in commandeLines %}
+            {% set counter = counter+1 %}
+            <tr>
+                <td>{{ counter }} {{ line.id }}</td>
+                <td>{{ line.designation }}</td>
+                <td>{{ line.QuantiteCommandee }}</td>
+                <td class="flex place-items-center action-cell">
+                    <span class="received-text">{{ line.QuantiteRecue }}</span>
+                    {% if commande.IsApproved == true %}
+                        <button class="btn btn-sm btn-show-form">Recevoir</button>
+                    {% endif %}
+                    <form class="inline-form flex" action="{{ path("app_line_receipt", {id: line.id}) }}" method="GET" style="display:none;">
+                        {% set QteRestante = line.QuantiteCommandee - line.QuantiteRecue %}
+                        <input type="text" name="quantite" class="form-input" value="{{ QteRestante }}">
+                        <input type="hidden" name="id" class="form-input" value="{{ line.id }}">
+                        <div class="flex justify-start">
+                            <input type="submit" class="btn btn-sm btn-success mx-2" value="Save">
+                            <input type="button" class="btn btn-sm btn-outline-danger btn-cancel" value="Cancel">
+                        </div>
+
+                    </form>
+                </td>
+{#
+{#                {% set stotal = line.Quantite * ptotal %}#}
+                <td> {{  line.prixUnitaire|number_format(0, ',', ' ') }}</td>
+{#                <td>{{ line.Taux }}</td>#}
+                <td>{{ line.prixTotal|number_format(0, ',', ' ') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{#    <a href="{{ path('app_commande_index') }}">back to list</a>#}
+
+{#    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">edit</a>#}
+
+{#    {{ include('commande/_delete_form.html.twig') }}#}
+</div>
+
+    <div>
+        <br>
+        <div x-data="modal" class="mb-5">
+            <!-- button -->
+            <div class="flex items-center justify-left">
+                {% if (is_granted("ROLE_ADMIN") or isApprover) and commande.Status == 'submitted' %}
+                    <button type="button" class="btn btn-primary mr-2" @click="toggle">Approuver</button>
+{#                    <a href="{{ path("app_reset_password", {"id":1}) }}" class="btn btn-primary m-2">Reinitialiser le mot de passe</a>#}
+                {% endif %}
+            </div>
+            <!-- modal -->
+            <div class="fixed inset-0 bg-[black]/60 z-[999] hidden overflow-y-auto" :class="open && '!block'">
+                <div class="flex items-start justify-center min-h-screen px-4" @click.self="open = false">
+                    <div x-show="open" x-transition x-transition.duration.300 class="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg">
+                        <div class="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                            <div class="font-bold text-lg">Approbation de Commande</div>
+                        </div>
+                        <form method="GET" action="{{ path("app_approve_commande", {id:commande.id }) }}">
+                            <div class="p-5">
+                                <div class="dark:text-white-dark/70 text-base font-medium text-[#1f2937]">
+                                    <label for="">Voulez-vous vraiment Approuver cette commande ?</label>
+                                    <input type="hidden" value="{{ commande.id }}" name="commandeID">
+                                    <input type="hidden" value="{{ commande.id }}" name="id">
+                                </div>
+                                <div class="flex justify-end items-center mt-8">
+                                    <button type="button" class="btn btn-outline-danger" @click="toggle">Annuler</button>
+                                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4" @click="toggle">Confirmer</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div x-data="modal" class="mb-5">
+            <!-- button -->
+            <div class="flex items-center justify-left">
+                {% if (is_granted("ROLE_ADMIN") or isApprover == true) and commande.Status == 'submitted' %}
+                    <button type="button" class="btn btn-outline-warning mr-2" @click="toggle">Rejeter</button>
+                    {#                    <a href="{{ path("app_reset_password", {"id":1}) }}" class="btn btn-primary m-2">Reinitialiser le mot de passe</a>#}
+                {% endif %}
+            </div>
+            <!-- modal -->
+            <div class="fixed inset-0 bg-[black]/60 z-[999] hidden overflow-y-auto" :class="open && '!block'">
+                <div class="flex items-start justify-center min-h-screen px-4" @click.self="open = false">
+                    <div x-show="open" x-transition x-transition.duration.300 class="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg">
+                        <div class="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                            <div class="font-bold text-lg">Rejection de Commande</div>
+                        </div>
+                        <form method="GET" action="{{ path("app_reject_commande", {id:commande.id }) }}">
+                            <div class="p-5">
+                                <div class="dark:text-white-dark/70 text-base font-medium text-[#1f2937]">
+                                    <label for="">Voulez-vous vraiment Rejeter cette commande ?</label>
+                                    <input type="hidden" value="{{ commande.id }}" name="commandeID">
+                                    <input type="hidden" value="{{ commande.id }}" name="id">
+                                </div>
+                                <div class="flex justify-end items-center mt-8">
+                                    <button type="button" class="btn btn-outline-danger" @click="toggle">Annuler</button>
+                                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4" @click="toggle">Confirmer</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div x-data="modal" class="mb-5">
+            <!-- button -->
+            <div class="flex items-center justify-left">
+                {% if commande.Status == 'draft' %}
+                    <button type="button" class="btn btn-primary btn-sm mr-2" @click="toggle">Soumettre</button>
+                    {#                    <a href="{{ path("app_reset_password", {"id":1}) }}" class="btn btn-primary m-2">Reinitialiser le mot de passe</a>#}
+                {% endif %}
+            </div>
+            <!-- modal -->
+            <div class="fixed inset-0 bg-[black]/60 z-[999] hidden overflow-y-auto" :class="open && '!block'">
+                <div class="flex items-start justify-center min-h-screen px-4" @click.self="open = false">
+                    <div x-show="open" x-transition x-transition.duration.300 class="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg">
+                        <div class="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                            <div class="font-bold text-lg">Soumission de la Commande</div>
+                        </div>
+                        <form method="GET" action="{{ path("app_submit_commande", {id:commande.id }) }}">
+                            <div class="p-5">
+                                <div class="dark:text-white-dark/70 text-base font-medium text-[#1f2937]">
+                                    <label for="">Voulez-vous vraiment Soumettre la commande pour Approbation ?</label>
+                                    <input type="hidden" value="{{ commande.id }}" name="commandeID">
+                                    <input type="hidden" value="{{ commande.id }}" name="id">
+                                </div>
+                                <div class="flex justify-end items-center mt-8">
+                                    <button type="button" class="btn btn-outline-danger" @click="toggle">Annuler</button>
+                                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4" @click="toggle">Soumettre</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script>
+
+        // $(document).ready(function () {
+        //     // Afficher le formulaire
+        //     $('.btn-show-form').on('click', function () {
+        //         const cell = $(this).closest('.action-cell');
+        //         console.log('receipt')
+        //         $(this).hide();
+        //         cell.find('.inline-form').show();
+        //     });
+        //
+        //     // Annuler → cacher le form
+        //     $('.btn-cancel').on('click', function () {
+        //         const cell = $(this).closest('.action-cell');
+        //         console.log('cancel')
+        //         cell.find('.inline-form').hide();
+        //         cell.find('.btn-show-form').show();
+        //     });
+        // })
+
+        $(document).on('click', '.btn-show-form', function () {
+
+            // Fermer les autres
+            $('.inline-form').hide();
+            $('.btn-show-form').show();
+
+            const cell = $(this).closest('td');
+            cell.find('.btn-show-form').hide();
+            cell.find('.inline-form').show();
+        });
+
+        $(document).ready(function () {
+
+            $('.btn-cancel').on('click', function () {
+                const cell = $(this).closest('.action-cell');
+                console.log('cancel')
+                cell.find('.inline-form').hide();
+                cell.find('.btn-show-form').show();
+            });
+        })
+
+    </script>
+{% endblock %}

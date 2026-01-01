@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+
+<title>Edit CommandeReception</title>
+
+{% block body %}
+    <h1>Edit CommandeReception</h1>
+
+    {{ include('commande_reception/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_commande_reception_index') }}">back to list</a>
+
+    {{ include('commande_reception/_delete_form.html.twig') }}
+{% endblock %}
