@@ -87,10 +87,13 @@ class VenteRepository extends ServiceEntityRepository
     public function venteTotalGrouped(): array{
         $em = $this->getEntityManager();
         $query = $em->createQuery(
-            'SELECT SUM(s.qty * s.prixUnitaire) montant, SUM(s.qty * s.prixUnitaire) / s.taux convert, s.taux, v.id, v.createdAt, v.statusVente, v.createdBy, v.numeroVente      
+            'SELECT SUM(s.qty * s.prixUnitaire) montant, SUM(s.qty * s.prixUnitaire) / s.taux convert, 
+            s.taux, v.id, v.createdAt, v.statusVente, v.createdBy, v.numeroVente, s.id ligneID
+            , (select t.designation from App\Entity\Table t where t.id = v.TableServie) as table
                     FROM App\Entity\Produits pr, App\Entity\ProduitVendu s, App\Entity\Vente v
                      where s.produit = pr.id
                           and v.id = s.vente
+                          
                     GROUP BY v.id 
             '
         );

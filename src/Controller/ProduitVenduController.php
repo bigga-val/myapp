@@ -10,6 +10,7 @@ use App\Repository\ProduitsRepository;
 use App\Repository\ProduitVenduRepository;
 use App\Repository\VenteRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,10 +21,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProduitVenduController extends AbstractController
 {
     #[Route('/', name: 'app_produit_vendu_index', methods: ['GET'])]
-    public function index(ProduitVenduRepository $produitVenduRepository): Response
+    public function index(Request $request, ProduitVenduRepository $produitVenduRepository): Response
     {
+        $start = $request->query->get('start');
+        $end = $request->query->get('end');
+
+        $start = new \DateTime($start) ?? new \DateTime('today');
+        $end = new \DateTime($end) ?? new \DateTime('today');
+
+        $start->setTime(0, 0, 0);      // 00:00:00
+        $end->setTime(23, 59, 59);
+        //dd(new \DateTime('today'), $end==null);
+        $produits = $produitVenduRepository->findByDateIntervalle($start, $end);
         return $this->render('produit_vendu/index.html.twig', [
-            'produit_vendus' => $produitVenduRepository->findAll(),
+            //'produit_vendus' => $produitVenduRepository->findBy([], ['createdAt' => 'DESC'] ),
+            'produit_vendus' => $produits,
+            'start' => $start,
+            'end' => $end,
+
         ]);
     }
 
@@ -58,6 +73,26 @@ class ProduitVenduController extends AbstractController
 
     }
 
+
+    #[Route('/jsonDeleteLigneVente', name: 'jsonDeleteLigneVente', methods: ['GET'])]
+    public function jsonDeleteLigneVente(Request $request,
+                                       ProduitVenduRepository $produitVenduRepository,
+                                       EntityManagerInterface $entityManager
+    ): Response
+    {
+        try {
+            $ligne = $produitVenduRepository->find($request->query->get('ligneID'));
+            $entityManager->remove($ligne);
+            $entityManager->flush();
+            return new JsonResponse([
+                'etat' => true
+            ]);
+        } catch (Exception $e) {
+            return new JsonResponse([
+                'etat' => false
+            ]);
+        }
+    }
 
     #[Route('/new', name: 'app_produit_vendu_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

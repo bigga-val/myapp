@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Approvisionnement;
+use App\Entity\Vente;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+
 
 /**
  * @extends ServiceEntityRepository<Approvisionnement>
@@ -71,7 +73,7 @@ class ApprovisionnementRepository extends ServiceEntityRepository
                      where s.produit = pr.id
                           and v.id = s.vente
                           and v.statusVente = \'paid\'
-                          and pr.id = produitID
+                          and pr.id = :prodID
                     GROUP BY pr.id 
                     ) as totalSortie,
                     (
@@ -81,7 +83,7 @@ class ApprovisionnementRepository extends ServiceEntityRepository
                      where s2.produit = pr2.id
                           and v2.id = s2.vente
                           and v2.statusVente = \'progress\'
-                          and pr2.id = produitID
+                          and pr2.id = :prodID
                     GROUP BY pr2.id 
                     ) as totalReserve
             FROM App\Entity\Produits p, App\Entity\Approvisionnement e

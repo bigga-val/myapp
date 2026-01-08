@@ -36,6 +36,20 @@ class ProduitVenduRepository extends ServiceEntityRepository
 //        ;
 //    }
 
+    public function findByDateIntervalle($start, $end): array
+    {
+
+
+        return $this->createQueryBuilder('p')
+            ->where('p.createdAt BETWEEN :start AND :end')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('p.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    public function findOneBySomeField($value): ?ProduitVendu
 //    {
 //        return $this->createQueryBuilder('p')

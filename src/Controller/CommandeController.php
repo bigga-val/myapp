@@ -163,6 +163,33 @@ class CommandeController extends AbstractController
 
     }
 
+
+    #[Route('/jsonRecallCommande', name: 'jsonRecallCommande', methods: ['GET'])]
+    public function jsonRecallCommande(Request $request,
+                                     CommandeRepository $commandeRepository,
+                                     EntityManagerInterface $entityManager,
+
+    ): JsonResponse
+    {
+        try {
+            $commandeID = $request->query->get('commandeID');
+            $commande = $commandeRepository->find($commandeID);
+            $commande->setStatus('cancelled');
+            //$commande->setCommandeNumber($this->genererNumeroCommande(5, $countCommande));
+            $entityManager->persist($commande);
+            $entityManager->flush();
+            return new JsonResponse([
+                'etat'=>true,
+                //'CommandeID'=>$commande->getId()
+            ]);
+        }catch (Exception $e){
+            return new JsonResponse([
+                'etat'=>false
+            ]);
+        }
+
+    }
+
     function genererNumeroCommande($sequenceLength, $lastId): string {
         // Définir le préfixe
         $prefix = "COM";
@@ -182,9 +209,27 @@ class CommandeController extends AbstractController
         //$commandeLines = $commandeProduitRepository->findBy(['Commande' => $commande]);
         $approver = $commandeApprobateurRepository->findBy(['User'=>$this->getUser(), 'isActive'=>true]);
         $isApprover = count($approver)>0;
-        //dd($isApprover);
+        //dd($commande->getId());
         $commandeLines = $commandeReceptionRepository->CommandeQuantite($commande->getId());
         return $this->render('commande/show.html.twig', [
+            'commande' => $commande,
+            'commandeLines'=>$commandeLines,
+            'isApprover'=>$isApprover,
+        ]);
+    }
+
+    #[Route('/{id}/print', name: 'app_commande_print', methods: ['GET'])]
+    public function print(Commande $commande,
+                         CommandeReceptionRepository $commandeReceptionRepository,
+                         CommandeApprobateurRepository $commandeApprobateurRepository
+    ): Response
+    {
+        //$commandeLines = $commandeProduitRepository->findBy(['Commande' => $commande]);
+        $approver = $commandeApprobateurRepository->findBy(['User'=>$this->getUser(), 'isActive'=>true]);
+        $isApprover = count($approver)>0;
+        //dd($commande->getId());
+        $commandeLines = $commandeReceptionRepository->CommandeQuantite($commande->getId());
+        return $this->render('commande/print.html.twig', [
             'commande' => $commande,
             'commandeLines'=>$commandeLines,
             'isApprover'=>$isApprover,

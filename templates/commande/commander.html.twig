@@ -73,6 +73,14 @@
         const date = new Date();
         const element = document.getElementById("date");
         element.textContent = date.toLocaleDateString();
+        document.addEventListener('DOMContentLoaded', function () {
+            initNiceSelect();
+            // document.querySelectorAll('select').forEach(function (el) {
+            //     NiceSelect.bind(el, {
+            //         searchable: true
+            //     });
+            // });
+        });
     </script>
     <script>
         $(document).ready(function() {
@@ -101,11 +109,13 @@
                 '   <td><span class="item-total">0</span></td>'+
                 '   <td><button class="remove-row btn btn-danger btn-sm">X</button></td>'+
                 '</tr>'
-            $('.tbody').append(newRow);
+            let row = $('.tbody').append(newRow);
+            initNiceSelect(row[0]);
             //console.log(newRow)
             $('#add-row').click(function() {
                 counter++
-                $('.tbody').append(newRow);
+                let row = $('.tbody').append(newRow);
+                initNiceSelect(row[0]);
                 setPrix()
             });
 
@@ -123,6 +133,7 @@
             });
             setPrix()
         });
+
 
         //saving the commande as draft
         $("#btnSaveCommandeDraft").click(function(e) {
@@ -250,7 +261,18 @@
             console.log('fin')
         })
 
-
+        function initNiceSelect(context = document) {
+            context.querySelectorAll('select').forEach(function (el) {
+                if (!el.classList.contains('nice-initialized')) {
+                    NiceSelect.bind(el, {
+                        searchable: true,
+                        placeholder: "Rechercher ...",
+                        searchPlaceholder: "Rechercher ..."
+                    });
+                    el.classList.add('nice-initialized');
+                }
+            });
+        }
 
         //Automatizing the calculations on fields for creation
         function setPrix(){

@@ -32,6 +32,9 @@ class Vente
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $statusVente = null;
 
+    #[ORM\ManyToOne]
+    private ?Table $TableServie = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +108,18 @@ class Vente
     public function setStatusVente(?string $statusVente): static
     {
         $this->statusVente = $statusVente;
+
+        return $this;
+    }
+
+    public function getTableServie(): ?Table
+    {
+        return $this->TableServie;
+    }
+
+    public function setTableServie(?Table $TableServie): static
+    {
+        $this->TableServie = $TableServie;
 
         return $this;
     }

@@ -25,6 +25,7 @@
                 <th>Taux</th>
                 <th>Date Vente</th>
                 <th>Ops</th>
+                <th>Table</th>
                 <th>Status</th>
                 <th>actions</th>
             </tr>
@@ -39,6 +40,7 @@
                     <td>{{ vente.taux }}</td>
                     <td>{{ vente.createdAt ? vente.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                     <td>{{ vente.createdBy }}</td>
+                    <td>{{ vente.table }}</td>
                     <td>
 {#                        {{ vente.statusVente }}#}
                         {% if(vente.statusVente == "progress") %}

@@ -1,5 +1,6 @@
 {% extends 'components/layout/default.html.twig' %}
 {% block content %}
+
 <div class="panel">
     <div class="flex justify-between mb-3">
         <h1>Vendre des produits</h1>
@@ -12,7 +13,18 @@
         <table class="table">
             <tr>
                 <td>Facture No: <span>{{ numeroFacture }}</span></td>
-                <td> <span id="date"></span></td>
+                <td >
+
+                    <label for="input-tables">Table:</label>
+                    <select class="form-input seachable-select" name="input-tables" id="input-tables">
+                        <option value="-1">Choisir la table</option>
+                        {% for table in tables %}
+                            <option value="{{ table.id }}">{{ table.designation }}</option>
+                        {% endfor %}
+                    </select>
+
+                </td>
+                <td>Date: <span id="date"></span></td>
 
             </tr>
         </table>
@@ -66,12 +78,19 @@
 
     </div>
 </div>
-    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         const date = new Date();
         const element = document.getElementById("date");
-        element.textContent = date.toLocaleDateString();
+        element.textContent = date.toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
     </script>
 <script>
     $(document).ready(function() {
@@ -100,11 +119,13 @@
             '   <td><span class="item-total">0</span></td>'+
             '   <td><button class="remove-row btn btn-danger btn-sm">X</button></td>'+
             '</tr>'
-        $('.tbody').append(newRow);
+        let row = $('.tbody').append(newRow);
+        initNiceSelect(row[0]);
         //console.log(newRow)
         $('#add-row').click(function() {
             counter++
-            $('.tbody').append(newRow);
+            let row = $('.tbody').append(newRow);
+            initNiceSelect(row[0]);
             setPrix()
         });
 
@@ -145,6 +166,7 @@
             url: '/vente/jsonSaveVente',
             method: 'GET',
             data: {
+                tableID: inputTables.val()
             },
             success: function (response) {
                 console.log(response)
@@ -214,6 +236,7 @@
             url: '/vente/jsonSaveVentePay',
             method: 'GET',
             data: {
+                tableID: inputTables.val()
             },
             success: function (response) {
                 console.log(response)
@@ -284,6 +307,7 @@
             url: '/vente/jsonSaveVentePay',
             method: 'GET',
             data: {
+                tableID: inputTables.val()
             },
             success: function (response) {
                 // console.log(response)
@@ -335,7 +359,36 @@
         //console.log('fin')
     })
 
+    //table selection constraints
+    let inputTables = $("#input-tables")
+    inputTables.on("change", function(){
+        //alert($(this).val())
+        if($(this).val() === "-1" ||$(this).val() === "current") {
+            $("#btnSaveInvoice").prop("disabled", true)
+            $("#btnSaveInvoice2").prop("disabled", true)
+            $("#btnSaveInvoicePrint").prop("disabled", true)
+            $("#errorSpan").text("Aucune table n'a été choisie")
 
+        }else {
+            $("#btnSaveInvoice").prop("disabled", false)
+            $("#btnSaveInvoice2").prop("disabled", false)
+            $("#btnSaveInvoicePrint").prop("disabled", false)
+            $("#errorSpan").text("")
+        }
+    })
+
+    function initNiceSelect(context = document) {
+        context.querySelectorAll('select').forEach(function (el) {
+            if (!el.classList.contains('nice-initialized')) {
+                NiceSelect.bind(el, {
+                    searchable: true,
+                    placeholder: "Rechercher ...",
+                    searchPlaceholder: "Rechercher ..."
+                });
+                el.classList.add('nice-initialized');
+            }
+        });
+    }
 
     //Automatizing the calculations on fields for creation
     function setPrix(){
@@ -356,10 +409,12 @@
                     let dispo = $(this).parent("td").siblings("td").children(".item-dispo")
                     let reel = 0
                     $.ajax({
-                        url: '/vente/jsonGetProduct2?' +
-                            'productID=' + $(this).val(),
+                        url: '/vente/jsonGetProduct2?',// +
+                            //'productID=' + $(this).val(),
                         method: 'GET',
-                        data: {},
+                        data: {
+                            productID: $(this).val(),
+                        },
                         success: function (response) {
                             console.log(response)
                             var ts = response["data"][0]["totalSortie"] != null?response["data"][0]["totalSortie"]:0
@@ -391,25 +446,37 @@
                             $('#subtotal').text(subtotal)
                             setTotal()
                         },
-                        error: function () {
-                            alert('Erreur lors de la requête AJAX.');
-                            // Autres actions à effectuer en cas d'erreur
+                        error: function (xhr, status, error) {
+                            // Message renvoyé par le serveur
+                            let message = xhr.responseText;
+
+                            // Affichage simple
+                            console.log(error);
+
+                            // Ou dans une div
+                            //$('#error-message').text(message).show();
                         }
                         //let qty = $(this).parent("td").siblings("td").children("input[x-model='item.quantity']")
                     })
 
                     qty.on("keyup", function(e){
                         //console.log($(this).val(), min.text(), max.text())
-                        if($(this).val() <= 0) {
+                        if($(this).val() <= 0 ) {
                             $("#btnSaveInvoice").prop("disabled", true)
                             $("#btnSaveInvoice2").prop("disabled", true)
                             $("#btnSaveInvoicePrint").prop("disabled", true)
-                            $("#errorSpan").text("Valeur incorrecte fournie")
+                            $("#errorSpan").text("Valeur incorrecte fournie ou table non choisie")
                         }else if($(this).val() > parseFloat(dispo.text())) {
                             $("#btnSaveInvoice").prop("disabled", true)
                             $("#btnSaveInvoice2").prop("disabled", true)
                             $("#btnSaveInvoicePrint").prop("disabled", true)
-                            $("#errorSpan").text("Valeur maximale depassee: "+ dispo.text())
+                            $("#errorSpan").text("Table non choisie ou Valeur maximale depassee: "+ dispo.text())
+
+                        }else if(inputTables.val() === "-1" || inputTables.val() === "current"){
+                            $("#btnSaveInvoice").prop("disabled", true)
+                            $("#btnSaveInvoice2").prop("disabled", true)
+                            $("#btnSaveInvoicePrint").prop("disabled", true)
+                            $("#errorSpan").text("Aucune table n'a été choisie")
 
                         }else{
                             $("#btnSaveInvoice").prop("disabled", false)
@@ -429,6 +496,7 @@
                             })
                         }
                     })
+
                 }
             })
         })
@@ -450,5 +518,39 @@
         $('#grand-total').text(total)
     }
 </script>
+{#    Making select input searchable#}
+    <script>
+        document.addEventListener("DOMContentLoaded", function(e) {
+            // seachable
+            var options = {
+                searchable: true,
+                placeholder:"Choisir la table"
+            };
+            // NiceSelect.bind(document.getElementById("input-tables"), options);
 
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            initNiceSelect();
+            // document.querySelectorAll('select').forEach(function (el) {
+            //     NiceSelect.bind(el, {
+            //         searchable: true
+            //     });
+            // });
+        });
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            console.log('jquery', $.fn.jquery);
+            //console.log('nice-select2', $.fn.nice-select2);
+            //console.log('Select2:', typeof $.fn.select2);
+
+            // $('.item-product').select2({
+            //     placeholder: 'Rechercher...',
+            //     width: '100%'
+            // });
+        });
+
+    </script>
 {% endblock %}

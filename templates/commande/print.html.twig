@@ -1,139 +1,127 @@
-{% extends 'components/layout/default.html.twig' %}
+{% extends 'components/layout/default-print.html.twig' %}
 {% block content %}
     <link rel="stylesheet"
           href="{{ asset('assets/bootstrap/bootstrap.min.css') }}"
           media="all">
     <script src="{{ asset('assets/bootstrap/bootstrap.min.js') }}"></script>
+
     <style>
 
 
-        @media print {
+    @media print {
 
-            body * {
-                visibility: hidden !important;
-            }
+    body * {
+    visibility: hidden !important;
+    }
 
-            #printZone, #printZone * {
-                visibility: visible !important;
-            }
+    #printZone, #printZone * {
+    visibility: visible !important;
+    }
 
-            #printZone {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            .print-only {
-                display: inline-block !important;
-            }
+    #printZone {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    }
 
-            .no-print {
-                display: none !important;
-            }
-        }
-    </style>
-    <div id="printZone">
-        <div class="panel">
-            <div class=" mb-3">
-                <div class="flex justify-between">
-                    <div class="d-none print-only">
-                        <img class="w-8 ml-[5px] flex-none img-fluid" height="50" width="50" src="{{ asset('assets/images/credol.png') }}"
-                             alt="image" />
-                    </div>
-                    <div>
-                        <p >Details de la Commande <strong> {{ commande.CommandeNumber }} </strong>{{ isApprover }}</p>
+    .no-print {
+    display: none !important;
+    }
+    }
+</style>
+<div id="printZone">
+    <div class="panel">
+        <div class=" mb-3">
+            <div class="flex justify-between">
 
-                    </div>
-                    <div class="flex justify-between">
-                        <a href="{{ path('app_commande_index') }}" class="btn btn-sm btn-primary no-print">Voir liste</a>
-                        {#                <a href="{{ path('app_commande_print', { id: commande.id} ) }}" class="btn btn-sm btn-primary ml-2">Imprimer</a>#}
-                        <button href="" id="btnPrint" class="btn btn-sm btn-primary mx-2 no-print">Imprimer</button>
-                        <button id="btnCommandeRecall" class="btn btn-sm btn-outline-danger no-print">Annuler la Commande</button>
-
-                    </div>
-
+                <div>
+                    <h1 >Details de la Commande <strong> {{ commande.CommandeNumber }} </strong>{{ isApprover }}</h1>
 
                 </div>
-                {#        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_vente_new') }}">Nouvelle vente</a>#}
+                <div class="flex justify-between">
+                    <button href="" id="btnPrint" class="btn btn-sm btn-primary ml-2">Imprimer</button>
+                </div>
 
-                {#        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_index') }}">Liste des produits</a>#}
-                <table class="table">
-                    <tbody>
-
-                    <tr>
-                        <th>Par</th>
-                        <td>:{{ commande.CommandePar.username }}</td>
-                        <th>CommandeDate</th>
-                        <td>:{{ commande.CommandeDate ? commande.CommandeDate|date('Y-m-d H:i:s') : '' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td>:{{ commande.Status }}</td>
-                        <th>Approuve Par</th>
-                        <td>:
-                            {% if commande.ApprovedBy is not null and commande.ApprovedBy.Username is not null %}
-                                {{ commande.ApprovedBy.username }}
-                            {% else %}
-                                —
-                            {% endif %}</td>
-                    </tr>
-                    </tbody>
-                </table>
             </div>
+            {#        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_vente_new') }}">Nouvelle vente</a>#}
 
-            <table class="table table-hover">
-                <thead>
-                <tr class="bg-danger-light">
-                    <th>#</th>
-                    <th>Produit</th>
-                    <th>Quantite</th>
-                    <th>Recu</th>
-                    <th>Prix Unitaire</th>
-                    <th>Total</th>
-                </tr>
-                </thead>
+            {#        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_index') }}">Liste des produits</a>#}
+            <table>
                 <tbody>
-                {% set counter = 0 %}
-                {% for line in commandeLines %}
-                    {% set counter = counter+1 %}
-                    <tr>
-                        <td>{{ counter }}</td>
-                        <td>{{ line.designation }}</td>
-                        <td>{{ line.QuantiteCommandee }}</td>
-                        <td class="flex place-items-center action-cell">
-                            <span class="received-text">{{ line.QuantiteRecue }}</span>
-                            {% if commande.IsApproved == true and line.QuantiteRecue < line.QuantiteCommandee %}
-                                <button class="btn btn-sm btn-show-form no-print">Recevoir</button>
-                            {% endif %}
-                            <form class="inline-form flex" action="{{ path("app_line_receipt", {id: line.id}) }}" method="GET" style="display:none;">
-                                {% set QteRestante = line.QuantiteCommandee - line.QuantiteRecue %}
-                                <input type="text" name="quantite" class="form-input" value="{{ QteRestante }}">
-                                <input type="hidden" name="id" class="form-input" value="{{ line.id }}">
-                                <div class="flex justify-start">
-                                    <input type="submit" class="btn btn-sm btn-success mx-2" value="Save">
-                                    <input type="button" class="btn btn-sm btn-outline-danger btn-cancel" value="Cancel">
-                                </div>
 
-                            </form>
-                        </td>
-                        {#
-                        {#                {% set stotal = line.Quantite * ptotal %}#}
-                        <td> {{  line.prixUnitaire|number_format(0, ',', ' ') }}</td>
-                        {#                <td>{{ line.Taux }}</td>#}
-                        <td>{{ line.prixTotal|number_format(0, ',', ' ') }}</td>
-                    </tr>
-                {% endfor %}
+                <tr>
+                    <th>User</th>
+                    <td>:{{ commande.CommandePar.username }}</td>
+                    <th>CommandeDate</th>
+                    <td>:{{ commande.CommandeDate ? commande.CommandeDate|date('Y-m-d H:i:s') : '' }}</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td>:{{ commande.Status }} - {{ commande.isApproved? "Approuvé":"Attente" }}</td>
+                    <th>Approuve Par</th>
+                    <td>:
+                        {% if commande.ApprovedBy is not null and commande.ApprovedBy.Username is not null %}
+                            {{ commande.ApprovedBy.username }}
+                        {% else %}
+                            —
+                        {% endif %}</td>
+                </tr>
                 </tbody>
             </table>
-
-            {#    <a href="{{ path('app_commande_index') }}">back to list</a>#}
-
-            {#    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">edit</a>#}
-
-            {#    {{ include('commande/_delete_form.html.twig') }}#}
         </div>
-    </div>
 
+        <table class="table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Produit</th>
+                <th>Quantite</th>
+                <th>Recu</th>
+                <th>Prix Unitaire</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = 0 %}
+            {% for line in commandeLines %}
+                {% set counter = counter+1 %}
+                <tr>
+                    <td>{{ counter }}</td>
+                    <td>{{ line.designation }}</td>
+                    <td>{{ line.QuantiteCommandee }}</td>
+                    <td class="flex place-items-center action-cell">
+                        <span class="received-text">{{ line.QuantiteRecue }}</span>
+                        {% if commande.IsApproved == true and line.QuantiteRecue < line.QuantiteCommandee %}
+                            <button class="btn btn-sm btn-show-form no-print">Recevoir</button>
+                        {% endif %}
+                        <form class="inline-form flex" action="{{ path("app_line_receipt", {id: line.id}) }}" method="GET" style="display:none;">
+                            {% set QteRestante = line.QuantiteCommandee - line.QuantiteRecue %}
+                            <input type="text" name="quantite" class="form-input" value="{{ QteRestante }}">
+                            <input type="hidden" name="id" class="form-input" value="{{ line.id }}">
+                            <div class="flex justify-start">
+                                <input type="submit" class="btn btn-sm btn-success mx-2" value="Save">
+                                <input type="button" class="btn btn-sm btn-outline-danger btn-cancel" value="Cancel">
+                            </div>
+
+                        </form>
+                    </td>
+                    {#
+                    {#                {% set stotal = line.Quantite * ptotal %}#}
+                    <td> {{  line.prixUnitaire|number_format(0, ',', ' ') }}</td>
+                    {#                <td>{{ line.Taux }}</td>#}
+                    <td>{{ line.prixTotal|number_format(0, ',', ' ') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {#    <a href="{{ path('app_commande_index') }}">back to list</a>#}
+
+        {#    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">edit</a>#}
+
+        {#    {{ include('commande/_delete_form.html.twig') }}#}
+    </div>
 
     <div>
         <br>
@@ -142,7 +130,7 @@
             <div class="flex items-center justify-left">
                 {% if (is_granted("ROLE_ADMIN") or isApprover) and commande.Status == 'submitted' and commande.isApproved == false %}
                     <button type="button" class="btn btn-primary mr-2" @click="toggle">Approuver</button>
-{#                    <a href="{{ path("app_reset_password", {"id":1}) }}" class="btn btn-primary m-2">Reinitialiser le mot de passe</a>#}
+                    {#                    <a href="{{ path("app_reset_password", {"id":1}) }}" class="btn btn-primary m-2">Reinitialiser le mot de passe</a>#}
                 {% endif %}
             </div>
             <!-- modal -->
@@ -156,7 +144,7 @@
                             <div class="p-5">
                                 <div class="dark:text-white-dark/70 text-base font-medium text-[#1f2937]">
                                     <label for="">Voulez-vous vraiment Approuver cette commande ?</label>
-                                    <input type="hidden" value="{{ commande.id }}" id="commandeID" name="commandeID">
+                                    <input type="hidden" value="{{ commande.id }}" name="commandeID">
                                     <input type="hidden" value="{{ commande.id }}" name="id">
                                 </div>
                                 <div class="flex justify-end items-center mt-8">
@@ -170,6 +158,8 @@
             </div>
         </div>
     </div>
+</div>
+
 
     <div>
         <div x-data="modal" class="mb-5">
@@ -285,31 +275,6 @@
             $('#btnPrint').on('click', function () {
                 window.print();
             });
-
-            $("#btnCommandeRecall").on('click', function () {
-                if(confirm('Voulez-vous vraiment Annuler cette commande ?')) {
-                    let commandeID = $("#commandeID").val();
-                    $.ajax({
-                        url: "/commande/jsonRecallCommande?commandeID="+commandeID,
-                        method: 'GET',
-                        data: {
-                        },
-                        success: function (response) {
-                            //console.log("bien ajoute")
-                            // console.log(response)
-                            raiseToastr('success', 'Commande annulée avec succès !')
-                            //-- On reload l'app apres l'enregistrement des produits vendu
-                            location.reload()
-                        },
-                        error: function (e) {
-                            console.log('Erreur lors de la requête AJAX.');
-                            console.log(e)
-                            // Autres actions à effectuer en cas d'erreur
-                        }
-                    })
-                    }
-                })
-
         })
 
     </script>

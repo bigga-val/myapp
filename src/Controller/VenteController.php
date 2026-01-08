@@ -6,6 +6,7 @@ use App\Entity\ProduitVendu;
 use App\Entity\Vente;
 use App\Entity\Credit;
 use App\Form\VenteType;
+use App\Repository\TableRepository;
 use App\Service\PdfService;
 use App\Repository\ApprovisionnementRepository;
 use App\Repository\ProduitsRepository;
@@ -36,21 +37,26 @@ class VenteController extends AbstractController
         ]);
     }
 
+
+
     #[Route('/jsonSaveVente', name: 'jsonSaveVente', methods: ['GET'])]
     public function jsonSaveVente(Request $request,
-                                    VenteRepository $venteRepository,
-                                    EntityManagerInterface $entityManager
+                                  VenteRepository $venteRepository,
+                                  EntityManagerInterface $entityManager,
+                                  TableRepository $tableRepository,
     ): Response
     {
         try {
             $vente = new Vente();
-
+            $vTable = $tableRepository->find($request->query->get('tableID'));
+            $vente->setTableServie($vTable);
             $countVente = count($venteRepository->findAll());
             $vente->setCreatedBy($this->getUser()->getUsername());
             $vente->setVenteDate(new \DateTime());
             $vente->setCreatedAt(new \DateTimeImmutable());
             $vente->setStatusVente("progress");
             $vente->setNumeroVente($this->genererNUmeroVente(5, $countVente));
+
             $entityManager->persist($vente);
             $entityManager->flush();
             return new JsonResponse([
@@ -68,13 +74,15 @@ class VenteController extends AbstractController
 
     #[Route('/jsonSaveVentePay', name: 'jsonSaveVentePay', methods: ['GET'])]
     public function jsonSaveVentePay(Request $request,
-                                  VenteRepository $venteRepository,
-                                  EntityManagerInterface $entityManager
+                                     VenteRepository $venteRepository,
+                                     EntityManagerInterface $entityManager,
+                                     TableRepository $tableRepository
     ): Response
     {
         try {
             $vente = new Vente();
-
+            $vTable = $tableRepository->find($request->query->get('tableID'));
+            $vente->setTableServie($vTable);
             $countVente = count($venteRepository->findAll());
             $vente->setCreatedBy($this->getUser()->getUsername());
             $vente->setVenteDate(new \DateTime());
@@ -99,8 +107,8 @@ class VenteController extends AbstractController
 
     #[Route('/jsonGetMonthlyVente', name: 'jsonGetMonthlyVente', methods: ['GET'])]
     public function jsonGetMonthlyVente(Request $request,
-                                  VenteRepository $venteRepository,
-                                  EntityManagerInterface $entityManager
+                                        VenteRepository $venteRepository,
+                                        EntityManagerInterface $entityManager
     ): Response
     {
         try {
@@ -179,7 +187,7 @@ class VenteController extends AbstractController
         ]);
     }
 
-    #[Route('/jsonGetProductCommande', name: 'jsonGetProduct2', methods: ['GET'])]
+    #[Route('/jsonGetProductCommande', name: 'jsonGetProductCommande', methods: ['GET'])]
     public function jsonGetProductCommande(Request $request, ApprovisionnementRepository $approvisionnementRepository,): Response
     {
         $prodStock = $approvisionnementRepository->stockProduitCommandeByID($request->query->get('productID'));
@@ -195,24 +203,27 @@ class VenteController extends AbstractController
 
     #[Route('/new', name: 'app_vente_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager,
-        ProduitsRepository $produitsRepository,
-        VenteRepository $venteRepository,
-        ApprovisionnementRepository $approvisionnementRepository
+                        ProduitsRepository $produitsRepository,
+                        VenteRepository $venteRepository,
+                        ApprovisionnementRepository $approvisionnementRepository,
+                        TableRepository $tableRepository
     ): Response
     {
         $venteNo = $this->genererNUmeroVente( 5, count($venteRepository->findAll()));
         $produits = $approvisionnementRepository->stockProduit();
+        $tables = $tableRepository->findAll();
         return $this->renderForm('vente/new.html.twig', [
             'produits' => $produits,
-            'numeroFacture'=> $venteNo
+            'numeroFacture'=> $venteNo,
+            'tables' => $tables,
         ]);
     }
 
     #[Route('/finance', name: 'app_vente_finance', methods: ['GET'])]
     public function finance( ProduitVenduRepository $produitVenduRepository,
-        VenteRepository $venteRepository,
-        ApprovisionnementRepository $approvisionnementRepository,
-        CreditRepository $creditRepo
+                             VenteRepository $venteRepository,
+                             ApprovisionnementRepository $approvisionnementRepository,
+                             CreditRepository $creditRepo
     ): Response
     {
         ///===== Today activities =======
@@ -375,7 +386,7 @@ class VenteController extends AbstractController
         //dd($saturday);
         // Déterminer le décalage pour obtenir le dimanche
         $sundayOffset = -$dayOfWeek;
-           // dd($sundayOffset);
+        // dd($sundayOffset);
 
 
         // Calculer la date du dimanche
@@ -394,11 +405,17 @@ class VenteController extends AbstractController
 
 
     #[Route('/{id}', name: 'app_vente_show', methods: ['GET'])]
-    public function show(Vente $vente,  ProduitVenduRepository $produitVenduRepository): Response
+    public function show(Vente $vente, TableRepository $tableRepository,
+                         ProduitVenduRepository $produitVenduRepository,
+                         ApprovisionnementRepository $approvisionnementRepository): Response
     {
+        $produits = $approvisionnementRepository->stockProduit();
+        $tables = $tableRepository->findAll();
         return $this->render('vente/show.html.twig', [
             'vente' => $vente,
-            'produits'=> $produitVenduRepository->findBy(['vente'=>$vente->getId()])
+            'produitsVendu'=> $produitVenduRepository->findBy(['vente'=>$vente->getId()]),
+            'produits'=>$produits,
+            'tables'=>$tables
         ]);
     }
 
