@@ -1,26 +1,36 @@
-<!DOCTYPE html>
+{% extends 'components/layout/default.html.twig' %}
 
-<title>Table index</title>
 
-{% block body %}
-    <h1>Table index</h1>
+{% block content %}
+
+<link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+<div class="panel">
+    <div class="panel-header flex justify-between mb-3">
+        <h1>Tables disponibles</h1>
+        <a class="btn btn-primary" href="{{ path('app_table_new') }}">Creer une table</a>
+
+    </div>
+    <div class="">
+
 
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>#</th>
                 <th>Designation</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
+        {% set counter = 0 %}
         {% for table in tables %}
+            {% set counter = counter + 1 %}
             <tr>
-                <td>{{ table.id }}</td>
+                <td>{{ counter }}</td>
                 <td>{{ table.designation }}</td>
-                <td>
-                    <a href="{{ path('app_table_show', {'id': table.id}) }}">show</a>
-                    <a href="{{ path('app_table_edit', {'id': table.id}) }}">edit</a>
+                <td class="flex justify-between">
+{#                    <a href="{{ path('app_table_show', {'id': table.id}) }}">show</a>#}
+                    <a class="btn btn-primary btn-sm" href="{{ path('app_table_edit', {'id': table.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
@@ -31,5 +41,6 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_table_new') }}">Create new</a>
+    </div>
+</div>
 {% endblock %}

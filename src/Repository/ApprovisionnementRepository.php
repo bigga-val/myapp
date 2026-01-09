@@ -105,32 +105,10 @@ class ApprovisionnementRepository extends ServiceEntityRepository
             '    
             SELECT p.id produitID, p.code, concat(p.designation, \' - \', UPPER(p.code)) as designation ,
              p.prix, p.uniteMesure, p.minimum, p.maximum, p.preemption, p.fabricant,
-                  SUM(e.qty) AS totalEntree,
-                  (
-                    SELECT 
-                      SUM(s.qty) AS quantite_sortie
-                    FROM App\Entity\Produits pr, App\Entity\ProduitVendu s, App\Entity\Vente v
-                     where s.produit = pr.id
-                          and v.id = s.vente
-                          and v.statusVente = \'paid\'
-                          and pr.id = produitID
-                    GROUP BY pr.id 
-                    ) as totalSortie,
-                    (
-                    SELECT 
-                      SUM(s2.qty) AS quantite_reserve
-                    FROM App\Entity\Produits pr2, App\Entity\ProduitVendu s2, App\Entity\Vente v2
-                     where s2.produit = pr2.id
-                          and v2.id = s2.vente
-                          and v2.statusVente = \'progress\'
-                          and pr2.id = produitID
-                    GROUP BY pr2.id 
-                    ) as totalReserve,
                     (p.prix+(p.prix *  coalesce(cp.Pourcentage, 40)/100)) prixTotal
-            FROM App\Entity\Produits p, App\Entity\Approvisionnement e,
+            FROM App\Entity\Produits p,
             App\Entity\CategorieProduit cp
-            where e.produit = p.id
-            and p.Categorie = cp.id
+            where p.Categorie = cp.id
             and p.id = :prodID
             GROUP BY p.id
             '

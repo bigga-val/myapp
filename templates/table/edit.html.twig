@@ -1,13 +1,20 @@
-<!DOCTYPE html>
+{% extends 'components/layout/default.html.twig' %}
 
-<title>Edit Table</title>
 
-{% block body %}
-    <h1>Edit Table</h1>
+{% block content %}
+    <div class="panel">
+        <div class="panel-header flex justify-between">
+            <h1>Modifier la Table</h1>
 
-    {{ include('table/_form.html.twig', {'button_label': 'Update'}) }}
+            <a class="btn btn-primary" href="{{ path('app_table_index') }}">Voir la liste</a>
 
-    <a href="{{ path('app_table_index') }}">back to list</a>
+        </div>
 
-    {{ include('table/_delete_form.html.twig') }}
+    <div class="panel-body">
+        {{ include('table/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+
+    </div>
+    </div>
+
+{#    {{ include('table/_delete_form.html.twig') }}#}
 {% endblock %}

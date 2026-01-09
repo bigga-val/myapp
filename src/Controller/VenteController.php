@@ -190,15 +190,19 @@ class VenteController extends AbstractController
     #[Route('/jsonGetProductCommande', name: 'jsonGetProductCommande', methods: ['GET'])]
     public function jsonGetProductCommande(Request $request, ApprovisionnementRepository $approvisionnementRepository,): Response
     {
-        $prodStock = $approvisionnementRepository->stockProduitCommandeByID($request->query->get('productID'));
-        return new JsonResponse([
-            'data'=>$prodStock
-//            'prix'=>$prodStock['prix'],
-//            'unite'=>$prodStock['mesure'],
-//            'min'=>$prodStock['min'],
-//            'max'=>$prodStock['max'],
-//            'reel'=>$prodStock['dispo'],
-        ]);
+        try{
+            $prodStock = $approvisionnementRepository->stockProduitCommandeByID($request->query->get('productID'));
+            return new JsonResponse([
+                'data'=>$prodStock,
+                'etat'=>false
+            ]);
+        }catch (Exception $e){
+            return new JsonResponse([
+                'data'=>[],
+                'etat'=>false
+            ]);
+        }
+
     }
 
     #[Route('/new', name: 'app_vente_new', methods: ['GET', 'POST'])]

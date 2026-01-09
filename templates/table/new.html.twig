@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+{% extends 'components/layout/default.html.twig' %}
 
-<title>New Table</title>
 
-{% block body %}
-    <h1>Create new Table</h1>
+{% block content %}
+<div class="panel">
+    <h1>Creer une nouvelle table</h1>
 
     {{ include('table/_form.html.twig') }}
 
-    <a href="{{ path('app_table_index') }}">back to list</a>
+    <a href="{{ path('app_table_index') }}">Voir la liste</a>
+</div>
 {% endblock %}

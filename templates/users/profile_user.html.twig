@@ -64,6 +64,7 @@
                             <div class="flex items-center justify-left">
                                 {% if is_granted("ROLE_ADMIN") %}
                                     <button type="button" class="btn btn-primary mr-2" @click="toggle">Changer le role</button>
+                                {% elseif is_granted("ROLE_ADMIN") or user == app.user %}
                                     <a href="{{ path("app_reset_password", {"id":user.id}) }}" class="btn btn-primary m-2">Reinitialiser le mot de passe</a>
                                 {% endif %}
 

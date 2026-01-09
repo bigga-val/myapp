@@ -151,7 +151,9 @@ class UsersController extends AbstractController
             ));
             $entityManager->flush();
             $this->addFlash('success', "Mot de passe réinitialisé avec succès");
-
+            If($this->getUser() == $user){
+                return $this->redirectToRoute('app_logout');
+            }
             return $this->redirectToRoute('app_user_profile', ['id'=>$user->getId()], Response::HTTP_SEE_OTHER);
         }
 

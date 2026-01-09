@@ -22,7 +22,7 @@
                 <tr>
                     <th>Produit</th>
                     <th>Qté</th>
-                    <th>Qté Dispo</th>
+                    <th></th>
                     <th>Prix Unitaire</th>
                     <th>Mesure</th>
                     <th>Sous-Total</th>
@@ -299,23 +299,23 @@
                             data: {},
                             success: function (response) {
                                 console.log(response)
-                                var ts = response["data"][0]["totalSortie"] != null?response["data"][0]["totalSortie"]:0
-                                var tr = response["data"][0]["totalReserve"] != null?response["data"][0]["totalReserve"]:0
-                                var te = response["data"][0]["totalEntree"] != null? response["data"][0]["totalEntree"]:0
-
-                                reel = te-(tr+ts)
-                                if(isNaN(reel)){
-                                    reel = 0
-                                }else{
-
-                                }
-                                console.log(te, ts, tr, reel)
-                                console.log(response["data"][0]["prix"])
+                                // //var ts = response["data"][0]["totalSortie"] != null?response["data"][0]["totalSortie"]:0
+                                // //var tr = response["data"][0]["totalReserve"] != null?response["data"][0]["totalReserve"]:0
+                                // //var te = response["data"][0]["totalEntree"] != null? response["data"][0]["totalEntree"]:0
+                                //
+                                // //reel = te-(tr+ts)
+                                // //if(isNaN(reel)){
+                                //  //   reel = 0
+                                // //}else{
+                                //
+                                // }
+                                // console.log(te, ts, tr, reel)
+                                // console.log(response["data"][0]["prix"])
                                 amount.val(response["data"][0]["prixTotal"])
                                 unit.text(response["data"][0]["uniteMesure"])
                                 min.text(response["data"][0]["minimum"])
                                 max.text(response["data"][0]["maximum"])
-                                dispo.text(reel)
+                                //dispo.text(reel)
                                 // qty.attr('readonly', false)
                                 // qty.val(1)
                                 // totalAmount.text(response["prix"])
