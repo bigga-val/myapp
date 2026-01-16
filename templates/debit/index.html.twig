@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<title>Debit index</title>
+
+{% block body %}
+    <h1>Debit index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Montant</th>
+                <th>Raison</th>
+                <th>CreatedBy</th>
+                <th>CreatedAt</th>
+                <th>DateDebit</th>
+                <th>Taux</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for debit in debits %}
+            <tr>
+                <td>{{ debit.id }}</td>
+                <td>{{ debit.montant }}</td>
+                <td>{{ debit.raison }}</td>
+                <td>{{ debit.createdBy }}</td>
+                <td>{{ debit.createdAt ? debit.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ debit.DateDebit ? debit.DateDebit|date('Y-m-d') : '' }}</td>
+                <td>{{ debit.taux }}</td>
+                <td>
+                    <a href="{{ path('app_debit_show', {'id': debit.id}) }}">show</a>
+                    <a href="{{ path('app_debit_edit', {'id': debit.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_debit_new') }}">Create new</a>
+{% endblock %}

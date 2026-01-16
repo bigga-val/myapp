@@ -402,11 +402,17 @@
                         <ul x-cloak x-show="activeDropdown === 'caisse'" x-collapse class="sub-menu text-gray-500">
 
                             <li>
+                                <a href="{{ path("app_debit_new") }}">Nouvelle Entrée</a>
+                            </li>
+                            <li>
+                                <a href="{{ path("app_debit_index") }}">Récentes Entrées</a>
+                            </li>
+                            <li>
                                 <a href="{{ path("app_credit_new") }}">Nouvelle Sortie</a>
                             </li>
 
                             <li>
-                                <a href="{{ path("app_credit_index") }}">Historique</a>
+                                <a href="{{ path("app_credit_index") }}">Récentes Sorties</a>
                             </li>
                         </ul>
                     </li>
