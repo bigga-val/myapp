@@ -1,13 +1,15 @@
 {% extends 'components/layout/default.html.twig' %}
 {% block content %}
     <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
 
 <div class="panel">
     <div class="flex justify-between mb-3">
         <h1>Liste des produits</h1>
-        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_new') }}">Nouveau produit</a>
-{#        <a class="border border-2 p-2 m2 text-white rounded bg-success" href="{{ path('app_produits_excel') }}">Excel</a>#}
-
+        <div class="flex gap-2 items-center">
+            <div id="export-buttons"></div>
+            <a class="border border-2 p-2 text-white rounded bg-primary" href="{{ path('app_produits_new') }}">Nouveau produit</a>
+        </div>
     </div>
         <div>
 {#            <input type="text" class="form-input mb-3" id="myInput" placeholder="Rechercher..." title="Tapez ici pour rechercher">#}
@@ -15,16 +17,16 @@
             <table id="datatable" class="table table-bordered">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Designation</th>
-                    <th>Categorie</th>
-                    <th>Unité de Mesure</th>
+                    <th>Code</th>
+                    <th>Désignation</th>
+                    <th>Catégorie</th>
+                    <th>Unité de mesure</th>
                     <th>Prix</th>
-                    <th>Min</th>
-                    <th>Max</th>
+                    <th>Stock min</th>
+                    <th>Stock max</th>
                     <th>Fabricant</th>
-                    <th>Preemption</th>
-                    <th>actions</th>
+                    <th>Date de péremption</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="myTable">
@@ -34,7 +36,7 @@
                 <tr>
                     <td>{{ produit.code }}</td>
                     <td>{{ produit.designation }}</td>
-                    <td>{{ produit.categorie? '-' ?produit.categorie.designation }}</td>
+                    <td>{{ produit.categorie ? produit.categorie.designation : '-' }}</td>
                     <td>{{ produit.uniteMesure }}</td>
                     <td>{{ produit.prix }}</td>
                     <td>{{ produit.minimum }}</td>
@@ -58,12 +60,18 @@
     </div>
     <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatables.js') }}"></script>
-
+    <script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+    <script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
 
     <script>
 
         let table = new DataTable('#datatable', {
+            initComplete: function () {
+                this.api().buttons().container().appendTo('#export-buttons');
+            },
             order: [[0, 'desc']],
+            dom: '<"flex justify-end"f>rtip',
             language: {
                 info: 'Page _PAGE_ / _PAGES_',
                 infoEmpty: 'No records available',
@@ -72,7 +80,34 @@
                 zeroRecords: 'Nothing found - sorry'
             },
             buttons: [
-                'copy', 'excel', 'pdf'
+                {
+                    extend: 'copy',
+                    text: 'Copier',
+                    className: 'btn btn-sm btn-secondary',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'excel',
+                    text: 'Excel',
+                    className: 'btn btn-sm btn-success',
+                    filename: 'Liste des produits',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'csv',
+                    text: 'CSV',
+                    className: 'btn btn-sm btn-info',
+                    filename: 'Liste des produits',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'pdf',
+                    text: 'PDF',
+                    className: 'btn btn-sm btn-danger',
+                    filename: 'Liste des produits',
+                    title: 'Liste des produits',
+                    exportOptions: { columns: ':not(:last-child)' }
+                }
             ]
         });
     </script>

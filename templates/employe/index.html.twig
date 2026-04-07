@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<title>Employe index</title>
+
+{% block body %}
+    <h1>Employe index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nomcomplet</th>
+                <th>Matricule</th>
+                <th>Dateembauche</th>
+                <th>Categorie</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for employe in employes %}
+            <tr>
+                <td>{{ employe.id }}</td>
+                <td>{{ employe.nomcomplet }}</td>
+                <td>{{ employe.matricule }}</td>
+                <td>{{ employe.dateembauche ? employe.dateembauche|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ employe.categorie }}</td>
+                <td>
+                    <a href="{{ path('app_employe_show', {'id': employe.id}) }}">show</a>
+                    <a href="{{ path('app_employe_edit', {'id': employe.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_employe_new') }}">Create new</a>
+{% endblock %}
