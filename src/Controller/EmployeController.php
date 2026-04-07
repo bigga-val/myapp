@@ -152,6 +152,7 @@ class EmployeController extends AbstractController
         $html = $this->renderView('employe/fiche_paie.html.twig', [
             'paieEmploye' => $paieEmploye,
             'employe'     => $employe,
+            'isPdf'       => true,
         ]);
 
         $filename = sprintf('fiche-paie-%s-%s.pdf',
