@@ -1,14 +1,17 @@
 {% extends 'components/layout/default.html.twig' %}
 {% block content %}
     <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
 
 <div class="panel">
     <div class="flex justify-between mb-3">
 
         <h1>Liste des ventes</h1>
 
-
-        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_vente_new') }}">Nouvelle vente</a>
+        <div class="flex gap-2 items-center">
+            <div id="export-buttons"></div>
+            <a class="border border-2 p-2 text-white rounded bg-primary" href="{{ path('app_vente_new') }}">Nouvelle vente</a>
+        </div>
 
 {#        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_index') }}">Liste des produits</a>#}
     </div>
@@ -74,11 +77,17 @@
 
     <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatables.js') }}"></script>
-
+    <script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+    <script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
 
     <script>
         let table = new DataTable('#datatable', {
             order: [[0, 'ASC']],
+            dom: '<"flex justify-between"lf>rtip',
+            initComplete: function () {
+                this.api().buttons().container().appendTo('#export-buttons');
+            },
             language: {
                 info: 'Page _PAGE_ / _PAGES_',
                 infoEmpty: 'Aucune ligne trouvee',
@@ -87,7 +96,34 @@
                 zeroRecords: 'Nothing found - sorry'
             },
             buttons: [
-                'copy', 'csv', 'excel', 'pdf', 'print'
+                {
+                    extend: 'copy',
+                    text: 'Copier',
+                    className: 'btn btn-sm btn-secondary',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'excel',
+                    text: 'Excel',
+                    className: 'btn btn-sm btn-success',
+                    filename: 'Liste des ventes',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'csv',
+                    text: 'CSV',
+                    className: 'btn btn-sm btn-info',
+                    filename: 'Liste des ventes',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'pdf',
+                    text: 'PDF',
+                    className: 'btn btn-sm btn-danger',
+                    filename: 'Liste des ventes',
+                    title: 'Liste des ventes',
+                    exportOptions: { columns: ':not(:last-child)' }
+                }
             ],
         });
     </script>
