@@ -88,6 +88,7 @@
                         <th>Déductions</th>
                         <th>Total</th>
                         <th>Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,6 +101,12 @@
                         <td>{{ paie.deductions | number_format(2) }}</td>
                         <td><strong>{{ paie.total | number_format(2) }}</strong></td>
                         <td>{{ paie.createdAt ? paie.createdAt|date('d-m-Y') : '' }}</td>
+                        <td class="flex gap-1">
+                            <a href="{{ path('app_employe_fiche_paie', {'id': paie.id}) }}"
+                               class="btn btn-sm btn-secondary" target="_blank">Voir</a>
+                            <a href="{{ path('app_employe_fiche_paie_pdf', {'id': paie.id}) }}"
+                               class="btn btn-sm btn-success">PDF</a>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>

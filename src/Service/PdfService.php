@@ -19,9 +19,17 @@ class PdfService
 
     }
 
-    public function showPdfFIle($html){
+    public function showPdfFile($html, string $filename = 'document.pdf'): void
+    {
         $this->domPDF->loadHtml($html);
         $this->domPDF->render();
-        $this->domPDF->stream('invoice.pdf');
+        $this->domPDF->stream($filename, ['Attachment' => false]);
+    }
+
+    public function downloadPdfFile($html, string $filename = 'document.pdf'): void
+    {
+        $this->domPDF->loadHtml($html);
+        $this->domPDF->render();
+        $this->domPDF->stream($filename, ['Attachment' => true]);
     }
 }

@@ -9,6 +9,7 @@ use App\Form\EmployeType;
 use App\Repository\EmployeRepository;
 use App\Repository\PaieEmployeRepository;
 use App\Repository\PaieRepository;
+use App\Service\PdfService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -133,6 +134,34 @@ class EmployeController extends AbstractController
             'paiesEmploye'  => $paiesEmploye,
             'nbJoursDefaut' => $nbJoursDefaut,
         ]);
+    }
+
+    #[Route('/fiche-paie/{id}', name: 'app_employe_fiche_paie', methods: ['GET'])]
+    public function fichePaie(PaieEmploye $paieEmploye): Response
+    {
+        return $this->render('employe/fiche_paie.html.twig', [
+            'paieEmploye' => $paieEmploye,
+            'employe'     => $paieEmploye->getEmploye(),
+        ]);
+    }
+
+    #[Route('/fiche-paie/{id}/pdf', name: 'app_employe_fiche_paie_pdf', methods: ['GET'])]
+    public function fichePaiePdf(PaieEmploye $paieEmploye, PdfService $pdfService): Response
+    {
+        $employe = $paieEmploye->getEmploye();
+        $html = $this->renderView('employe/fiche_paie.html.twig', [
+            'paieEmploye' => $paieEmploye,
+            'employe'     => $employe,
+        ]);
+
+        $filename = sprintf('fiche-paie-%s-%s.pdf',
+            strtolower(str_replace(' ', '-', $employe->getNomcomplet())),
+            $paieEmploye->getPaie()->getLabel()
+        );
+
+        $pdfService->downloadPdfFile($html, $filename);
+
+        return new Response('', 200, ['Content-Type' => 'application/pdf']);
     }
 
     #[Route('/{id}', name: 'app_employe_delete', methods: ['POST'])]
