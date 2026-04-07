@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Employe;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -20,6 +21,11 @@ class EmployeType extends AbstractType
             ])
             ->add('categorie')
             ->add('titre')
+            ->add('salaireJournalier', NumberType::class, [
+                'label' => 'Salaire journalier',
+                'required' => false,
+                'scale' => 2,
+            ])
         ;
     }
 

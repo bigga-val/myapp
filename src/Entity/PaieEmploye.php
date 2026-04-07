@@ -3,10 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\PaieEmployeRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PaieEmployeRepository::class)]
+#[ORM\UniqueConstraint(name: 'unique_employe_paie', columns: ['employe_id', 'paie_id'])]
 class PaieEmploye
 {
     #[ORM\Id]
@@ -15,13 +15,27 @@ class PaieEmploye
     private ?int $id = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Employe $Employe = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Paie $Paie = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $total = null;
+    #[ORM\Column]
+    private int $nbJours = 0;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $salaireBase = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $primes = 0;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $deductions = 0;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $total = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
@@ -55,16 +69,69 @@ class PaieEmploye
         return $this;
     }
 
-    public function getTotal(): ?string
+    public function getNbJours(): int
+    {
+        return $this->nbJours;
+    }
+
+    public function setNbJours(int $nbJours): static
+    {
+        $this->nbJours = $nbJours;
+
+        return $this;
+    }
+
+    public function getSalaireBase(): ?float
+    {
+        return $this->salaireBase;
+    }
+
+    public function setSalaireBase(?float $salaireBase): static
+    {
+        $this->salaireBase = $salaireBase;
+
+        return $this;
+    }
+
+    public function getPrimes(): ?float
+    {
+        return $this->primes;
+    }
+
+    public function setPrimes(?float $primes): static
+    {
+        $this->primes = $primes;
+
+        return $this;
+    }
+
+    public function getDeductions(): ?float
+    {
+        return $this->deductions;
+    }
+
+    public function setDeductions(?float $deductions): static
+    {
+        $this->deductions = $deductions;
+
+        return $this;
+    }
+
+    public function getTotal(): ?float
     {
         return $this->total;
     }
 
-    public function setTotal(?string $total): static
+    public function setTotal(?float $total): static
     {
         $this->total = $total;
 
         return $this;
+    }
+
+    public function calculerTotal(): void
+    {
+        $this->total = ($this->salaireBase ?? 0) + ($this->primes ?? 0) - ($this->deductions ?? 0);
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable

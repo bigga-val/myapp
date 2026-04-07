@@ -74,29 +74,64 @@ class EmployeController extends AbstractController
 
     #[Route('/{id}/payer', name: 'app_employe_payer', methods: ['GET', 'POST'])]
     public function payer(Request $request,
-                          Employe $employe, PaieRepository $paieRepository,
+                          Employe $employe,
+                          PaieRepository $paieRepository,
                           PaieEmployeRepository $paieEmployeRepository,
                           EntityManagerInterface $entityManager,
-
     ): Response
     {
-        $fraisapayer = $paieRepository->findAll();
-        $fraispayes = $paieEmployeRepository->findBy(['Employe'=>$employe]);
+        $periodes = $paieRepository->findAll();
+        $paiesEmploye = $paieEmployeRepository->findBy(['Employe' => $employe], ['createdAt' => 'DESC']);
+
         if ($request->isMethod('POST')) {
-            $frais = $paieRepository->find($request->request->get('frais'));
-            $fraispaye = new PaieEmploye();
-            $fraispaye->setEmploye($employe);
-            $fraispaye->setPaie($frais);
-            $fraispaye->setTotal($request->request->get('montant'));
-            $fraispaye->setCreatedAt(new \DateTimeImmutable('now'));
-            $entityManager->persist($fraispaye);
+            if (!$this->isCsrfTokenValid('payer'.$employe->getId(), $request->request->get('_token'))) {
+                $this->addFlash('error', 'Token invalide.');
+                return $this->redirectToRoute('app_employe_payer', ['id' => $employe->getId()]);
+            }
+
+            $periode = $paieRepository->find($request->request->get('periode'));
+            if (!$periode) {
+                $this->addFlash('error', 'Période de paie introuvable.');
+                return $this->redirectToRoute('app_employe_payer', ['id' => $employe->getId()]);
+            }
+
+            // Bloquer les doublons
+            $existant = $paieEmployeRepository->findOneBy(['Employe' => $employe, 'Paie' => $periode]);
+            if ($existant) {
+                $this->addFlash('error', "Cet employé a déjà été payé pour la période : {$periode->getLabel()}.");
+                return $this->redirectToRoute('app_employe_payer', ['id' => $employe->getId()]);
+            }
+
+            $nbJours = (int) $request->request->get('nb_jours');
+            $primes = (float) $request->request->get('primes', 0);
+            $deductions = (float) $request->request->get('deductions', 0);
+            $salaireBase = ($employe->getSalaireJournalier() ?? 0) * $nbJours;
+
+            $paieEmploye = new PaieEmploye();
+            $paieEmploye->setEmploye($employe);
+            $paieEmploye->setPaie($periode);
+            $paieEmploye->setNbJours($nbJours);
+            $paieEmploye->setSalaireBase($salaireBase);
+            $paieEmploye->setPrimes($primes);
+            $paieEmploye->setDeductions($deductions);
+            $paieEmploye->calculerTotal();
+            $paieEmploye->setCreatedAt(new \DateTimeImmutable('now'));
+
+            $entityManager->persist($paieEmploye);
             $entityManager->flush();
-            return $this->redirectToRoute("app_employe_index");
+
+            $this->addFlash('success', "Paie enregistrée avec succès pour {$employe->getNomcomplet()}.");
+            return $this->redirectToRoute('app_employe_payer', ['id' => $employe->getId()]);
         }
-        return $this->renderForm('employe/payer.html.twig', [
-            'employe' => $employe,
-            'frais'=>$fraisapayer,
-            'fraispayes'=>$fraispayes
+
+        // Pré-calculer le nombre de jours réels du mois courant
+        $nbJoursDefaut = (int) (new \DateTime())->format('t');
+
+        return $this->render('employe/payer.html.twig', [
+            'employe'       => $employe,
+            'periodes'      => $periodes,
+            'paiesEmploye'  => $paiesEmploye,
+            'nbJoursDefaut' => $nbJoursDefaut,
         ]);
     }
 

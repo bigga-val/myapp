@@ -29,6 +29,9 @@ class Employe
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $Titre = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $salaireJournalier = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +93,18 @@ class Employe
     public function setTitre(?string $Titre): static
     {
         $this->Titre = $Titre;
+
+        return $this;
+    }
+
+    public function getSalaireJournalier(): ?float
+    {
+        return $this->salaireJournalier;
+    }
+
+    public function setSalaireJournalier(?float $salaireJournalier): static
+    {
+        $this->salaireJournalier = $salaireJournalier;
 
         return $this;
     }
