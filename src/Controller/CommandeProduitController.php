@@ -8,6 +8,7 @@ use App\Form\CommandeProduitType;
 use App\Repository\CommandeProduitRepository;
 use App\Repository\CommandeRepository;
 use App\Repository\ProduitsRepository;
+use App\Repository\TauxRepository;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,17 +52,19 @@ class CommandeProduitController extends AbstractController
     public function jsonSaveLigneCommande(Request $request,
                                        CommandeRepository $commandeRepository,
                                        ProduitsRepository $produitsRepository,
-                                       EntityManagerInterface $entityManager
+                                       EntityManagerInterface $entityManager,
+    TauxRepository $tauxRepository
     ): JsonResponse
     {
         try {
             $produit = $produitsRepository->find($request->query->get('produitID'));
             $Commandeproduit = new Commandeproduit();
+            $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
             $Commandeproduit->setQuantite($request->query->get('qty'));
             $Commandeproduit->setCommande($commandeRepository->find($request->query->get('commandeID')));
             $Commandeproduit->setProduit($produit);
-            $Commandeproduit->setPrixUnitaire($produit->getPrix());
-            $Commandeproduit->setTaux($request->getSession()->get('tauxactif'));
+            $Commandeproduit->setPrixUnitaire($request->query->get('price'));
+            $Commandeproduit->setTaux($tauxactif->getCout());
             $entityManager->persist($Commandeproduit);
             $entityManager->flush();
             return new JsonResponse([

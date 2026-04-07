@@ -93,7 +93,6 @@ class VenteRepository extends ServiceEntityRepository
                     FROM App\Entity\Produits pr, App\Entity\ProduitVendu s, App\Entity\Vente v
                      where s.produit = pr.id
                           and v.id = s.vente
-                          
                     GROUP BY v.id 
             '
         );

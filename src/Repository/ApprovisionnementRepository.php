@@ -59,6 +59,91 @@ class ApprovisionnementRepository extends ServiceEntityRepository
 
     }
 
+    public function stockProduitByDate(
+        ?\DateTimeInterface $dateDebut = null,
+        ?\DateTimeInterface $dateFin = null
+    ): array {
+        $em = $this->getEntityManager();
+
+        $query = $em->createQuery(
+            '
+        SELECT
+            p.id                                                        AS produitID,
+            p.code,
+            CONCAT(p.designation, \' - \', UPPER(p.code))              AS designation,
+            p.prix,
+            p.preemption,
+            p.fabricant,
+            p.minimum,
+
+            -- Entrées dans la période
+            COALESCE(SUM(e.qty),  0)                                    AS totalEntree,
+            COALESCE(SUM(e.cout), 0)                                    AS cout,
+
+            -- Stock avant la période (toutes les entrées avant dateDebut)
+            (
+                SELECT COALESCE(SUM(e2.qty), 0)
+                FROM App\Entity\Approvisionnement e2
+                WHERE e2.produit = p
+                  AND (:dateDebut IS NULL OR e2.createdAt < :dateDebut)
+            )                                                           AS stockAvant,
+
+            -- Sorties dans la période (ventes payées)
+            (
+                SELECT COALESCE(SUM(sv.qty), 0)
+                FROM App\Entity\ProduitVendu sv
+                JOIN sv.vente v
+                WHERE sv.produit = p
+                  AND v.statusVente = :paid
+                  AND (:dateDebut IS NULL OR v.createdAt >= :dateDebut)
+                  AND (:dateFin   IS NULL OR v.createdAt <= :dateFin)
+            )                                                           AS totalSortie,
+
+            -- Réservations dans la période (ventes en cours)
+            (
+                SELECT COALESCE(SUM(sr.qty), 0)
+                FROM App\Entity\ProduitVendu sr
+                JOIN sr.vente vr
+                WHERE sr.produit = p
+                  AND vr.statusVente = :progress
+                  AND (:dateDebut IS NULL OR vr.createdAt >= :dateDebut)
+                  AND (:dateFin   IS NULL OR vr.createdAt <= :dateFin)
+            )                                                           AS totalReserve
+
+        FROM App\Entity\Produits p
+        LEFT JOIN App\Entity\Approvisionnement e WITH e.produit = p
+            AND (:dateDebut IS NULL OR e.createdAt >= :dateDebut)
+            AND (:dateFin   IS NULL OR e.createdAt <= :dateFin)
+
+        GROUP BY
+            p.id, p.code, p.designation, p.prix,
+            p.preemption, p.fabricant, p.minimum
+        '
+        )
+            ->setParameter('paid',      'paid')
+            ->setParameter('progress',  'progress')
+            ->setParameter('dateDebut', $dateDebut)
+            ->setParameter('dateFin',   $dateFin);
+
+        $results = $query->getResult();
+
+        // Stock disponible = stock avant la période + entrées - sorties - réserves
+        $results = array_map(function ($row) {
+            $row['stockDisponible'] = $row['stockAvant'] + $row['totalEntree'] - $row['totalSortie'] - $row['totalReserve'];
+            $row['stockBas']        = $row['stockDisponible'] <= $row['minimum'] ? 1 : 0;
+            return $row;
+        }, $results);
+
+        usort($results, function ($a, $b) {
+            if ($b['stockBas'] !== $a['stockBas']) {
+                return $b['stockBas'] <=> $a['stockBas'];
+            }
+            return $a['designation'] <=> $b['designation'];
+        });
+
+        return $results;
+    }
+
     public function stockProduitByID($prodID): array{
         $em = $this->getEntityManager();
         $query = $em->createQuery(

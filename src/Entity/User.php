@@ -42,6 +42,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $adressephysique = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $sessionId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $devicename = null;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -159,4 +166,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getSessionId(): ?string
+    {
+        return $this->sessionId;
+    }
+
+    public function setSessionId(?string $sessionId): static
+    {
+        $this->sessionId = $sessionId;
+
+        return $this;
+    }
+
+    public function getDevicename(): ?string
+    {
+        return $this->devicename;
+    }
+
+    public function setDevicename(?string $devicename): static
+    {
+        $this->devicename = $devicename;
+
+        return $this;
+    }
+
+
 }

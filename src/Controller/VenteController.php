@@ -7,6 +7,7 @@ use App\Entity\Vente;
 use App\Entity\Credit;
 use App\Form\VenteType;
 use App\Repository\TableRepository;
+use App\Repository\TauxRepository;
 use App\Service\PdfService;
 use App\Repository\ApprovisionnementRepository;
 use App\Repository\ProduitsRepository;
@@ -210,12 +211,15 @@ class VenteController extends AbstractController
                         ProduitsRepository $produitsRepository,
                         VenteRepository $venteRepository,
                         ApprovisionnementRepository $approvisionnementRepository,
-                        TableRepository $tableRepository
+                        TableRepository $tableRepository,
+                        TauxRepository $tauxRepository,
     ): Response
     {
         $venteNo = $this->genererNUmeroVente( 5, count($venteRepository->findAll()));
         $produits = $approvisionnementRepository->stockProduit();
         $tables = $tableRepository->findAll();
+        $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
+        $request->getSession()->set('tauxactif', $tauxactif->getCout());
         return $this->renderForm('vente/new.html.twig', [
             'produits' => $produits,
             'numeroFacture'=> $venteNo,
@@ -253,17 +257,20 @@ class VenteController extends AbstractController
         ///=============== End today Activities  ==================
         //============ weekly activities ====
 //        $this->getWeekDates('2024/04/05');
-        $todayDate1 = new \DateTime('today');
-        $thisSunday = $this->getWeekDates($todayDate1)['sunday'];
-        $thisSaturday = $this->getWeekDates($todayDate1)['saturday'];
-        $thisWeek = $venteRepository->venteparIntervale($thisSunday, $thisSaturday)?$venteRepository->venteparIntervale($thisSunday, $thisSaturday)[0]['montant']:0;
-        //dd($thisSunday, $thisSaturday, $thisWeek);
-        $todayDate2 = new \DateTime('today');
-        $todayDate2 = $todayDate2->modify('-7days');
-        $lastSunday = $this->getWeekDates($todayDate2)['sunday'];
-        $lastSaturday = $this->getWeekDates($todayDate2)['saturday'];
-        $lastWeek = $venteRepository->venteparIntervale($lastSunday, $lastSaturday)?$venteRepository->venteparIntervale($lastSunday, $lastSaturday)[0]['montant']:0;
+        $today = new \DateTime('today');
 
+// Semaine en cours
+        $thisSunday   = $this->getWeekDates($today)['sunday'];
+        $thisSaturday = $this->getWeekDates($today)['saturday'];
+        $thisWeekData = $venteRepository->venteparIntervale($thisSunday, $thisSaturday);
+        $thisWeek     = $thisWeekData ? $thisWeekData[0]['montant'] : 0;
+
+// Semaine dernière (clone pour éviter de modifier $today)
+        $lastWeekDate  = (clone $today)->modify('-7 days');
+        $lastSunday    = $this->getWeekDates($lastWeekDate)['sunday'];
+        $lastSaturday  = $this->getWeekDates($lastWeekDate)['saturday'];
+        $lastWeekData  = $venteRepository->venteparIntervale($lastSunday, $lastSaturday);
+        $lastWeek      = $lastWeekData ? $lastWeekData[0]['montant'] : 0;
 //        $lastWeek = $venteRepository->venteparIntervale($lastSunday, $lastSaturday)==null?$venteRepository->venteparIntervale($lastSunday, $lastSaturday)[0]['montant']:0;
         //dd($lastSunday, $lastSaturday, $lastWeek, $thisWeek);
 

@@ -23,10 +23,26 @@ class ApprovisionnementController extends AbstractController
     }
 
     #[Route('/stock', name: 'app_approvisionnement_stock', methods: ['GET'])]
-    public function stock(ApprovisionnementRepository $approvisionnementRepository): Response
+    public function stock(ApprovisionnementRepository $approvisionnementRepository, Request $request): Response
     {
-        $appros = $approvisionnementRepository->stockProduit();
-        //dd($appros);
+        //$appros = $approvisionnementRepository->stockProduit();
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $dateDebut = $date1 ? \DateTimeImmutable::createFromFormat('Y-m-d', $date1) : null;
+        $dateFin   = $date2 ? \DateTimeImmutable::createFromFormat('Y-m-d', $date2) : null;
+
+//        dd([
+//            'date1_raw'  => $date1,
+//            'date2_raw'  => $date2,
+//            'dateDebut'  => $dateDebut,
+//            'dateFin'    => $dateFin,
+//        ]);
+        //$appros = $approvisionnementRepository->stockProduit(new \DateTime('2025-01-01'), new \DateTime('2025-12-31'));
+        $appros = $approvisionnementRepository->stockProduitByDate(
+            $dateDebut,
+            $dateFin
+        );
+
         return $this->render('approvisionnement/stock.html.twig', [
             'appros'=>$appros
         ]);

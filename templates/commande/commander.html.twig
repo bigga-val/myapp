@@ -11,7 +11,7 @@
         <div>
             <table class="table">
                 <tr>
-                    <td>Commande No: <span>{{ numeroCommande }}</span></td>
+                    <td>Commande No: <span>{{ numeroCommande }} </span></td>
                     <td> <span id="date"></span></td>
                     <td> <span>Par: {{ app.user.username }}</span></td>
 
@@ -22,8 +22,7 @@
                 <tr>
                     <th>Produit</th>
                     <th>Qté</th>
-                    <th></th>
-                    <th>Prix Unitaire</th>
+                    <th>Prix D'achat</th>
                     <th>Mesure</th>
                     <th>Sous-Total</th>
                     <th></th>
@@ -92,15 +91,21 @@
             let counter = 0
             var newRow = '<tr class="prod_Line">'+
                 '<td><select class="form-input item-product" name="select-'+counter+'">' +
-                '<option value="-1">Choisir un produit</option>'+
+                // '<option value="-1">Choisir un produit</option>'+
                     {% for produit in produits %}
-                '<option value="{{ produit.produitID }}">{{ produit.designation }}</option>'+
+                        {% if produit.produitID == app.request.attributes.get('id') %}
+                            '<option value="{{ produit.produitID }}" selected>{{ produit.designation }}</option>'+
+
+                        {% else %}
+                            '<option value="{{ produit.produitID }}">{{ produit.designation }}</option>'+
+
+                        {% endif %}
                     {% endfor %}
                 '</select></td>'+
                 '   <td><input type="number" class="form-input item-quantity" ></td>'+
-                '   <td><span class="item-dispo"></span></td>'+
+                //'   <td><span class="item-dispo"></span></td>'+
 
-                '   <td><input type="number" class="form-input item-prix" readonly="true">' +
+                '   <td><input type="number" class="form-input item-prix">' +
                 '   <td>' +
                 '<span class="item-unit">-</span>' +
                 '<span class="item-min hidden d-none"></span>' +
@@ -161,15 +166,16 @@
                             let commandeID = response.CommandeID
                             let productID = $(this).find("td").eq(0).find(".item-product").val()
                             let quantity = $(this).find("td").eq(1).find(".item-quantity").val()
-                            // let price = $(this).find("td").eq(2).find(".item-prix").val()
+                            let price = $(this).find("td").eq(2).find(".item-prix").val()
 
-                            if(productID != -1){
+                            if(productID !== -1){
                                 // console.log("produit:"+productID+"-quantite:"+quantity+"-prix:"+price)
                                 $.ajax({
                                     url: '/commande/produit/jsonSaveLigneCommande?' +
                                         'commandeID=' +commandeID+
                                         '&produitID='+ productID+
-                                        '&qty='+ quantity,
+                                        '&qty='+ quantity+
+                                        '&price='+ price,
                                     method: 'GET',
                                     data: {
                                     },
@@ -224,15 +230,16 @@
                             let commandeID = response.CommandeID
                             let productID = $(this).find("td").eq(0).find(".item-product").val()
                             let quantity = $(this).find("td").eq(1).find(".item-quantity").val()
-                            // let price = $(this).find("td").eq(2).find(".item-prix").val()
+                            let price = $(this).find("td").eq(2).find(".item-prix").val()
 
-                            if(productID != -1){
-                                // console.log("produit:"+productID+"-quantite:"+quantity+"-prix:"+price)
+                            if(productID !== -1){
+                                 console.log("produit:"+productID+"-quantite:"+quantity+"-prix:"+price)
                                 $.ajax({
                                     url: '/commande/produit/jsonSaveLigneCommande?' +
                                         'commandeID=' +commandeID+
                                         '&produitID='+ productID+
-                                        '&qty='+ quantity,
+                                        '&qty='+ quantity+
+                                        '&price='+ price,
                                     method: 'GET',
                                     data: {
                                     },
@@ -283,7 +290,7 @@
                     if($(this).val() != -1){
 
                         let qty = $(this).parent("td").siblings("td").children(".item-quantity")
-
+                        let price = $(this).parent("td").siblings("td").children(".item-prix")
                         let amount = $(this).parent("td").siblings("td").children(".item-prix")
                         let totalAmount = $(this).parent("td").siblings("td").children(".item-total")
                         let unit = $(this).parent("td").siblings("td").children(".item-unit")
@@ -355,6 +362,38 @@
                                 $("#errorSpan").text("")
 
                                 let total = amount.val() * $(this).val()
+                                totalAmount.text(total)
+                                $(".item-total").each(function(i, e){
+                                    let subtotal = 0
+                                    $('.item-total').each(function(i, e){
+                                        subtotal = subtotal+ parseFloat($(this).text())
+                                    })
+                                    $('#subtotal').text(subtotal)
+                                    setTotal()
+                                })
+                            }
+                        })
+
+                        price.on("keyup", function(e){
+                            //console.log($(this).val(), min.text(), max.text())
+                            if($(this).val() <= 0) {
+                                $("#btnSaveCommandeDraft").prop("disabled", true)
+                                $("#btnSaveCommande").prop("disabled", true)
+                                //$("#btnSaveInvoicePrint").prop("disabled", true)
+                                $("#errorSpan").text("Valeur incorrecte fournie")
+                            }else if($(this).val() > parseFloat(dispo.text())) {
+                                // $("#btnSaveCommandeDraft").prop("disabled", true)
+                                // $("#btnSaveCommande").prop("disabled", true)
+                                //$("#btnSaveInvoicePrint").prop("disabled", true)
+                                //$("#errorSpan").text("Valeur maximale depassee: "+ dispo.text())
+
+                            }else{
+                                $("#btnSaveCommandeDraft").prop("disabled", false)
+                                $("#btnSaveCommande").prop("disabled", false)
+                                //$("#btnSaveInvoicePrint").prop("disabled", false)
+                                $("#errorSpan").text("")
+
+                                let total = amount.val() * qty.val()
                                 totalAmount.text(total)
                                 $(".item-total").each(function(i, e){
                                     let subtotal = 0

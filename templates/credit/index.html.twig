@@ -25,9 +25,12 @@
             </tr>
             </thead>
             <tbody>
+            {% set counter = 0 %}
             {% for credit in credits %}
+                {% set counter = counter + 1 %}
+
                 <tr>
-                    <td>#</td>
+                    <td>{{ counter }}</td>
 {#                    <td>{{ credit.dateCredit ? credit.dateCredit|date('Y-m-d') : '' }}</td>#}
                     <td>{{ credit.createdAt ? credit.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                     <td>{{ credit.montant }}</td>

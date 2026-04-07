@@ -1,11 +1,49 @@
-<!DOCTYPE html>
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <div class="panel">
+        <div class="flex justify-items-between">
 
-<title>New Employe</title>
+            <h1>Ajouter un employé</h1>
+            <a class="btn btn-primary" href="{{ path('app_employe_index') }}">Voir la liste</a>
 
-{% block body %}
-    <h1>Create new Employe</h1>
+        </div>
+    </div>
+    <br>
+    <div class="panel">
+        <div class="row">
 
-    {{ include('employe/_form.html.twig') }}
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                {{ form_start(form) }}
+                <div>
+                    <label for="">Nom Complet</label>
+                    {{ form_widget(form.nomcomplet, {'attr': {'class': 'form-input'}}) }}
+                </div>
+                <div>
+                    <label for="">Matricule</label>
+                    {{ form_widget(form.matricule, {'attr': {'class': 'form-input'}}) }}
+                </div>
+                <div>
+                    <label for="">Categorie</label>
+                    {{ form_widget(form.categorie, {'attr': {'class': 'form-input'}}) }}
+                </div>
+                <div>
+                    <label for="">Titre</label>
+                    {{ form_widget(form.titre, {'attr': {'class': 'form-input'}}) }}
+                </div>
+                <div>
+                    <label for="">Date d'embauche</label>
+                    {{ form_widget(form.dateembauche, {'attr': {'class': 'form-input'}}) }}
+                </div>
+                <br>
+                <input class="btn btn-success" type="submit" value="Enregistrer">
+                {{ form_end(form) }}
+            </div>
+            <div class="col-md-3"></div>
+        </div>
 
-    <a href="{{ path('app_employe_index') }}">back to list</a>
+    </div>
+
+{#    {{ include('employe/_form.html.twig') }}#}
+
 {% endblock %}

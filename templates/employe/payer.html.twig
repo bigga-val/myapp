@@ -2,11 +2,116 @@
 
 
 {% block content %}
-    <h1>Edit Employe</h1>
 
-    {{ include('employe/_form.html.twig', {'button_label': 'Update'}) }}
+    <div class="panel">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <h1>Payer l'employé</h1>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <table>
+                        <tr>
+                            <th>
+                                Nom Complet: {{ employe.nomcomplet }}
+                            </th>
+                            <th>
+                                Matricule: {{ employe.matricule }}
+                            </th>
+                            <th>
+                                Categorie: {{ employe.categorie }}
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Titre: {{ employe.titre }}
+                            </th>
+                            <th>
+                                Date d'embauche: {{ employe.dateembauche | date('d-m-Y') }}
+                            </th>
+                            <th>
 
-    <a href="{{ path('app_employe_index') }}">back to list</a>
+                            </th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="panel">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <h1>Paie</h1>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="container">
+                <div class="row flex justify-content-between">
+                    <div class="mb-6 lg:w-1/2 w-full">
+                        <form action="" method="post">
+                        <div>
+                            <label for="frais">Choisir le frais</label>
+                            <select class="form-input" name="frais" id="frais">
+                                {% for frais in frais %}
+                                    <option value="{{ frais.id }}">{{ frais.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="montant">Entrez le montant</label>
+                            <input name="montant" id="montant" type="number" class="form-input">
+                        </div>
+                        <br>
+                        <div>
+                            <input type="submit" class="btn btn-primary" value="Soumettre">
+                        </div>
+                        </form>
+                    </div>
+                    <div class="mb-6 lg:w-1/2 w-full">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    <h1> Recentes Paies</h1>
+                                </div>
+                            </div>
 
-    {{ include('employe/_delete_form.html.twig') }}
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div>
+                                            <table>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Frais</th>
+                                                    <th>Total</th>
+                                                    <th>Date Paie</th>
+                                                </tr>
+                                                {% set counter = 0 %}
+                                                {% for fraispaye in fraispayes %}
+                                                    {% set counter = counter + 1 %}
+                                                    <tr>
+                                                        <th>{{ counter }}</th>
+                                                        <th>{{ fraispaye.paie.label }}</th>
+                                                        <th>{{ fraispaye.total }}</th>
+                                                        <th>{{ fraispaye.createdat ? fraispaye.createdat |date('d-m-Y H:i:s') : '' }}</th>
+                                                    </tr>
+                                                {% endfor %}
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <br>
+
+
 {% endblock %}

@@ -14,6 +14,8 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Password</th>
+                        <th>IsLoggedIn</th>
+
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -25,10 +27,18 @@
                             <td>{{ i }}</td>
                             <td>{{ user.username }}</td>
                             <td>{{ user.email }}</td>
+
                             <td>********</td>
                             <td>
+                                {{ user.sessionId is null ? "No": "Yes" }}
+                            </td>
+                            <td>
+
                                 <a class="bg-primary text-white rounded border border-2 m-2 p-2" href="{{ path("app_user_profile", {"id": user.id}) }}">Profile</a>
                                 <a class="bg-primary text-white rounded border border-2 m-2 p-2" href="{{ path("app_reset_password", {"id": user.id}) }}">Reset Password</a>
+                                {% if user.sessionId is not null %}
+                                    <a class="bg-danger text-white rounded border border-2 m-2 p-2" href="{{ path("app_user_disconnect", {"id": user.id}) }}">Log Out</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

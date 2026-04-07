@@ -1,13 +1,33 @@
-<!DOCTYPE html>
+{% extends 'components/layout/default.html.twig' %}
 
-<title>Edit Employe</title>
 
-{% block body %}
+{% block content %}
     <h1>Edit Employe</h1>
 
-    {{ include('employe/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ form_start(form) }}
+    <div>
+        <label for="">Nom Complet</label>
+        {{ form_widget(form.nomcomplet, {'attr': {'class': 'form-input'}}) }}
+    </div>
+    <div>
+        <label for="">Matricule</label>
+        {{ form_widget(form.matricule, {'attr': {'class': 'form-input'}}) }}
+    </div>
+    <div>
+        <label for="">Categorie</label>
+        {{ form_widget(form.categorie, {'attr': {'class': 'form-input'}}) }}
+    </div>
+    <div>
+        <label for="">Titre</label>
+        {{ form_widget(form.titre, {'attr': {'class': 'form-input'}}) }}
+    </div>
+    <div>
+        <label for="">Date d'embauche</label>
+        {{ form_widget(form.dateembauche, {'attr': {'class': 'form-input'}}) }}
+    </div>
+    <br>
+    <input class="btn btn-success" type="submit" value="Enregistrer">
+    {{ form_end(form) }}
 
-    <a href="{{ path('app_employe_index') }}">back to list</a>
-
-    {{ include('employe/_delete_form.html.twig') }}
+{#    {{ include('employe/_delete_form.html.twig') }}#}
 {% endblock %}

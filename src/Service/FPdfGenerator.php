@@ -2,6 +2,7 @@
 
 namespace App\Service;
 use App\Entity\BonProduit;
+use App\Repository\DebitRepository;
 use App\Repository\LigneBonProduitRepository;
 use App\Repository\ProduitVenduRepository;
 use App\Repository\VenteRepository;
@@ -360,6 +361,112 @@ class FPdfGenerator
     }
 
 
+    public function generateVersementPdf($debit, DebitRepository $debitRepository)
+    {
+        $debit = $debitRepository->find($debit);
+
+        $pdf = $this->fPDF;
+        //$mail = new PHPMailer();
+        //$pdf->AddPage();
+
+        $pdf->SetDrawColor(183); // Couleur du fond RVB
+        $pdf->SetFillColor(221); // Couleur des filets RVB
+        $pdf->SetTextColor(0); // Couleur du texte noir
+
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetY(5);
+        $pdf->SetX(15);
+        $pdf->Cell(40, 10, 'Espace 19-24');
+
+        //$pdf->Image('assets/images/qazi.png', 147, 0, 50);
+
+        // Facture number label
+        $pdf->SetY(10);
+        $pdf->SetX(15);
+        $pdf->Cell(40,8,'Restau - Lounge Bar');
+        //tracer une ligne horizontale
+        //$pdf->Line(15, 20, 195, 20);
+        $pdf->Line(15, 17, 80, 17);
+
+        //tableau des lignes de la facture
+        $tabY = 20;
+        $prodX = 15; $qtyX = $prodX + 20; $totX=$qtyX+15;
+
+        //1° ligne du tableau
+        $pdf->SetY($tabY);
+        $pdf->SetX($prodX);
+        $pdf->Cell(20,4,'Montant' ,0,0,'C',0);  // 60 >largeur colonne, 8 >hauteur colonne
+        //position de la colonne 2 (70 = 10+60)
+        $pdf->SetX($qtyX);
+        $pdf->Cell(20,4,'Taux',0,0,'C',0);
+
+
+        //foreach($lignes as $ligne){
+            $tabY = $tabY +6;
+            $pdf->SetY($tabY);
+            ////Nom du produit
+            //$prodX = $prodX;
+            $pdf->SetX($prodX);
+            $pdf->Cell(20,4,$debit->getMontant() .' '.$debit->getDevise(),0,0,'L',0);  // 60 >largeur colonne, 8 >hauteur colonne
+
+
+            // position de la colonne 2 (70 = 10+60) qty de produits
+            $qtyX = $prodX + 15;
+            $pdf->SetX($qtyX);
+            $pdf->Cell(20,4,$debit->getTaux(),0,0,'R',0);
+
+
+
+        //}
+
+        //label Valeur totale
+        $tabY = $tabY+6;
+        $pdf->SetY($tabY);
+        $pdf->SetX(15);
+        //$pdf->Cell(60,8,'Total: '. $soustotal.' Fc -> '.number_format($totalUSD,2, '.', '') .' USD',0,1,'L',0);
+
+
+        //label date etablissement
+        $tabY = $tabY+6;
+        $pdf->SetY($tabY);
+        $pdf->SetX(15);
+        $pdf->Cell(60,8,'Emis ',0,1,'L',0);
+
+        $pdf->SetY($tabY);
+        $pdf->SetX(30);
+        $pdf->Cell(60,8,': '.$debit->getCreatedAt()->format('d-m-Y H:i:s') ,0,1,'L',0);
+
+        //label date impression
+        $tabY = $tabY+6;
+        $pdf->SetY($tabY);
+        $pdf->SetX(15);
+        $pdf->Cell(60,8,'Imprime ',0,1,'L',0);
+
+        //valeur date d'impression de facture
+        $pdf->SetY($tabY);
+        $pdf->SetX(30);
+        $pdf->Cell(60,8,': '.date("d-m-Y H:i:s"),0,1,'L',0);
+
+
+
+
+        $tabY = $tabY +6;
+        $pdf->SetY($tabY);
+        $pdf->SetX(15);
+        $pdf->Cell(20,4,'Par : '.$debit->getCreatedBy(),0,0,'L',0);  // 60 >largeur colonne, 8 >hauteur colonne
+
+        $tabY = $tabY +6;
+
+        $pdf->SetY($tabY);
+        $pdf->SetX(15);
+        $pdf->Cell(20,4,'A Bientot',0,6,'C',0);  // 60 >largeur colonne, 8 >hauteur colonne
+
+        //I: send the file inline to the browser. The PDF viewer is used if available.
+        //D: send to the browser and force a file download with the name given by name.
+        //F: save to a local file with the name given by name (may include a path).
+        //S: return the document as a string.
+        return $pdf->Output('S');
+    }
     public function sendInvoiceByEMail($factureID, FactureRepository $factureRepository, LigneFactureRepository $ligneFactureRepository)
     {
         $facture = $factureRepository->find($factureID);

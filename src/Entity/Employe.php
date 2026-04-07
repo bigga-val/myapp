@@ -26,6 +26,9 @@ class Employe
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $categorie = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Titre = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class Employe
     public function setCategorie(?string $categorie): static
     {
         $this->categorie = $categorie;
+
+        return $this;
+    }
+
+    public function getTitre(): ?string
+    {
+        return $this->Titre;
+    }
+
+    public function setTitre(?string $Titre): static
+    {
+        $this->Titre = $Titre;
 
         return $this;
     }

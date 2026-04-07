@@ -1,17 +1,24 @@
-<!DOCTYPE html>
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
 
-<title>Employe index</title>
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Liste des employés</h1>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_employe_new') }}">Nouvel Employé</a>
 
-{% block body %}
-    <h1>Employe index</h1>
-
+    </div>
+</div>
+<div class="panel">
+    <div class="flex justify-between mb-3">
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Nomcomplet</th>
+                <th>#</th>
                 <th>Matricule</th>
-                <th>Dateembauche</th>
+                <th>Nom Complet</th>
+                <th>Titre</th>
+                <th>Date Embauche</th>
                 <th>Categorie</th>
                 <th>actions</th>
             </tr>
@@ -20,13 +27,15 @@
         {% for employe in employes %}
             <tr>
                 <td>{{ employe.id }}</td>
-                <td>{{ employe.nomcomplet }}</td>
+
                 <td>{{ employe.matricule }}</td>
-                <td>{{ employe.dateembauche ? employe.dateembauche|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ employe.nomcomplet }}</td>
+                <td>{{ employe.titre }}</td>
+                <td>{{ employe.dateembauche ? employe.dateembauche|date('d-m-Y') : '' }}</td>
                 <td>{{ employe.categorie }}</td>
-                <td>
-                    <a href="{{ path('app_employe_show', {'id': employe.id}) }}">show</a>
-                    <a href="{{ path('app_employe_edit', {'id': employe.id}) }}">edit</a>
+                <td class="flex">
+                    <a class="btn btn-primary y-1" href="{{ path('app_employe_edit', {'id': employe.id}) }}">Modifier</a>
+                    <a class="btn btn-primary y-1" href="{{ path('app_employe_payer', {'id': employe.id}) }}">Payer</a>
                 </td>
             </tr>
         {% else %}
@@ -36,6 +45,6 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_employe_new') }}">Create new</a>
+    </div>
+</div>
 {% endblock %}

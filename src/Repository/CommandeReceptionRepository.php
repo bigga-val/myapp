@@ -72,6 +72,30 @@ class CommandeReceptionRepository extends ServiceEntityRepository
     p.designation,
     cp.Quantite AS QuantiteCommandee,
     COALESCE(SUM(cr2.QuantiteRecue), 0) AS QuantiteRecue,
+    cp.PrixUnitaire AS prixUnitaire,
+    (cp.Quantite * cp.PrixUnitaire) AS prixTotal
+FROM App\Entity\CommandeProduit cp
+JOIN cp.Produit p
+JOIN cp.Commande c
+LEFT JOIN p.Categorie cat
+LEFT JOIN App\Entity\CommandeReception cr2 WITH cr2.CommandeProduit = cp.id
+WHERE (:commandeID IS NULL OR c.id = :commandeID)
+GROUP BY cp.id
+
+            '
+        );
+        $query->setParameter('commandeID', $commandeID);
+        return $query->getResult();
+    }
+
+    public function CommandeQuantite_1($commandeID): array{
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            'SELECT 
+    cp.id,
+    p.designation,
+    cp.Quantite AS QuantiteCommandee,
+    COALESCE(SUM(cr2.QuantiteRecue), 0) AS QuantiteRecue,
     (p.prix + (p.prix * COALESCE(cat.Pourcentage, 40) / 100)) AS prixUnitaire,
     (cp.Quantite * (p.prix + (p.prix * COALESCE(cat.Pourcentage, 40) / 100))) AS prixTotal
 FROM App\Entity\CommandeProduit cp

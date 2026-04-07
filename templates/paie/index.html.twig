@@ -1,0 +1,38 @@
+{% extends 'components/layout/default.html.twig' %}
+
+
+{% block content %}
+    <h1>Liste des Paies</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Label</th>
+                <th>Mois de Paie</th>
+                <th>Annee</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for paie in paies %}
+            <tr>
+                <td>{{ paie.id }}</td>
+                <td>{{ paie.label }}</td>
+                <td>{{ paie.MonthPay }}</td>
+                <td>{{ paie.YearPay }}</td>
+                <td>
+                    <a href="{{ path('app_paie_show', {'id': paie.id}) }}">show</a>
+                    <a href="{{ path('app_paie_edit', {'id': paie.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_paie_new') }}">Ajouter</a>
+{% endblock %}

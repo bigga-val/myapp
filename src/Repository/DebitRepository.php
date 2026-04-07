@@ -36,13 +36,16 @@ class DebitRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Debit
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findDebitByDatesIntervalle($date1, $date2): array
+    {
+
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.DateDebit BETWEEN :start AND :end')
+            ->setParameter('start', $date1)
+            ->setParameter('end', $date2)
+            ->OrderBy('d.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

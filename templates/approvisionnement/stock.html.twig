@@ -10,6 +10,29 @@
         </div>
     </div>
     <br>
+    <div class="panel">
+        <div class="panel-body">
+            <form action="" class="flex d-flex inline-block">
+                <div class="form-group p-2">
+                    <label for="start">Debut</label>
+                    <input type="date" name="date1" class="form-input">
+                </div>
+
+                <div class="form-group p-2">
+                    <label for="end">Fin</label>
+                    <input type="date" name="date2" class="form-input" value="">
+                </div>
+                <div class="form-group p-2">
+                    <label for=""> -</label>
+                    <input type="submit" value="Rechercher" class="btn btn-primary">
+                </div>
+                <div class="form-group p-2">
+                    <label for=""> -</label>
+                    <a href="{{ path("app_produit_vendu_index") }}" class="btn btn-primary"> Rafraichir</a>
+                </div>
+            </form>
+        </div>
+    </div>
 <div class="panel">
     <div class="flex justify-between mb-3">
         <h1>Stock des produits</h1>
@@ -17,7 +40,6 @@
 
     </div>
     <div class="panel-body">
-        <input type="text" class="form-input mb-3" id="myInput" placeholder="Rechercher..." title="Tapez ici pour rechercher">
 
         <table  id="datatable" class="table table-responsive">
         <thead>
@@ -61,7 +83,7 @@
                 <td>
 {#                    <a href="{{ path('app_approvisionnement_show', {'id': appro.produitID}) }}">show</a>#}
 {#                    <a href="{{ path('app_approvisionnement_new', {'id': appro.produitID}) }}">edit</a>#}
-                    <button class="btn btn-sm btn-primary">Commander</button>
+                    <a href="{{ path('app_commander', {'id': appro.produitID}) }}" class="btn btn-sm btn-primary">Commander</a>
                 </td>
             </tr>
         {% else %}

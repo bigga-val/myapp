@@ -3,8 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Employe;
+use App\Entity\Paie;
+use App\Entity\PaieEmploye;
 use App\Form\EmployeType;
 use App\Repository\EmployeRepository;
+use App\Repository\PaieEmployeRepository;
+use App\Repository\PaieRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,6 +69,34 @@ class EmployeController extends AbstractController
         return $this->renderForm('employe/edit.html.twig', [
             'employe' => $employe,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}/payer', name: 'app_employe_payer', methods: ['GET', 'POST'])]
+    public function payer(Request $request,
+                          Employe $employe, PaieRepository $paieRepository,
+                          PaieEmployeRepository $paieEmployeRepository,
+                          EntityManagerInterface $entityManager,
+
+    ): Response
+    {
+        $fraisapayer = $paieRepository->findAll();
+        $fraispayes = $paieEmployeRepository->findBy(['Employe'=>$employe]);
+        if ($request->isMethod('POST')) {
+            $frais = $paieRepository->find($request->request->get('frais'));
+            $fraispaye = new PaieEmploye();
+            $fraispaye->setEmploye($employe);
+            $fraispaye->setPaie($frais);
+            $fraispaye->setTotal($request->request->get('montant'));
+            $fraispaye->setCreatedAt(new \DateTimeImmutable('now'));
+            $entityManager->persist($fraispaye);
+            $entityManager->flush();
+            return $this->redirectToRoute("app_employe_index");
+        }
+        return $this->renderForm('employe/payer.html.twig', [
+            'employe' => $employe,
+            'frais'=>$fraisapayer,
+            'fraispayes'=>$fraispayes
         ]);
     }
 

@@ -9,6 +9,7 @@ use App\Form\CommandeReceptionType;
 use App\Repository\ApprovisionnementRepository;
 use App\Repository\CommandeProduitRepository;
 use App\Repository\CommandeReceptionRepository;
+use App\Repository\TauxRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,9 +52,11 @@ class CommandeReceptionController extends AbstractController
                                     CommandeProduit $commandeProduit,
                                     CommandeProduitRepository $commandeProduitRepository,
                                     EntityManagerInterface $entityManager,
-                                    Approvisionnement $approvisionnement
+                                    Approvisionnement $approvisionnement,
+                                    TauxRepository $tauxRepository
     ): Response
     {
+        $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
         $commandeReception = new CommandeReception();
         $commandeReception->setCommandeProduit($commandeProduit);
         $commandeReception->setQuantiteRecue($request->query->get('quantite'));
@@ -64,7 +67,7 @@ class CommandeReceptionController extends AbstractController
         //Approvisionner
         $approvisionnement = new Approvisionnement();
         $approvisionnement->setProduit($commandeProduit->getproduit());
-        $approvisionnement->setTaux($request->getSession()->get('tauxactif'));
+        $approvisionnement->setTaux($tauxactif->getCout());
         $approvisionnement->setQty($request->query->get('quantite'));
         $approvisionnement->setCreatedAt(new \DateTimeImmutable());
         $approvisionnement->setCreatedBy($this->getUser()->getUserIdentifier());

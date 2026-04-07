@@ -1,0 +1,22 @@
+{% extends 'components/layout/default.html.twig' %}
+
+
+{% block content %}
+    <div class="panel">
+        <div class="">
+            <div class="flex justify-between">
+                <h1>Modifier Paie</h1>
+                <a class="btn btn-primary" href="{{ path("app_paie_index") }}"> Voir la liste</a>
+            </div>
+
+        </div>
+    </div>
+    <br>
+    <div class="panel">
+        {{ include('paie/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+    </div>
+
+
+
+
+{% endblock %}

@@ -8,6 +8,7 @@ use App\Entity\Vente;
 use App\Form\ProduitVenduType;
 use App\Repository\ProduitsRepository;
 use App\Repository\ProduitVenduRepository;
+use App\Repository\TauxRepository;
 use App\Repository\VenteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Exception;
@@ -46,10 +47,12 @@ class ProduitVenduController extends AbstractController
     public function jsonSaveLigneVente(Request $request,
                                   VenteRepository $venteRepository,
                                   ProduitsRepository $produitsRepository,
-                                  EntityManagerInterface $entityManager
+                                  EntityManagerInterface $entityManager,
+                                    TauxRepository $tauxRepository
     ): Response
     {
         try {
+            $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
             $produit = $produitsRepository->find($request->query->get('produitID'));
             $produitVendu = new ProduitVendu();
             $produitVendu->setCreatedAt(new \DateTimeImmutable());
@@ -58,7 +61,8 @@ class ProduitVenduController extends AbstractController
             $produitVendu->setVente($venteRepository->find($request->query->get('venteID')));
             $produitVendu->setProduit($produit);
             $produitVendu->setPrixUnitaire($produit->getPrix());
-            $produitVendu->setTaux($request->getSession()->get('tauxactif'));
+            //$produitVendu->setTaux($request->getSession()->get('tauxactif'));
+            $produitVendu->setTaux($tauxactif->getCout());
             $entityManager->persist($produitVendu);
             $entityManager->flush();
             return new JsonResponse([

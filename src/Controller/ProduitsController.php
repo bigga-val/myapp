@@ -78,6 +78,7 @@ class ProduitsController extends AbstractController
         $form = $this->createForm(ProduitsType::class, $produit);
         $form->handleRequest($request);
 
+        //dd($form->isSubmitted(), $form->isValid(), $form->getErrors(true));
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
             $this->addFlash('success', "Produit modifié avec succès");

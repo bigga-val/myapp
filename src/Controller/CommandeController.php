@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Commande;
 use App\Entity\User;
+use App\Repository\TauxRepository;
 use App\Form\Commande1Type;
 use App\Repository\ApprovisionnementRepository;
 use App\Repository\CommandeApprobateurRepository;
@@ -30,12 +31,17 @@ class CommandeController extends AbstractController
     }
 
     #[Route('/new', name: 'app_commande_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request,
+                        EntityManagerInterface $entityManager,
+                        TauxRepository $tauxRepository
+    ): Response
     {
         $commande = new Commande();
         $form = $this->createForm(Commande1Type::class, $commande);
         $form->handleRequest($request);
 
+        $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
+        $request->getSession()->set('tauxactif', $tauxactif->getCout());
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($commande);
             $entityManager->flush();
@@ -49,15 +55,19 @@ class CommandeController extends AbstractController
         ]);
     }
 
-    #[Route('/commander', name: 'app_commander', methods: ['GET', 'POST'])]
+    #[Route('/commander/{id}', name: 'app_commander', defaults: ['id' => null], methods: ['GET', 'POST'])]
     public function commander(Request $request,
                               EntityManagerInterface $entityManager,
                                 CommandeRepository $commandeRepository,
-                                ApprovisionnementRepository $approvisionnementRepository
+                                ApprovisionnementRepository $approvisionnementRepository,
+                                TauxRepository $tauxRepository,
     ): Response
     {
         $CommandeNo = $this->genererNumeroCommande( 5, count($commandeRepository->findAll()));
         $produits = $approvisionnementRepository->stockProduit();
+
+        $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
+        $request->getSession()->set('tauxactif', $tauxactif->getCout());
         return $this->renderForm('commande/commander.html.twig', [
             'produits' => $produits,
             'numeroCommande'=> $CommandeNo

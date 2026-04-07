@@ -13,7 +13,7 @@
         <div class="w-full lg:w-1/2 relative flex justify-center items-center">
             <div class="max-w-[480px] p-5 md:p-10">
                 <h2 class="font-bold text-3xl mb-3">Connectez-vous</h2>
-                <p class="mb-7">Entrez votre adresse email et votre mot de passe</p>
+                <p class="mb-7">Entrez votre adresse nom d'utilisateur et votre mot de passe</p>
                 <form class="space-y-5" method="post">
                     {% if error %}
                         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -43,6 +43,7 @@
 {#                        </label>#}
                     </div>
                     <button type="submit" class="btn btn-primary w-full">Se connecter</button>
+
                 </form>
             </div>
         </div>

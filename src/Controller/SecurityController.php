@@ -13,6 +13,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    private entityManagerInterface $entityManager;
     #[Route(path: '/', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -41,12 +42,12 @@ class SecurityController extends AbstractController
         }ELSE{
             return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
         }
-
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
+
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }

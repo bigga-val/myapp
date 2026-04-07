@@ -62,6 +62,24 @@ class UsersController extends AbstractController
         ]);
     }
 
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route('/profile_disconnect/{id}', name: 'app_user_disconnect', methods: ['GET', 'POST'])]
+    public function profile_disconnect($id, Request $request,EntityManagerInterface $entityManager, UserRepository $userRepository):Response
+    {
+
+        $user = $userRepository->find($id);
+        if ($user) {
+
+            $user->setSessionId(null);
+            $entityManager->persist($user);
+            $entityManager->flush();
+            $this->addFlash('success', "Utilisateur deconecte avec succes !");
+
+
+        }
+        return $this->redirectToRoute('app_user_index');
+    }
+
     #[Route('/saveChangedRole/{id}', name: 'saveChangedRole', methods: ['GET', 'POST'])]
     public function saveChangedRole($id, User $user, Request $request,EntityManagerInterface $entityManager, UserRepository $userRepository):Response
     {

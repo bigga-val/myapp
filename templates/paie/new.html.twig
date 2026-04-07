@@ -1,0 +1,10 @@
+{% extends 'components/layout/default.html.twig' %}
+
+
+{% block content %}
+    <h1>Ajouter un frais</h1>
+
+    {{ include('paie/_form.html.twig') }}
+
+    <a href="{{ path('app_paie_index') }}">back to list</a>
+{% endblock %}

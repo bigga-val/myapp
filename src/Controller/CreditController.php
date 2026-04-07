@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Credit;
 use App\Form\CreditType;
 use App\Repository\CreditRepository;
+use App\Repository\TauxRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +24,14 @@ class CreditController extends AbstractController
     }
 
     #[Route('/new', name: 'app_credit_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, CreditRepository $creditRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager,
+                        CreditRepository $creditRepository,
+                        TauxRepository $tauxRepository
+    ): Response
     {
+
+        $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
+        $request->getSession()->set('tauxactif', $tauxactif->getCout());
         if ($request->getMethod() == "POST") {
             $data = $request->request->all();
             $credit = new Credit();
