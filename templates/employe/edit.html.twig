@@ -25,6 +25,10 @@
         <label for="">Date d'embauche</label>
         {{ form_widget(form.dateembauche, {'attr': {'class': 'form-input'}}) }}
     </div>
+    <div>
+        <label for="">Salaire journalier</label>
+        {{ form_widget(form.salaireJournalier, {'attr': {'class': 'form-input'}}) }}
+    </div>
     <br>
     <input class="btn btn-success" type="submit" value="Enregistrer">
     {{ form_end(form) }}
