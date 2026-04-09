@@ -36,12 +36,7 @@ class SecurityController extends AbstractController
     {
         $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
         $request->getSession()->set('tauxactif', $tauxactif->getCout());
-        if (!$this->isGranted('ROLE_COMMANDE')) {
-            return $this->redirectToRoute('app_produits_index', [], Response::HTTP_SEE_OTHER);
-
-        }ELSE{
-            return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
-        }
+        return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route(path: '/logout', name: 'app_logout')]

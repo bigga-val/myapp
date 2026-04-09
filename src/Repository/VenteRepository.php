@@ -130,6 +130,108 @@ class VenteRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    public function caHier(): float
+    {
+        $hier = (new \DateTime('yesterday'))->format('Y-m-d');
+        $result = $this->getEntityManager()->createQuery('
+            SELECT SUM(pv.qty * pv.prixUnitaire) as montant
+            FROM App\Entity\Vente v
+            JOIN App\Entity\ProduitVendu pv WITH pv.vente = v
+            WHERE v.venteDate = :hier
+            AND v.statusVente = :status
+        ')
+        ->setParameter('hier', $hier)
+        ->setParameter('status', 'paid')
+        ->getSingleScalarResult();
+        return (float) ($result ?? 0);
+    }
+
+    public function countHier(): int
+    {
+        $hier = (new \DateTime('yesterday'))->format('Y-m-d');
+        return (int) $this->createQueryBuilder('v')
+            ->select('COUNT(v.id)')
+            ->where('v.venteDate = :hier')
+            ->setParameter('hier', $hier)
+            ->getQuery()->getSingleScalarResult();
+    }
+
+    public function caMoisCourant(): float
+    {
+        $debut = new \DateTime('first day of this month');
+        $fin   = new \DateTime('last day of this month');
+        $result = $this->getEntityManager()->createQuery('
+            SELECT SUM(pv.qty * pv.prixUnitaire) as montant
+            FROM App\Entity\Vente v
+            JOIN App\Entity\ProduitVendu pv WITH pv.vente = v
+            WHERE v.venteDate BETWEEN :debut AND :fin
+            AND v.statusVente = :status
+        ')
+        ->setParameter('debut', $debut->format('Y-m-d'))
+        ->setParameter('fin', $fin->format('Y-m-d'))
+        ->setParameter('status', 'paid')
+        ->getSingleScalarResult();
+        return (float) ($result ?? 0);
+    }
+
+    public function countMoisCourant(): int
+    {
+        $debut = new \DateTime('first day of this month');
+        $fin   = new \DateTime('last day of this month');
+        return (int) $this->createQueryBuilder('v')
+            ->select('COUNT(v.id)')
+            ->where('v.venteDate BETWEEN :debut AND :fin')
+            ->setParameter('debut', $debut->format('Y-m-d'))
+            ->setParameter('fin', $fin->format('Y-m-d'))
+            ->getQuery()->getSingleScalarResult();
+    }
+
+    public function caParMois(int $nbMois = 6): array
+    {
+        $debut = new \DateTime('first day of -'.($nbMois - 1).' months');
+        $fin   = new \DateTime('last day of this month');
+        return $this->getEntityManager()->createQuery('
+            SELECT SUBSTRING(v.venteDate, 1, 7) as mois, SUM(pv.qty * pv.prixUnitaire) as montant
+            FROM App\Entity\Vente v
+            JOIN App\Entity\ProduitVendu pv WITH pv.vente = v
+            WHERE v.venteDate BETWEEN :debut AND :fin
+            AND v.statusVente = :status
+            GROUP BY mois
+            ORDER BY mois ASC
+        ')
+        ->setParameter('debut', $debut->format('Y-m-d'))
+        ->setParameter('fin', $fin->format('Y-m-d'))
+        ->setParameter('status', 'paid')
+        ->getResult();
+    }
+
+    public function ventesParJourDuMois(): array
+    {
+        $debut = new \DateTime('first day of this month');
+        $fin   = new \DateTime('last day of this month');
+        return $this->getEntityManager()->createQuery('
+            SELECT SUBSTRING(v.venteDate, 9, 2) as jour, SUM(pv.qty * pv.prixUnitaire) as montant
+            FROM App\Entity\Vente v
+            JOIN App\Entity\ProduitVendu pv WITH pv.vente = v
+            WHERE v.venteDate BETWEEN :debut AND :fin
+            AND v.statusVente = :status
+            GROUP BY jour
+            ORDER BY jour ASC
+        ')
+        ->setParameter('debut', $debut->format('Y-m-d'))
+        ->setParameter('fin', $fin->format('Y-m-d'))
+        ->setParameter('status', 'paid')
+        ->getResult();
+    }
+
+    public function dernieres(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('v')
+            ->orderBy('v.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()->getResult();
+    }
+
 
 //    /**
 //     * @return Vente[] Returns an array of Vente objects

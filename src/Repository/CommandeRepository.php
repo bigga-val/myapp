@@ -45,4 +45,20 @@ class CommandeRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function countEnAttente(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.IsApproved IS NULL OR c.IsApproved = false')
+            ->getQuery()->getSingleScalarResult();
+    }
+
+    public function dernieres(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.CommandeDate', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()->getResult();
+    }
 }

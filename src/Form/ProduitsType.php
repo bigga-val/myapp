@@ -9,7 +9,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 
 class ProduitsType extends AbstractType
@@ -28,9 +28,8 @@ class ProduitsType extends AbstractType
             ->add('minimum')
             ->add('uniteMesure')
             //->add('fabricant')
-            ->add('preemption', DateTimeType::class, [
-                'date_label' => 'Starts On',
-                'widget'=>'single_text'
+            ->add('preemption', DateType::class, [
+                'widget' => 'single_text',
             ]);
     }
 

@@ -45,4 +45,18 @@ class PaieEmployeRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function masseSalarialeMoisCourant(): float
+    {
+        $mois   = (int) date('n');
+        $annee  = (int) date('Y');
+        $result = $this->createQueryBuilder('pe')
+            ->select('SUM(pe.total)')
+            ->join('pe.Paie', 'p')
+            ->where('p.MonthPay = :mois AND p.YearPay = :annee')
+            ->setParameter('mois', $mois)
+            ->setParameter('annee', $annee)
+            ->getQuery()->getSingleScalarResult();
+        return (float) ($result ?? 0);
+    }
 }

@@ -50,14 +50,16 @@
                             </svg>
                         </div>
                     </button>
-                    {% if is_granted('ROLE_ADMIN') %}
                     <ul x-cloak x-show="activeDropdown === 'dashboard'" x-collapse class="sub-menu text-gray-500">
+                        <li>
+                            <a href="{{ path("app_dashboard") }}">Tableau de bord</a>
+                        </li>
+                        {% if is_granted('ROLE_ADMIN') %}
                         <li>
                             <a href="{{ path("app_vente_finance") }}">Finance</a>
                         </li>
-
+                        {% endif %}
                     </ul>
-                    {% endif %}
                 </li>
 
 {#                <h2#}

@@ -36,6 +36,19 @@ class ProduitVenduRepository extends ServiceEntityRepository
 //        ;
 //    }
 
+    public function topProduits(int $limit = 5): array
+    {
+        return $this->getEntityManager()->createQuery('
+            SELECT p.designation, SUM(pv.qty * pv.prixUnitaire) as chiffre, SUM(pv.qty) as quantite
+            FROM App\Entity\ProduitVendu pv
+            JOIN pv.produit p
+            GROUP BY p.id, p.designation
+            ORDER BY chiffre DESC
+        ')
+        ->setMaxResults($limit)
+        ->getResult();
+    }
+
     public function findByDateIntervalle($start, $end): array
     {
 

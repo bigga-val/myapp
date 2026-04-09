@@ -36,6 +36,19 @@ class DebitRepository extends ServiceEntityRepository
 //        ;
 //    }
 
+    public function totalMoisCourant(): float
+    {
+        $debut = new \DateTime('first day of this month');
+        $fin   = new \DateTime('last day of this month');
+        $result = $this->createQueryBuilder('d')
+            ->select('SUM(d.montant)')
+            ->where('d.DateDebit BETWEEN :debut AND :fin')
+            ->setParameter('debut', $debut->format('Y-m-d'))
+            ->setParameter('fin', $fin->format('Y-m-d'))
+            ->getQuery()->getSingleScalarResult();
+        return (float) ($result ?? 0);
+    }
+
     public function findDebitByDatesIntervalle($date1, $date2): array
     {
 

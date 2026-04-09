@@ -46,6 +46,19 @@ class CreditRepository extends ServiceEntityRepository
 //        ;
 //    }
 
+    public function totalMoisCourant(): float
+    {
+        $debut = new \DateTime('first day of this month');
+        $fin   = new \DateTime('last day of this month');
+        $result = $this->createQueryBuilder('c')
+            ->select('SUM(c.montant)')
+            ->where('c.dateCredit BETWEEN :debut AND :fin')
+            ->setParameter('debut', $debut->format('Y-m-d'))
+            ->setParameter('fin', $fin->format('Y-m-d'))
+            ->getQuery()->getSingleScalarResult();
+        return (float) ($result ?? 0);
+    }
+
     public function sortiepardate($dateDebut, $dateFin): array{
         $em = $this->getEntityManager();
         $query = $em->createQuery(
