@@ -8,8 +8,10 @@
 #/public/bundles/
 /var/
 /vendor/
-#/node_modules/
+/node_modules/
 ###< symfony/framework-bundle ###
+
+/.claude/
 
 ###> phpunit/phpunit ###
 #/phpunit.xml

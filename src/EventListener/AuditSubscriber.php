@@ -30,6 +30,8 @@ class AuditSubscriber
         'App\Entity\Produits',
         'App\Entity\Taux',
         'App\Entity\Table',
+        'App\Entity\ProduitVendu',
+        'App\Entity\User',
     ];
 
     /** @var AuditLog[] */
