@@ -1,6 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./templates/**/*.html.twig"],
+  safelist: [
+    { pattern: /^bg-gradient-to-./ },
+    { pattern: /^from-./ },
+    { pattern: /^to-./ },
+    { pattern: /^bg-(primary|secondary|success|danger|warning|info|dark)/ },
+  ],
   darkMode: "class",
   theme: {
     container: {
