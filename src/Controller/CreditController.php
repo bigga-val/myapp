@@ -37,6 +37,7 @@ class CreditController extends AbstractController
             $credit = new Credit();
             $credit->setRaison($data["raison"]);
             $credit->setMontant($data["montant"]);
+            $credit->setDevise($data["devise"] ?? 'FC');
             $credit->setCreatedBy($this->getUser()->getUserIdentifier());
             $credit->setCreatedAt(new \DateTimeImmutable());
             $credit->setDateCredit(new \DateTime());
@@ -79,6 +80,7 @@ class CreditController extends AbstractController
             // $credit = new Credit();
             $credit->setRaison($data["raison"]);
             $credit->setMontant($data["montant"]);
+            $credit->setDevise($data["devise"] ?? 'FC');
             $credit->setCreatedBy($this->getUser()->getUserIdentifier());
 //            $credit->setCreatedAt(new \DateTimeImmutable());
             $credit->setDateCredit(new \DateTime());

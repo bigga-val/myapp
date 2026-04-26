@@ -1,83 +1,117 @@
 {% extends 'components/layout/default.html.twig' %}
 {% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
 <div class="panel">
-    <div class="flex justify-between mb-3">
-        <h1>Recents Approvisionnements</h1>
-        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_approvisionnement_new') }}">Approvisionner</a>
-
+    <div class="flex justify-between items-center mb-4">
+        <h1>Approvisionnements</h1>
+        <div class="flex gap-2 items-center">
+            <div id="export-buttons"></div>
+            <a class="border border-2 p-2 text-white rounded bg-primary" href="{{ path('app_approvisionnement_new') }}">Approvisionner</a>
+        </div>
     </div>
-    <div>
-{#        <input type="text" class="form-input mb-3" id="myInput" placeholder="Rechercher..." title="Tapez ici pour rechercher">#}
 
-        <table id="datatable" class="table table-bordered">
+    <table id="datatable" class="table display">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Designation</th>
-                <th>Unité de Mesure</th>
-                <th>Prix</th>
-                <th>Min</th>
-                <th>Max</th>
-                <th>Qty</th>
-                <th>Coût(Fc)</th>
-                <th>Coût($)</th>
+                <th>Code</th>
+                <th>Désignation</th>
+                <th>Unité</th>
+                <th>Prix unit.</th>
+                <th>Qté</th>
+                <th>Coût (Fc)</th>
+                <th>Coût ($)</th>
                 <th>Taux</th>
                 <th>Date</th>
-                <th>Ops</th>
-                <th>actions</th>
+                <th>Opérateur</th>
+                <th>Actions</th>
             </tr>
         </thead>
-        <tbody id="myTable">
-        {% for approvisionnement in approvisionnements %}
+        <tbody>
+        {% for appro in approvisionnements %}
+            {% if appro.taux is not null and appro.taux != 0 %}
+                {% set convert = appro.cout / appro.taux %}
+            {% else %}
+                {% set convert = 0 %}
+            {% endif %}
             <tr>
-                <td>{{ approvisionnement.produit.code }}</td>
-                <td>{{ approvisionnement.produit.designation }}</td>
-                <td>{{ approvisionnement.produit.uniteMesure }}</td>
-                <td>{{ approvisionnement.produit.prix }}</td>
-                <td>{{ approvisionnement.produit.minimum }}</td>
-                <td>{{ approvisionnement.produit.maximum }}</td>
-                <td>{{ approvisionnement.qty }}</td>
-                <td>Fc {{ approvisionnement.cout }}</td>
-                {% if(approvisionnement.taux is not null or approvisionnement.taux != 0) %}
-                {% set convert = approvisionnement.cout / approvisionnement.taux %}
-                {% else %}
-                    {% set convert = 0 %}
-                {% endif %}
+                <td>{{ appro.produit.code }}</td>
+                <td>{{ appro.produit.designation }}</td>
+                <td>{{ appro.produit.uniteMesure }}</td>
+                <td>Fc {{ appro.produit.prix|number_format(2) }}</td>
+                <td>{{ appro.qty }}</td>
+                <td>Fc {{ appro.cout|number_format(2) }}</td>
                 <td>$ {{ convert|number_format(2) }}</td>
-                <td>{{ approvisionnement.taux }}</td>
-                <td>{{ approvisionnement.createdAt ? approvisionnement.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-                <td>{{ approvisionnement.createdBy | capitalize }}</td>
+                <td>{{ appro.taux }}</td>
+                <td data-order="{{ appro.createdAt ? appro.createdAt|date('Y-m-d H:i:s') : '' }}">
+                    {{ appro.createdAt ? appro.createdAt|date('d/m/Y H:i') : '—' }}
+                </td>
+                <td>{{ appro.createdBy|capitalize }}</td>
                 <td>
-{#                    <a href="{{ path('app_approvisionnement_show', {'id': approvisionnement.id}) }}">show</a>#}
-                    <a class="btn btn-sm btn-primary" href="{{ path('app_approvisionnement_edit', {'id': approvisionnement.id}) }}">Editer</a>
+                    <a class="btn btn-sm btn-primary" href="{{ path('app_approvisionnement_edit', {'id': appro.id}) }}">Éditer</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="11" class="text-center">Aucun approvisionnement trouvé.</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-    </div>
 </div>
-    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatables.js') }}"></script>
 
+<script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/js/datatables.js') }}"></script>
+<script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+<script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
 
-    <script>
-        let table = new DataTable('#datatable', {
-            order: [[0, 'desc']],
-            language: {
-                info: 'Page _PAGE_ / _PAGES_',
-                infoEmpty: 'No records available',
-                infoFiltered: '(filtered from _MAX_ total records)',
-                lengthMenu: 'Afficher _MENU_ lignes par page',
-                zeroRecords: 'Nothing found - sorry'
+<script>
+    let table = new DataTable('#datatable', {
+        order: [[8, 'desc']],
+        dom: '<"flex justify-between"lf>rtip',
+        initComplete: function () {
+            this.api().buttons().container().appendTo('#export-buttons');
+        },
+        language: {
+            info: 'Page _PAGE_ / _PAGES_',
+            infoEmpty: 'Aucune ligne trouvée',
+            infoFiltered: '(filtré sur _MAX_ entrées)',
+            lengthMenu: 'Afficher _MENU_ lignes par page',
+            zeroRecords: 'Aucun résultat',
+            search: 'Rechercher :'
+        },
+        buttons: [
+            {
+                extend: 'copy',
+                text: 'Copier',
+                className: 'btn btn-sm btn-secondary',
+                exportOptions: { columns: ':not(:last-child)' }
             },
-            buttons: [
-                'copy', 'excel', 'pdf'
-            ]
-        });
-    </script>
+            {
+                extend: 'excel',
+                text: 'Excel',
+                className: 'btn btn-sm btn-success',
+                filename: 'Approvisionnements',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'csv',
+                text: 'CSV',
+                className: 'btn btn-sm btn-info',
+                filename: 'Approvisionnements',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'pdf',
+                text: 'PDF',
+                className: 'btn btn-sm btn-danger',
+                filename: 'Approvisionnements',
+                title: 'Liste des approvisionnements',
+                exportOptions: { columns: ':not(:last-child)' }
+            }
+        ]
+    });
+</script>
+
 {% endblock %}

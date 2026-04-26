@@ -45,4 +45,11 @@ class EmployeRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function countAll(): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->getQuery()->getSingleScalarResult();
+    }
 }

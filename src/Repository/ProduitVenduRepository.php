@@ -42,9 +42,12 @@ class ProduitVenduRepository extends ServiceEntityRepository
             SELECT p.designation, SUM(pv.qty * pv.prixUnitaire) as chiffre, SUM(pv.qty) as quantite
             FROM App\Entity\ProduitVendu pv
             JOIN pv.produit p
+            JOIN pv.vente v
+            WHERE v.statusVente = :status
             GROUP BY p.id, p.designation
             ORDER BY chiffre DESC
         ')
+        ->setParameter('status', 'paid')
         ->setMaxResults($limit)
         ->getResult();
     }

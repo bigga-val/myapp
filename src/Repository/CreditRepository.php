@@ -59,6 +59,25 @@ class CreditRepository extends ServiceEntityRepository
         return (float) ($result ?? 0);
     }
 
+    public function totauxParPeriode(?\DateTimeInterface $debut, ?\DateTimeInterface $fin): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->select('c.devise, SUM(c.montant) as total')
+            ->groupBy('c.devise');
+
+        if ($debut) $qb->andWhere('c.dateCredit >= :debut')->setParameter('debut', $debut->format('Y-m-d'));
+        if ($fin)   $qb->andWhere('c.dateCredit <= :fin')->setParameter('fin', $fin->format('Y-m-d'));
+
+        $rows = $qb->getQuery()->getResult();
+
+        $totaux = ['FC' => 0.0, 'USD' => 0.0];
+        foreach ($rows as $row) {
+            $devise = strtoupper($row['devise'] ?? 'FC');
+            $totaux[$devise] = (float) ($row['total'] ?? 0);
+        }
+        return $totaux;
+    }
+
     public function sortiepardate($dateDebut, $dateFin): array{
         $em = $this->getEntityManager();
         $query = $em->createQuery(

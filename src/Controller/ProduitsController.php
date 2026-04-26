@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Produits;
 use App\Form\ProduitsType;
+use App\Repository\ApprovisionnementRepository;
+use App\Repository\ProduitVenduRepository;
 use App\Repository\ProduitsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,14 +33,28 @@ class ProduitsController extends AbstractController
     }
 
     #[Route('/new', name: 'app_produits_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager
-    , ProduitsRepository $produitsRepository): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        ProduitsRepository $produitsRepository,
+    ): Response {
+        $imagesDir = $this->getParameter('produits_images_directory');
         $produit = new Produits();
-        $code = $this->genererCodeProduit(6, count($produitsRepository->findAll()));
-        $form = $this->createForm(ProduitsType::class, $produit);
+        $code    = $this->genererCodeProduit(6, count($produitsRepository->findAll()));
+        $form    = $this->createForm(ProduitsType::class, $produit);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $filename = uniqid() . '.' . $imageFile->guessExtension();
+                if (!is_dir($imagesDir)) {
+                    mkdir($imagesDir, 0755, true);
+                }
+                $imageFile->move($imagesDir, $filename);
+                $produit->setImage($filename);
+            }
+
             $entityManager->persist($produit);
             $entityManager->flush();
             $this->addFlash('success', "Produit créé avec succès");
@@ -48,16 +64,37 @@ class ProduitsController extends AbstractController
 
         return $this->renderForm('produits/new.html.twig', [
             'produit' => $produit,
-            'form' => $form,
-            'code'=> $code
+            'form'    => $form,
+            'code'    => $code,
         ]);
     }
 
     #[Route('/{id}', name: 'app_produits_show', methods: ['GET'])]
-    public function show(Produits $produit): Response
-    {
+    public function show(
+        Produits $produit,
+        ApprovisionnementRepository $approRepo,
+        ProduitVenduRepository $produitVenduRepo,
+    ): Response {
+        $stockData = $approRepo->stockProduitByID($produit->getId());
+        $stock     = $stockData[0] ?? null;
+
+        $dernieresEntrees = $approRepo->findBy(
+            ['produit' => $produit],
+            ['createdAt' => 'DESC'],
+            8
+        );
+
+        $dernieresSorties = $produitVenduRepo->findBy(
+            ['produit' => $produit],
+            ['createdAt' => 'DESC'],
+            8
+        );
+
         return $this->render('produits/show.html.twig', [
-            'produit' => $produit,
+            'produit'          => $produit,
+            'stock'            => $stock,
+            'dernieresEntrees' => $dernieresEntrees,
+            'dernieresSorties' => $dernieresSorties,
         ]);
     }
 
@@ -73,21 +110,41 @@ class ProduitsController extends AbstractController
 
 
     #[Route('/{id}/edit', name: 'app_produits_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Produits $produit, EntityManagerInterface $entityManager): Response
-    {
+    public function edit(
+        Request $request,
+        Produits $produit,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        $imagesDir = $this->getParameter('produits_images_directory');
         $form = $this->createForm(ProduitsType::class, $produit);
         $form->handleRequest($request);
 
-        //dd($form->isSubmitted(), $form->isValid(), $form->getErrors(true));
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                // Supprimer l'ancienne image si elle existe
+                if ($produit->getImage()) {
+                    $oldFile = $imagesDir . '/' . $produit->getImage();
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
+                }
+                $filename = uniqid() . '.' . $imageFile->guessExtension();
+                if (!is_dir($imagesDir)) {
+                    mkdir($imagesDir, 0755, true);
+                }
+                $imageFile->move($imagesDir, $filename);
+                $produit->setImage($filename);
+            }
+
             $entityManager->flush();
             $this->addFlash('success', "Produit modifié avec succès");
-            return $this->redirectToRoute('app_produits_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_produits_show', ['id' => $produit->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('produits/edit.html.twig', [
             'produit' => $produit,
-            'form' => $form,
+            'form'    => $form,
         ]);
     }
 

@@ -32,6 +32,9 @@ class Credit
     #[ORM\Column(nullable: true)]
     private ?float $taux = null;
 
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $devise = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +108,18 @@ class Credit
     public function setTaux(?float $taux): static
     {
         $this->taux = $taux;
+
+        return $this;
+    }
+
+    public function getDevise(): ?string
+    {
+        return $this->devise;
+    }
+
+    public function setDevise(?string $devise): static
+    {
+        $this->devise = $devise;
 
         return $this;
     }

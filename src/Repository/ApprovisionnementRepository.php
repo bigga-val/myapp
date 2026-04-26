@@ -80,6 +80,18 @@ class ApprovisionnementRepository extends ServiceEntityRepository
             COALESCE(SUM(e.qty),  0)                                    AS totalEntree,
             COALESCE(SUM(e.cout), 0)                                    AS cout,
 
+            -- Coût moyen unitaire (toutes entrées historiques, hors filtre date)
+            (
+                SELECT COALESCE(SUM(eH.cout), 0)
+                FROM App\Entity\Approvisionnement eH
+                WHERE eH.produit = p
+            )                                                           AS coutHistoTotal,
+            (
+                SELECT COALESCE(SUM(eH2.qty), 0)
+                FROM App\Entity\Approvisionnement eH2
+                WHERE eH2.produit = p
+            )                                                           AS qtyHistoTotal,
+
             -- Stock avant la période (toutes les entrées avant dateDebut)
             (
                 SELECT COALESCE(SUM(e2.qty), 0)
@@ -128,9 +140,20 @@ class ApprovisionnementRepository extends ServiceEntityRepository
         $results = $query->getResult();
 
         // Stock disponible = stock avant la période + entrées - sorties - réserves
-        $results = array_map(function ($row) {
-            $row['stockDisponible'] = $row['stockAvant'] + $row['totalEntree'] - $row['totalSortie'] - $row['totalReserve'];
-            $row['stockBas']        = $row['stockDisponible'] <= $row['minimum'] ? 1 : 0;
+        $results = array_map(function ($row) use ($dateDebut) {
+            // Quand aucune date de début n'est fournie, stockAvant couvre toutes les entrées
+            // (même période que totalEntree) → ne pas le cumuler pour éviter le double-comptage
+            $stockDisponible = $dateDebut === null
+                ? ($row['totalEntree'] - $row['totalSortie'] - $row['totalReserve'])
+                : ($row['stockAvant'] + $row['totalEntree'] - $row['totalSortie'] - $row['totalReserve']);
+
+            $cmu = $row['qtyHistoTotal'] > 0
+                ? ($row['coutHistoTotal'] / $row['qtyHistoTotal'])
+                : 0;
+
+            $row['stockDisponible'] = $stockDisponible;
+            $row['coutStockDispo']  = round($cmu * max($stockDisponible, 0), 2);
+            $row['stockBas']        = $stockDisponible <= $row['minimum'] ? 1 : 0;
             return $row;
         }, $results);
 

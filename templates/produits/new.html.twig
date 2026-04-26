@@ -53,8 +53,13 @@
 
 {#            </div>#}
             <div>
-                <label for="">Preemption</label>
+                <label for="">Préemption</label>
                 {{ form_widget(form.preemption, {'attr': {'class': 'form-input', 'type': 'date', 'required':'false'}}) }}
+            </div>
+            <div>
+                <label for="">Image du produit</label>
+                {{ form_widget(form.imageFile, {'attr': {'class': 'form-input', 'accept': 'image/jpeg,image/png,image/webp'}}) }}
+                <p class="text-xs text-gray-400 mt-1">JPG, PNG ou WEBP — max 2 Mo</p>
             </div>
             <br>
             <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>

@@ -46,6 +46,16 @@ class PaieEmployeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
+    public function totalParPeriode(?\DateTimeInterface $debut, ?\DateTimeInterface $fin): float
+    {
+        $qb = $this->createQueryBuilder('pe')->select('SUM(pe.total)');
+
+        if ($debut) $qb->andWhere('pe.createdAt >= :debut')->setParameter('debut', $debut->format('Y-m-d') . ' 00:00:00');
+        if ($fin)   $qb->andWhere('pe.createdAt <= :fin')->setParameter('fin',   $fin->format('Y-m-d')   . ' 23:59:59');
+
+        return (float) ($qb->getQuery()->getSingleScalarResult() ?? 0);
+    }
+
     public function masseSalarialeMoisCourant(): float
     {
         $mois   = (int) date('n');

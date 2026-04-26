@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Approvisionnement;
 use App\Form\ApprovisionnementType;
 use App\Repository\ApprovisionnementRepository;
+use App\Repository\ProduitsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,7 +50,7 @@ class ApprovisionnementController extends AbstractController
     }
 
     #[Route('/new', name: 'app_approvisionnement_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, ProduitsRepository $produitsRepository): Response
     {
         $approvisionnement = new Approvisionnement();
         $form = $this->createForm(ApprovisionnementType::class, $approvisionnement);
@@ -60,6 +61,8 @@ class ApprovisionnementController extends AbstractController
             $approvisionnement->setCreatedAt(new \DateTimeImmutable());
             $approvisionnement->setCreatedBy($this->getUser()->getUsername());
             $approvisionnement->setTaux($request->getSession()->get('tauxactif'));
+            $prixUnitaire = (float) ($form->get('prixUnitaire')->getData() ?? $approvisionnement->getProduit()?->getPrix() ?? 0);
+            $approvisionnement->setCout(($approvisionnement->getQty() ?? 0) * $prixUnitaire);
 
             $entityManager->persist($approvisionnement);
             $entityManager->flush();
@@ -68,8 +71,14 @@ class ApprovisionnementController extends AbstractController
             return $this->redirectToRoute('app_approvisionnement_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $prixMap = [];
+        foreach ($produitsRepository->findAll() as $p) {
+            $prixMap[$p->getId()] = $p->getPrix();
+        }
+
         return $this->renderForm('approvisionnement/new.html.twig', [
             'approvisionnement' => $approvisionnement,
+            'prixMap'           => $prixMap,
             'form' => $form,
         ]);
     }

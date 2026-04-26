@@ -13,9 +13,15 @@
         <div>
             <form action="" method="POST">
                 <div>
-                    <label for="">Montant(Fc)</label>
+                    <label for="devise">Devise</label>
+                    <select class="form-input" name="devise" id="devise">
+                        <option value="FC">FC</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="">Montant</label>
                     <input type="number" id="montant" name="montant" inputmode="decimal" class="form-input">
-
                 </div>
                 <div>
                     <label for="">Raison</label>
@@ -56,7 +62,7 @@
                     <tr>
                         <td>#</td>
                         <td>{{ credit.dateCredit ? credit.createdAt|date('d-m-Y H:m') : '' }}</td>
-                        <td>{{ credit.montant }}</td>
+                        <td>{{ credit.montant|number_format(0, ',', ' ') ~ ' ' ~ (credit.devise ?? 'FC') }}</td>
                         <td>{{ credit.createdBy }}</td>
                         <td>{{ credit.raison }}</td>
                         <td>

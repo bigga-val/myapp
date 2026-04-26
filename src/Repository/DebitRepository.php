@@ -49,6 +49,25 @@ class DebitRepository extends ServiceEntityRepository
         return (float) ($result ?? 0);
     }
 
+    public function totauxParPeriode(?\DateTimeInterface $debut, ?\DateTimeInterface $fin): array
+    {
+        $qb = $this->createQueryBuilder('d')
+            ->select('d.devise, SUM(d.montant) as total')
+            ->groupBy('d.devise');
+
+        if ($debut) $qb->andWhere('d.DateDebit >= :debut')->setParameter('debut', $debut->format('Y-m-d'));
+        if ($fin)   $qb->andWhere('d.DateDebit <= :fin')->setParameter('fin', $fin->format('Y-m-d'));
+
+        $rows = $qb->getQuery()->getResult();
+
+        $totaux = ['FC' => 0.0, 'USD' => 0.0];
+        foreach ($rows as $row) {
+            $devise = strtoupper($row['devise'] ?? 'FC');
+            $totaux[$devise] = (float) ($row['total'] ?? 0);
+        }
+        return $totaux;
+    }
+
     public function findDebitByDatesIntervalle($date1, $date2): array
     {
 

@@ -9,6 +9,13 @@
         <div>
             <form action="" method="POST">
                 <div>
+                    <label for="devise">Devise</label>
+                    <select class="form-input" name="devise" id="devise">
+                        <option value="FC" {{ credit.devise == 'FC' or credit.devise is null ? 'selected' }}>FC</option>
+                        <option value="USD" {{ credit.devise == 'USD' ? 'selected' }}>USD</option>
+                    </select>
+                </div>
+                <div>
                     <label for="">Montant</label>
                     <input type="number" id="montant" name="montant" inputmode="decimal" class="form-input" value="{{ credit.montant }}">
 

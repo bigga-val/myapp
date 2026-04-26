@@ -36,17 +36,31 @@ class DashboardController extends AbstractController
         $masseSalariale   = $paieEmployeRepo->masseSalarialeMoisCourant();
         $totalCredits     = $creditRepo->totalMoisCourant();
         $totalDebits      = $debitRepo->totalMoisCourant();
-        $nbEmployes       = count($employeRepo->findAll());
+        $nbEmployes       = $employeRepo->countAll();
 
-        // Graphique CA 6 derniers mois
-        $caParMoisRaw = $venteRepo->caParMois(6);
-        $caLabels     = array_column($caParMoisRaw, 'mois');
-        $caData       = array_map(fn($r) => round((float)$r['montant'], 2), $caParMoisRaw);
+        // Graphique CA 6 derniers mois (remplissage des mois sans ventes)
+        $caParMoisRaw    = $venteRepo->caParMois(6);
+        $caParMoisIndexe = [];
+        foreach ($caParMoisRaw as $row) {
+            $caParMoisIndexe[$row['mois']] = round((float)$row['montant'], 2);
+        }
+        $caLabels = [];
+        $caData   = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $mois = (new \DateTime("first day of -$i months"))->format('Y-m');
+            $caLabels[] = $mois;
+            $caData[]   = $caParMoisIndexe[$mois] ?? 0;
+        }
 
-        // Graphique ventes par jour du mois courant
+        // Graphique ventes par jour du mois courant (remplissage des jours sans ventes)
         $joursRaw    = $venteRepo->ventesParJourDuMois();
-        $joursLabels = array_map(fn($r) => (int) ltrim((string)$r['jour'], '0') ?: 0, $joursRaw);
-        $joursData   = array_map(fn($r) => round((float)$r['montant'], 2), $joursRaw);
+        $joursIndexe = [];
+        foreach ($joursRaw as $row) {
+            $joursIndexe[(int)$row['jour']] = round((float)$row['montant'], 2);
+        }
+        $nbJoursMois = (int)(new \DateTime('last day of this month'))->format('j');
+        $joursLabels = range(1, $nbJoursMois);
+        $joursData   = array_map(fn($j) => $joursIndexe[$j] ?? 0, $joursLabels);
 
         // Top 5 produits
         $topProduits = $produitVenduRepo->topProduits(5);

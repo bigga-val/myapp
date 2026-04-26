@@ -362,6 +362,11 @@
                         </button>
                         <ul x-cloak x-show="activeDropdown === 'caisse'" x-collapse class="sub-menu text-gray-500">
 
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <li>
+                                <a href="{{ path("app_caisse_index") }}">Bilan de caisse</a>
+                            </li>
+                            {% endif %}
                             <li>
                                 <a href="{{ path("app_debit_new") }}">Nouvelle Entrée</a>
                             </li>

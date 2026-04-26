@@ -50,7 +50,7 @@ class CommandeRepository extends ServiceEntityRepository
     {
         return (int) $this->createQueryBuilder('c')
             ->select('COUNT(c.id)')
-            ->where('c.IsApproved IS NULL OR c.IsApproved = false')
+            ->where('c.IsApproved IS NULL')
             ->getQuery()->getSingleScalarResult();
     }
 

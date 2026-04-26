@@ -20,8 +20,12 @@
             {{ form_widget(form.qty, {'attr': {'class': 'form-input'}}) }}
         </div>
         <div>
-            <label for="">Coût Total(Fc)</label>
-            {{ form_widget(form.cout, {'attr': {'class': 'form-input', 'type':'number'}}) }}
+            <label for="">Prix unitaire (Fc)</label>
+            {{ form_widget(form.prixUnitaire, {'attr': {'class': 'form-input'}}) }}
+        </div>
+        <div>
+            <label for="">Coût Total (Fc)</label>
+            {{ form_widget(form.cout, {'attr': {'class': 'form-input', 'readonly': 'readonly'}}) }}
         </div>
         <div>
             <br>
@@ -33,4 +37,27 @@
 
     </div>
 </div>
+<script>
+    const prixMap       = {{ prixMap|json_encode|raw }};
+    const selectProduit = document.getElementById('approvisionnement_produit');
+    const inputQty      = document.getElementById('approvisionnement_qty');
+    const inputPrix     = document.getElementById('approvisionnement_prixUnitaire');
+    const inputCout     = document.getElementById('approvisionnement_cout');
+
+    function recalculerCout() {
+        const qty  = parseFloat(inputQty.value)  || 0;
+        const prix = parseFloat(inputPrix.value) || 0;
+        inputCout.value = (qty * prix).toFixed(2);
+    }
+
+    if (selectProduit) {
+        selectProduit.addEventListener('change', function () {
+            inputPrix.value = prixMap[this.value] || 0;
+            recalculerCout();
+        });
+    }
+
+    if (inputQty)  inputQty.addEventListener('input',  recalculerCout);
+    if (inputPrix) inputPrix.addEventListener('input', recalculerCout);
+</script>
 {% endblock %}

@@ -152,7 +152,9 @@ class VenteRepository extends ServiceEntityRepository
         return (int) $this->createQueryBuilder('v')
             ->select('COUNT(v.id)')
             ->where('v.venteDate = :hier')
+            ->andWhere('v.statusVente = :status')
             ->setParameter('hier', $hier)
+            ->setParameter('status', 'paid')
             ->getQuery()->getSingleScalarResult();
     }
 
@@ -181,8 +183,10 @@ class VenteRepository extends ServiceEntityRepository
         return (int) $this->createQueryBuilder('v')
             ->select('COUNT(v.id)')
             ->where('v.venteDate BETWEEN :debut AND :fin')
+            ->andWhere('v.statusVente = :status')
             ->setParameter('debut', $debut->format('Y-m-d'))
             ->setParameter('fin', $fin->format('Y-m-d'))
+            ->setParameter('status', 'paid')
             ->getQuery()->getSingleScalarResult();
     }
 
@@ -224,10 +228,33 @@ class VenteRepository extends ServiceEntityRepository
         ->getResult();
     }
 
+    public function totauxParPeriode(?\DateTimeInterface $debut, ?\DateTimeInterface $fin): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('SUM(pv.qty * pv.prixUnitaire) as fc')
+            ->from('App\Entity\Vente', 'v')
+            ->join('App\Entity\ProduitVendu', 'pv', 'WITH', 'pv.vente = v')
+            ->where('v.statusVente = :status')
+            ->setParameter('status', 'paid');
+
+        if ($debut) $qb->andWhere('v.venteDate >= :debut')->setParameter('debut', $debut->format('Y-m-d'));
+        if ($fin)   $qb->andWhere('v.venteDate <= :fin')->setParameter('fin',   $fin->format('Y-m-d'));
+
+        $result = $qb->getQuery()->getSingleResult();
+
+        return [
+            'FC'  => (float) ($result['fc'] ?? 0),
+            'USD' => 0.0,
+        ];
+    }
+
     public function dernieres(int $limit = 5): array
     {
         return $this->createQueryBuilder('v')
-            ->orderBy('v.createdAt', 'DESC')
+            ->where('v.statusVente = :status')
+            ->setParameter('status', 'paid')
+            ->orderBy('v.venteDate', 'DESC')
+            ->addOrderBy('v.createdAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()->getResult();
     }
