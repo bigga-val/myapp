@@ -1,49 +1,68 @@
 {% extends 'components/layout/default.html.twig' %}
-{% block title %}Liste des utilisateur{% endblock %}
+{% block title %}Liste des utilisateurs{% endblock %}
+
 {% block content %}
-    <div class="card">
-        <div class="card-header">
-            <h1>Liste des utilisateurs</h1>
+<link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
 
-        </div>
-        <div class="card-body">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Password</th>
-                        <th>IsLoggedIn</th>
-
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% set i = 0 %}
-                    {% for user in users %}
-                    {% set i = i+1%}
-                        <tr>
-                            <td>{{ i }}</td>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.email }}</td>
-
-                            <td>********</td>
-                            <td>
-                                {{ user.sessionId is null ? "No": "Yes" }}
-                            </td>
-                            <td>
-
-                                <a class="bg-primary text-white rounded border border-2 m-2 p-2" href="{{ path("app_user_profile", {"id": user.id}) }}">Profile</a>
-                                <a class="bg-primary text-white rounded border border-2 m-2 p-2" href="{{ path("app_reset_password", {"id": user.id}) }}">Reset Password</a>
-                                {% if user.sessionId is not null %}
-                                    <a class="bg-danger text-white rounded border border-2 m-2 p-2" href="{{ path("app_user_disconnect", {"id": user.id}) }}">Log Out</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="panel">
+    <div class="flex justify-between items-center mb-4">
+        <h1>Liste des utilisateurs</h1>
+        <a class="btn btn-primary" href="{{ path('app_user_new') }}">Nouvel utilisateur</a>
     </div>
+
+    <div class="overflow-x-auto w-full">
+        <table id="datatable" class="table display w-full">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nom d'utilisateur</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if 'ROLE_ADMIN' in user.roles %}
+                                <span class="badge bg-danger">Admin</span>
+                            {% else %}
+                                <span class="badge bg-info">Utilisateur</span>
+                            {% endif %}
+                        </td>
+                        <td class="flex gap-2 flex-wrap">
+                            <a class="btn btn-sm btn-primary" href="{{ path('app_user_profile', {'id': user.id}) }}">Profil</a>
+                            <a class="btn btn-sm btn-warning" href="{{ path('app_reset_password', {'id': user.id}) }}">Réinit. MDP</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-400">Aucun utilisateur trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/js/datatables.js') }}"></script>
+<script>
+    new DataTable('#datatable', {
+        order: [[1, 'asc']],
+        dom: '<"flex justify-between"lf>rtip',
+        language: {
+            info: 'Page _PAGE_ / _PAGES_',
+            infoEmpty: 'Aucune ligne trouvée',
+            infoFiltered: '(filtré sur _MAX_ entrées)',
+            lengthMenu: 'Afficher _MENU_ lignes par page',
+            zeroRecords: 'Aucun résultat',
+            search: 'Rechercher :'
+        }
+    });
+</script>
 {% endblock %}

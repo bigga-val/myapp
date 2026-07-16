@@ -25,8 +25,8 @@ class DebitController extends AbstractController
         $start = $request->query->get('start');
         $end = $request->query->get('end');
 
-        $start = new \DateTime($start) ?? new \DateTime('today');
-        $end = new \DateTime($end) ?? new \DateTime('today');
+        $start = $start ? new \DateTime($start) : new \DateTime('today');
+        $end   = $end   ? new \DateTime($end)   : new \DateTime('today');
 
         $start->setTime(0, 0, 0);      // 00:00:00
         $end->setTime(23, 59, 59);

@@ -34,9 +34,6 @@ class ProduitVendu
     #[ORM\Column(nullable: true)]
     private ?float $taux = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $CreatedBy = null;
-
     public function getId(): ?int
     {
         return $this->id;

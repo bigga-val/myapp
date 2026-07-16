@@ -11,7 +11,6 @@ use App\Repository\CommandeApprobateurRepository;
 use App\Repository\CommandeProduitRepository;
 use App\Repository\CommandeReceptionRepository;
 use App\Repository\CommandeRepository;
-use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,7 +25,7 @@ class CommandeController extends AbstractController
     public function index(CommandeRepository $commandeRepository): Response
     {
         return $this->render('commande/index.html.twig', [
-            'commandes' => $commandeRepository->findAll(),
+            'commandes' => $commandeRepository->findBy([], ['CommandeDate' => 'DESC']),
         ]);
     }
 
@@ -63,7 +62,7 @@ class CommandeController extends AbstractController
                                 TauxRepository $tauxRepository,
     ): Response
     {
-        $CommandeNo = $this->genererNumeroCommande( 5, count($commandeRepository->findAll()));
+        $CommandeNo = $this->genererNumeroCommande(5, $commandeRepository->maxId());
         $produits = $approvisionnementRepository->stockProduit();
 
         $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
@@ -75,33 +74,19 @@ class CommandeController extends AbstractController
     }
 
     #[Route('/{id}/approve', name: 'app_approve_commande', methods: ['GET'])]
-    public function ApproveCommande(Request $request,
-                              Commande $commande,
-                              EntityManagerInterface $entityManager,
-                              CommandeRepository $commandeRepository
-    ): Response
+    public function ApproveCommande(Commande $commande, EntityManagerInterface $entityManager): Response
     {
-
-        $commande = $commandeRepository->find($request->query->get('id'));
         $commande->setIsApproved(true);
         $commande->setApprovedBy($this->getUser());
-        $entityManager->persist($commande);
         $entityManager->flush();
         return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{id}/reject', name: 'app_reject_commande', methods: ['GET'])]
-    public function RejectCommande(Request $request,
-                                    Commande $commande,
-                                    EntityManagerInterface $entityManager,
-                                    CommandeRepository $commandeRepository
-    ): Response
+    public function RejectCommande(Commande $commande, EntityManagerInterface $entityManager): Response
     {
-
-        $commande = $commandeRepository->find($request->query->get('id'));
         $commande->setIsApproved(false);
         $commande->setApprovedBy($this->getUser());
-        $entityManager->persist($commande);
         $entityManager->flush();
         return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
     }
@@ -127,18 +112,17 @@ class CommandeController extends AbstractController
     {
         try {
             $commande = new Commande();
-            $countCommande = count($commandeRepository->findAll());
             $commande->setCommandeDate(new \DateTime());
             $commande->setCommandePar($this->getUser());
             $commande->setStatus('draft');
-            $commande->setCommandeNumber($this->genererNumeroCommande(5, $countCommande));
+            $commande->setCommandeNumber($this->genererNumeroCommande(5, $commandeRepository->maxId()));
             $entityManager->persist($commande);
             $entityManager->flush();
             return new JsonResponse([
                 'etat'=>true,
                 'CommandeID'=>$commande->getId()
             ]);
-        }catch (Exception $e){
+        } catch (\Exception $e) {
             return new JsonResponse([
                 'etat'=>false
             ]);
@@ -154,18 +138,17 @@ class CommandeController extends AbstractController
     {
         try {
             $commande = new Commande();
-            $countCommande = count($commandeRepository->findAll());
             $commande->setCommandeDate(new \DateTime());
             $commande->setCommandePar($this->getUser());
             $commande->setStatus('submitted');
-            $commande->setCommandeNumber($this->genererNumeroCommande(5, $countCommande));
+            $commande->setCommandeNumber($this->genererNumeroCommande(5, $commandeRepository->maxId()));
             $entityManager->persist($commande);
             $entityManager->flush();
             return new JsonResponse([
                 'etat'=>true,
                 'CommandeID'=>$commande->getId()
             ]);
-        }catch (Exception $e){
+        } catch (\Exception $e) {
             return new JsonResponse([
                 'etat'=>false
             ]);
@@ -192,7 +175,7 @@ class CommandeController extends AbstractController
                 'etat'=>true,
                 //'CommandeID'=>$commande->getId()
             ]);
-        }catch (Exception $e){
+        } catch (\Exception $e) {
             return new JsonResponse([
                 'etat'=>false
             ]);

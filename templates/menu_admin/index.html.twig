@@ -1,0 +1,208 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+<div class="panel">
+    <div class="panel-header flex flex-wrap justify-between items-center gap-3 mb-4">
+        <div>
+            <h1 class="text-xl font-bold">Menu Restaurant</h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                Cochez les produits à afficher sur la carte scannée par les clients.
+                <span class="font-semibold text-primary">{{ total }} produit(s) actif(s) sur le menu.</span>
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ path('app_menu_public') }}" target="_blank"
+               class="btn btn-outline-primary btn-sm flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                Voir le menu client
+            </a>
+            <button onclick="ouvrirQrRestaurant()" class="btn btn-secondary btn-sm flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                </svg>
+                QR Code Restaurant
+            </button>
+        </div>
+    </div>
+
+    {# Par catégorie #}
+    {% for item in menu %}
+    {% if item.produits is not empty %}
+    <div class="mb-6">
+        <h2 class="text-sm font-bold text-gray-600 uppercase tracking-wider mb-2 border-b pb-1">
+            {{ item.categorie.designation }}
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {% for produit in item.produits %}
+            <div class="flex items-center justify-between p-3 rounded-lg border transition-colors {{ produit.isMenu ? 'border-primary/40 bg-primary/5' : 'border-gray-200 bg-white' }}"
+                 id="row-{{ produit.id }}">
+                <div class="flex items-center gap-3 min-w-0">
+                    {% if produit.image %}
+                    <img src="{{ asset('uploads/' ~ produit.image) }}" alt="{{ produit.designation }}"
+                         class="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23e5e7eb\' viewBox=\'0 0 24 24\'%3E%3Cpath d=\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01\'/%3E%3C/svg%3E'">
+                    {% else %}
+                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-gray-800 truncate">{{ produit.designation }}</p>
+                        <p class="text-xs text-primary font-medium">{{ produit.prix ? produit.prix|number_format(0, ',', '.') ~ ' FC' : '—' }}</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-3">
+                    <input type="checkbox"
+                           class="sr-only peer"
+                           {{ produit.isMenu ? 'checked' : '' }}
+                           onchange="toggleMenu({{ produit.id }}, this, '{{ csrf_token('menu_toggle_' ~ produit.id) }}')">
+                    <div class="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    {# Produits sans catégorie #}
+    {% if sansCat is not empty %}
+    <div class="mb-6">
+        <h2 class="text-sm font-bold text-gray-600 uppercase tracking-wider mb-2 border-b pb-1">
+            Sans catégorie
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {% for produit in sansCat %}
+            <div class="flex items-center justify-between p-3 rounded-lg border transition-colors {{ produit.isMenu ? 'border-primary/40 bg-primary/5' : 'border-gray-200 bg-white' }}"
+                 id="row-{{ produit.id }}">
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-gray-800 truncate">{{ produit.designation }}</p>
+                    <p class="text-xs text-primary font-medium">{{ produit.prix ? produit.prix|number_format(0, ',', '.') ~ ' FC' : '—' }}</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer ml-3">
+                    <input type="checkbox"
+                           class="sr-only peer"
+                           {{ produit.isMenu ? 'checked' : '' }}
+                           onchange="toggleMenu({{ produit.id }}, this, '{{ csrf_token('menu_toggle_' ~ produit.id) }}')">
+                    <div class="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if menu is empty and sansCat is empty %}
+    <div class="text-center py-16 text-gray-400">
+        <p class="text-4xl mb-2">🛒</p>
+        <p>Aucun produit trouvé. Créez d'abord des produits.</p>
+    </div>
+    {% endif %}
+</div>
+
+{# ── Modal QR Code Restaurant ──────────────────────────────────── #}
+<div id="qrModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60" onclick="fermerQrCode()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-xs w-full text-center">
+        <h3 class="font-bold text-base mb-1">QR Code — Menu Restaurant</h3>
+        <p class="text-xs text-gray-500 mb-4">Imprimez ce QR code et affichez-le dans le restaurant</p>
+        <div id="qrcode" class="flex justify-center mb-3"></div>
+        <p class="text-xs text-gray-400 break-all mb-4" id="qrUrl"></p>
+        <div class="flex gap-2">
+            <button onclick="imprimerQrCode()" class="flex-1 btn btn-primary btn-sm">Imprimer</button>
+            <button onclick="fermerQrCode()" class="flex-1 btn btn-outline-danger btn-sm">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    const TOGGLE_BASE_URL = '{{ path('app_menu_admin_toggle', {'id': 0}) }}'.replace('/0', '');
+    const MENU_PUBLIC_URL = '{{ url('app_menu_public') }}';
+
+    async function toggleMenu(id, checkbox, token) {
+        const row = document.getElementById('row-' + id);
+        checkbox.disabled = true;
+
+        const formData = new FormData();
+        formData.append('_token', token);
+
+        try {
+            const res = await fetch(TOGGLE_BASE_URL + '/' + id, {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await res.json();
+            if (data.etat) {
+                checkbox.checked = data.isMenu;
+                if (data.isMenu) {
+                    row.classList.remove('border-gray-200', 'bg-white');
+                    row.classList.add('border-primary/40', 'bg-primary/5');
+                } else {
+                    row.classList.remove('border-primary/40', 'bg-primary/5');
+                    row.classList.add('border-gray-200', 'bg-white');
+                }
+            } else {
+                checkbox.checked = !checkbox.checked;
+                alert('Erreur lors de la mise à jour');
+            }
+        } catch (e) {
+            checkbox.checked = !checkbox.checked;
+            alert('Erreur réseau');
+        } finally {
+            checkbox.disabled = false;
+        }
+    }
+
+    let qrInstance = null;
+
+    function ouvrirQrRestaurant() {
+        const url = MENU_PUBLIC_URL;
+        document.getElementById('qrUrl').textContent = url;
+        const container = document.getElementById('qrcode');
+        container.innerHTML = '';
+        qrInstance = new QRCode(container, {
+            text: url,
+            width: 200,
+            height: 200,
+            colorDark: '#1a1a2e',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        document.getElementById('qrModal').classList.remove('hidden');
+    }
+
+    function fermerQrCode() {
+        document.getElementById('qrModal').classList.add('hidden');
+        document.getElementById('qrcode').innerHTML = '';
+        qrInstance = null;
+    }
+
+    function imprimerQrCode() {
+        const url = document.getElementById('qrUrl').textContent;
+        const qrImg = document.querySelector('#qrcode img');
+        if (!qrImg) return;
+        const win = window.open('', '_blank');
+        win.document.write(`<!DOCTYPE html><html><head><title>Menu Restaurant - QR Code</title>
+            <style>body{font-family:sans-serif;text-align:center;padding:60px}h2{margin-bottom:4px}p{color:#666;font-size:13px;margin-bottom:20px}img{width:240px;height:240px}.url{font-size:10px;color:#999;margin-top:12px;word-break:break-all;max-width:260px;margin:12px auto}@media print{button{display:none}}</style>
+            </head><body>
+            <h2>Menu du Restaurant</h2><p>Scannez pour consulter la carte et commander</p>
+            <img src="${qrImg.src}" alt="QR Code">
+            <div class="url">${url}</div><br>
+            <button onclick="window.print()">Imprimer</button>
+            </body></html>`);
+        win.document.close();
+        win.focus();
+        setTimeout(() => win.print(), 500);
+    }
+</script>
+{% endblock %}

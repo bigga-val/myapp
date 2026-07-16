@@ -51,6 +51,7 @@
     }
 
     if (selectProduit) {
+        NiceSelect.bind(selectProduit, { searchable: true, searchPlaceholder: 'Rechercher un produit...' });
         selectProduit.addEventListener('change', function () {
             inputPrix.value = prixMap[this.value] || 0;
             recalculerCout();

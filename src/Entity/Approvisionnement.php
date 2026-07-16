@@ -35,6 +35,12 @@ class Approvisionnement
     #[ORM\Column(nullable: true)]
     private ?float $taux = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $type = 'approvisionnement';
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $motif = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -124,5 +130,27 @@ class Approvisionnement
         return $this;
     }
 
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
 
+    public function setType(?string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getMotif(): ?string
+    {
+        return $this->motif;
+    }
+
+    public function setMotif(?string $motif): static
+    {
+        $this->motif = $motif;
+
+        return $this;
+    }
 }

@@ -19,7 +19,7 @@ class CreditController extends AbstractController
     public function index(CreditRepository $creditRepository): Response
     {
         return $this->render('credit/index.html.twig', [
-            'credits' => $creditRepository->findAll([], ['created_at' => 'DESC']),
+            'credits' => $creditRepository->findBy([], ['createdAt' => 'DESC']),
         ]);
     }
 
@@ -52,7 +52,7 @@ class CreditController extends AbstractController
 
 
         return $this->renderForm('credit/new.html.twig', [
-            'credits' => $creditRepository->findAll([], ['created_at' => 'DESC']),
+            'credits' => $creditRepository->findBy([], ['createdAt' => 'DESC']),
         ]);
     }
 

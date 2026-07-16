@@ -36,20 +36,23 @@ class ProduitVenduRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-    public function topProduits(int $limit = 5): array
+    public function topProduits(int $limit = 5, ?\DateTimeInterface $debut = null, ?\DateTimeInterface $fin = null): array
     {
-        return $this->getEntityManager()->createQuery('
-            SELECT p.designation, SUM(pv.qty * pv.prixUnitaire) as chiffre, SUM(pv.qty) as quantite
-            FROM App\Entity\ProduitVendu pv
-            JOIN pv.produit p
-            JOIN pv.vente v
-            WHERE v.statusVente = :status
-            GROUP BY p.id, p.designation
-            ORDER BY chiffre DESC
-        ')
-        ->setParameter('status', 'paid')
-        ->setMaxResults($limit)
-        ->getResult();
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('p.designation, SUM(pv.qty * pv.prixUnitaire) as chiffre, SUM(pv.qty) as quantite')
+            ->from('App\Entity\ProduitVendu', 'pv')
+            ->join('pv.produit', 'p')
+            ->join('pv.vente', 'v')
+            ->where('v.statusVente = :status')
+            ->setParameter('status', 'paid')
+            ->groupBy('p.id, p.designation')
+            ->orderBy('chiffre', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($debut) $qb->andWhere('v.venteDate >= :debut')->setParameter('debut', $debut->format('Y-m-d'));
+        if ($fin)   $qb->andWhere('v.venteDate <= :fin')->setParameter('fin', $fin->format('Y-m-d'));
+
+        return $qb->getQuery()->getResult();
     }
 
     public function findByDateIntervalle($start, $end): array

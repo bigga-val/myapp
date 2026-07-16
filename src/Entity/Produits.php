@@ -44,6 +44,9 @@ class Produits
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
+    #[ORM\Column(nullable: true, options: ['default' => false])]
+    private ?bool $isMenu = false;
+
 
     public function getId(): ?int
     {
@@ -171,6 +174,18 @@ class Produits
     public function setImage(?string $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function isMenu(): ?bool
+    {
+        return $this->isMenu;
+    }
+
+    public function setIsMenu(?bool $isMenu): static
+    {
+        $this->isMenu = $isMenu;
 
         return $this;
     }

@@ -414,16 +414,7 @@
 
 
         function setTotal(){
-            let subtotal = parseFloat($('#subtotal').text())
-            let tax = parseFloat($('#tax-input').val())
-            let discount = parseFloat($('#discount-input').val())
-            let reductible = ((parseFloat(subtotal) * discount)/100)
-            //console.log(subtotal, tax, discount)
-            let taxable = (subtotal + ((parseFloat(subtotal) * tax)/100) )
-            let total = taxable - reductible
-            // console.log('settotal')
-
-            $('#grand-total').text(total)
+            // réservé pour une future implémentation de TVA/remise
         }
     </script>
 

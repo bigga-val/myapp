@@ -11,7 +11,6 @@ use App\Repository\ProduitVenduRepository;
 use App\Repository\TauxRepository;
 use App\Repository\VenteRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,8 +26,8 @@ class ProduitVenduController extends AbstractController
         $start = $request->query->get('start');
         $end = $request->query->get('end');
 
-        $start = new \DateTime($start) ?? new \DateTime('today');
-        $end = new \DateTime($end) ?? new \DateTime('today');
+        $start = $start ? new \DateTime($start) : new \DateTime('today');
+        $end   = $end   ? new \DateTime($end)   : new \DateTime('today');
 
         $start->setTime(0, 0, 0);      // 00:00:00
         $end->setTime(23, 59, 59);
@@ -69,7 +68,7 @@ class ProduitVenduController extends AbstractController
                 'etat'=>true,
                 'produitVenduID'=>$produitVendu->getId()
             ]);
-        }catch (Exeption $e){
+        }catch (\Exception $e){
             return new JsonResponse([
                 'etat'=>false
             ]);

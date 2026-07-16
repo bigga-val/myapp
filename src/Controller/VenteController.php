@@ -15,7 +15,6 @@ use App\Repository\ProduitVenduRepository;
 use App\Repository\VenteRepository;
 use App\Repository\CreditRepository;
 use App\Service\FPdfGenerator;
-use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Dompdf\Dompdf;
 
 
@@ -56,7 +56,7 @@ class VenteController extends AbstractController
             $vente->setVenteDate(new \DateTime());
             $vente->setCreatedAt(new \DateTimeImmutable());
             $vente->setStatusVente("progress");
-            $vente->setNumeroVente($this->genererNUmeroVente(5, $countVente));
+            $vente->setNumeroVente($this->genererNumeroVente(5, $countVente));
 
             $entityManager->persist($vente);
             $entityManager->flush();
@@ -89,14 +89,14 @@ class VenteController extends AbstractController
             $vente->setVenteDate(new \DateTime());
             $vente->setCreatedAt(new \DateTimeImmutable());
             $vente->setStatusVente("paid");
-            $vente->setNumeroVente($this->genererNUmeroVente(5, $countVente));
+            $vente->setNumeroVente($this->genererNumeroVente(5, $countVente));
             $entityManager->persist($vente);
             $entityManager->flush();
             return new JsonResponse([
                 'etat'=>true,
                 'venteID'=>$vente->getId()
             ]);
-        }catch (Exeption $e){
+        }catch (\Exception $e){
             return new JsonResponse([
                 'etat'=>false
             ]);
@@ -118,7 +118,7 @@ class VenteController extends AbstractController
                 'etat'=>true,
                 'ventes'=>$ventes
             ]);
-        }catch (Exeption $e){
+        }catch (\Exception $e){
             return new JsonResponse([
                 'etat'=>false
             ]);
@@ -127,7 +127,7 @@ class VenteController extends AbstractController
     }
 
 
-    function genererNUmeroVente($sequenceLength, $lastId) {
+    function genererNumeroVente($sequenceLength, $lastId) {
         // Définir le préfixe
         $prefix = "V";
         $sequenceLength = $sequenceLength;
@@ -206,6 +206,58 @@ class VenteController extends AbstractController
 
     }
 
+    #[Route('/en-attente', name: 'app_vente_en_attente', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function enAttente(
+        VenteRepository $venteRepository,
+        ProduitVenduRepository $produitVenduRepository,
+    ): Response {
+        $ventes = $venteRepository->findBy(['statusVente' => 'progress'], ['createdAt' => 'ASC']);
+
+        $produitsParVente = [];
+        foreach ($ventes as $vente) {
+            $produitsParVente[$vente->getId()] = $produitVenduRepository->findBy(['vente' => $vente]);
+        }
+
+        return $this->render('vente/en_attente.html.twig', [
+            'ventes'           => $ventes,
+            'produitsParVente' => $produitsParVente,
+        ]);
+    }
+
+    #[Route('/pending-count', name: 'app_vente_pending_count', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function pendingCount(VenteRepository $venteRepository): JsonResponse
+    {
+        return new JsonResponse([
+            'count' => count($venteRepository->findBy(['statusVente' => 'progress'])),
+        ]);
+    }
+
+    #[Route('/{id}/payer', name: 'app_vente_payer_rapide', methods: ['POST'])]
+    public function payerRapide(Vente $vente, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('payer' . $vente->getId(), $request->request->get('_token'))) {
+            $vente->setStatusVente('paid');
+            $vente->setCreatedBy($this->getUser()->getUserIdentifier());
+            $vente->setCreatedAt(new \DateTimeImmutable());
+            $entityManager->flush();
+        }
+        return $this->redirectToRoute('app_vente_en_attente');
+    }
+
+    #[Route('/{id}/rejeter', name: 'app_vente_rejeter', methods: ['POST'])]
+    public function rejeter(Vente $vente, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('rejeter' . $vente->getId(), $request->request->get('_token'))) {
+            $vente->setStatusVente('canceled');
+            $vente->setCreatedBy($this->getUser()->getUserIdentifier());
+            $vente->setCreatedAt(new \DateTimeImmutable());
+            $entityManager->flush();
+        }
+        return $this->redirectToRoute('app_vente_en_attente');
+    }
+
     #[Route('/new', name: 'app_vente_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager,
                         ProduitsRepository $produitsRepository,
@@ -215,10 +267,14 @@ class VenteController extends AbstractController
                         TauxRepository $tauxRepository,
     ): Response
     {
-        $venteNo = $this->genererNUmeroVente( 5, count($venteRepository->findAll()));
+        $venteNo = $this->genererNumeroVente( 5, count($venteRepository->findAll()));
         $produits = $approvisionnementRepository->stockProduit();
         $tables = $tableRepository->findAll();
         $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
+        if (!$tauxactif) {
+            $this->addFlash('error', 'Aucun taux de change actif configuré. Veuillez en définir un avant de créer une vente.');
+            return $this->redirectToRoute('app_vente_index');
+        }
         $request->getSession()->set('tauxactif', $tauxactif->getCout());
         return $this->renderForm('vente/new.html.twig', [
             'produits' => $produits,
@@ -312,7 +368,7 @@ class VenteController extends AbstractController
         $lastMonthCaisse = $creditRepo->sortiepardate($fisrtDaylastMonth, $lastdayLastMonth)[0]['montant']? $creditRepo->sortiepardate($fisrtDaylastMonth, $lastdayLastMonth)[0]['montant']:0;
         $monthCaissePercent = 0;
         if($lastMonthCaisse >0){
-            $lastMonthCaisse = ($currentMonthCaisse * 100)/$lastMonth;
+            $monthCaissePercent = ($currentMonthCaisse * 100)/$lastMonthCaisse;
         }
         ///=== End monthly activities
         ///

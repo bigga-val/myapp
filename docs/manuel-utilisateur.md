@@ -1,7 +1,7 @@
 # Manuel Utilisateur — Credol App
 
-> **Version :** 1.0  
-> **Date :** Avril 2026  
+> **Version :** 1.1  
+> **Date :** Mai 2026  
 > **Application :** Credol App — Gestion d'entreprise
 
 ---
@@ -68,7 +68,7 @@ Lors de votre première connexion, l'application peut vous demander de configure
 
 ## 3. Tableau de bord
 
-**Accessible à :** tous les rôles
+**Accessible à :** administrateurs uniquement
 
 Le tableau de bord est la page d'accueil de l'application. Il affiche une synthèse en temps réel de l'activité de l'entreprise.
 
@@ -88,7 +88,7 @@ Le tableau de bord est la page d'accueil de l'application. Il affiche une synth�
 
 - **Tendance des revenus (6 mois)** — courbe d'évolution du chiffre d'affaires sur les 6 derniers mois.
 - **Ventes journalières (mois en cours)** — graphique en barres des ventes jour par jour.
-- **Top 5 des produits** — les 5 produits les plus vendus.
+- **Top 5 des produits** — les 5 produits les plus vendus, avec filtre de période (champ **Du** / **Au**) pour analyser n'importe quelle plage de dates.
 
 ### 3.3 Activité récente
 
@@ -328,18 +328,42 @@ Depuis le détail d'une commande, cliquez sur **Imprimer** pour générer un bon
 | Champ | Description |
 |---|---|
 | **Produit** | Produit à réapprovisionner |
-| **Quantité** | Quantité ajoutée au stock |
-| **Prix unitaire** | Coût d'achat unitaire |
-| **Date** | Date d'entrée en stock |
+| **Quantité** | Quantité ajoutée au stock (peut être négative pour une correction) |
+| **Prix unitaire** | Coût d'achat unitaire (calculé automatiquement selon le produit) |
+| **Coût total** | Calculé automatiquement — non modifiable |
 
-3. Le **coût total** est calculé automatiquement (quantité × prix unitaire).
-4. Cliquez sur **Enregistrer**.
+3. Cliquez sur **Enregistrer**.
 
-### 9.2 Voir l'historique des approvisionnements
+### 9.2 Ajustement de stock
 
-Allez dans **Approvisionnement** → **Historique** pour consulter tous les approvisionnements passés.
+L'ajustement de stock permet de **corriger manuellement le niveau de stock** sans passer par un achat fournisseur. Il est utile pour enregistrer des pertes, vols, ou corrections après inventaire physique.
 
-### 9.3 Voir les niveaux de stock actuels
+1. Allez dans **Approvisionnement** → **Ajustement stock**.
+2. Remplissez le formulaire :
+
+| Champ | Description |
+|---|---|
+| **Produit** | Produit à ajuster |
+| **Quantité** | Positive = augmentation du stock / Négative = réduction du stock |
+| **Motif** | Raison de l'ajustement |
+
+3. Cliquez sur **Enregistrer l'ajustement**.
+
+**Motifs disponibles :**
+- Correction inventaire
+- Perte
+- Vol
+- Produit avarié
+- Retour client
+- Autre
+
+> Les ajustements apparaissent dans la liste des approvisionnements avec le badge **Ajustement** (orange), contrairement aux approvisionnements réels qui affichent le badge **Appro.** (bleu).
+
+### 9.3 Voir l'historique des approvisionnements
+
+Allez dans **Approvisionnement** → **Historique** pour consulter tous les mouvements de stock (approvisionnements et ajustements). La colonne **Type** permet de distinguer les deux.
+
+### 9.4 Voir les niveaux de stock actuels
 
 1. Allez dans **Approvisionnement** → **Stock**.
 2. Vous voyez le stock disponible par produit.
@@ -541,25 +565,26 @@ Allez dans **Utilisateur** → **Liste des Utilisateurs** pour voir tous les com
 
 | Champ | Description |
 |---|---|
-| **Nom** | Nom de l'utilisateur |
-| **Adresse e-mail** | Identifiant de connexion |
-| **Mot de passe** | Mot de passe initial |
+| **Nom d'utilisateur** | Identifiant de connexion |
+| **Adresse e-mail** | Adresse e-mail de l'utilisateur |
 | **Rôle** | Niveau d'accès (voir section 16) |
 
 3. Cliquez sur **Enregistrer**.
 
-> L'utilisateur devra utiliser l'adresse e-mail et le mot de passe fournis pour se connecter.
+> Un mot de passe par défaut est automatiquement attribué et affiché dans le message de confirmation (format : `Credol@{année}`). Communiquez-le à l'utilisateur et demandez-lui de le changer dès sa première connexion via **Réinitialiser le mot de passe**.
 
 ### 15.3 Voir et modifier le profil d'un utilisateur
 
-Cliquez sur un utilisateur dans la liste pour accéder à son profil. Cliquez sur **Modifier** pour changer ses informations ou son rôle.
+- **Administrateur** : cliquez sur n'importe quel utilisateur dans la liste pour accéder à son profil, puis sur **Modifier** pour changer ses informations ou son rôle.
+- **Utilisateur standard** : chaque utilisateur peut modifier **son propre compte** (nom, email) depuis son profil. Il ne peut pas modifier les comptes des autres.
 
-### 15.4 Déconnecter un utilisateur de force
+### 15.4 Réinitialiser un mot de passe
 
-Si un utilisateur est connecté et doit être déconnecté immédiatement :
+1. Dans la liste des utilisateurs, cliquez sur **Réinit. MDP** en face de l'utilisateur concerné.
+2. Saisissez le nouveau mot de passe.
+3. Cliquez sur **Enregistrer**.
 
-1. Ouvrez son profil.
-2. Cliquez sur **Déconnecter la session**.
+> Si un utilisateur réinitialise son propre mot de passe, il est automatiquement déconnecté et doit se reconnecter avec le nouveau mot de passe.
 
 ---
 
@@ -571,7 +596,7 @@ L'application dispose de plusieurs niveaux d'accès. Chaque utilisateur se voit 
 
 | Fonctionnalité | Utilisateur standard | ROLE_COMMANDE | Administrateur |
 |---|:---:|:---:|:---:|
-| Tableau de bord | ✅ | ✅ | ✅ |
+| Tableau de bord | ❌ | ❌ | ✅ |
 | Créer une vente | ✅ | ✅ | ✅ |
 | Voir les factures | ✅ | ✅ | ✅ |
 | Historique des ventes | ✅ | ✅ | ✅ |
@@ -582,6 +607,7 @@ L'application dispose de plusieurs niveaux d'accès. Chaque utilisateur se voit 
 | Approuver / rejeter une commande | ✅ (si approbateur) | ✅ (si approbateur) | ✅ |
 | Gérer les approbateurs | ✅ | ❌ | ✅ |
 | Approvisionnement & stock | ❌ | ❌ | ✅ |
+| Ajustement de stock | ❌ | ❌ | ✅ |
 | Caisse (entrées / sorties / bilan) | ❌ | ❌ | ✅ |
 | Gestion des employés | ❌ | ❌ | ✅ |
 | Gestion de la paie | ❌ | ❌ | ✅ |
@@ -589,6 +615,7 @@ L'application dispose de plusieurs niveaux d'accès. Chaque utilisateur se voit 
 | Taux de change | ❌ | ❌ | ✅ |
 | Gestion des tables | ❌ | ❌ | ✅ |
 | Gestion des utilisateurs | ❌ | ❌ | ✅ |
+| Modifier son propre compte | ✅ | ✅ | ✅ |
 | Tableau de bord Finance | ❌ | ❌ | ✅ |
 
 ### 16.2 Description des rôles
@@ -634,6 +661,18 @@ R : Allez dans **Taux** → **Taux Récents**, puis créez un nouveau taux et ma
 
 **Q : Où voir le journal des actions effectuées dans le système ?**  
 R : Le tableau de bord affiche les dernières entrées du journal d'audit en bas de page. Pour un historique complet, contactez votre administrateur.
+
+**Q : Quelle est la différence entre un approvisionnement et un ajustement de stock ?**  
+R : Un **approvisionnement** correspond à un achat réel auprès d'un fournisseur (entrée de marchandise avec un coût). Un **ajustement** est une correction manuelle du stock pour refléter la réalité physique (perte, vol, erreur de comptage) — il n'a pas d'impact financier sur la caisse.
+
+**Q : Puis-je entrer une quantité négative lors d'un approvisionnement ?**  
+R : Oui, une quantité négative est autorisée et représente une réduction de stock (retour fournisseur, correction). Pour les corrections liées à des pertes ou vols, préférez utiliser la fonction **Ajustement de stock** qui permet de préciser le motif.
+
+**Q : Je ne vois plus le tableau de bord depuis la mise à jour.**  
+R : Le tableau de bord est désormais réservé aux administrateurs. Si vous avez besoin d'y accéder, contactez votre administrateur pour qu'il vous attribue le rôle `ROLE_ADMIN`.
+
+**Q : Quel est le mot de passe par défaut d'un nouvel utilisateur ?**  
+R : Le mot de passe par défaut est affiché dans le message de confirmation lors de la création du compte. Il est de la forme `Credol@{année}` (ex : `Credol@2026`). Changez-le dès la première connexion via **Réinitialiser le mot de passe**.
 
 ---
 

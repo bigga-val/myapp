@@ -7,16 +7,18 @@
         <h1>Approvisionnements</h1>
         <div class="flex gap-2 items-center">
             <div id="export-buttons"></div>
-            <a class="border border-2 p-2 text-white rounded bg-primary" href="{{ path('app_approvisionnement_new') }}">Approvisionner</a>
+            <a class="btn btn-warning" href="{{ path('app_approvisionnement_ajustement') }}">Ajustement stock</a>
+            <a class="btn btn-primary" href="{{ path('app_approvisionnement_new') }}">Approvisionner</a>
         </div>
     </div>
 
-    <table id="datatable" class="table display">
+    <div class="overflow-x-auto w-full">
+    <table id="datatable" class="table display w-full">
         <thead>
             <tr>
+                <th>Type</th>
                 <th>Code</th>
                 <th>Désignation</th>
-                <th>Unité</th>
                 <th>Prix unit.</th>
                 <th>Qté</th>
                 <th>Coût (Fc)</th>
@@ -35,11 +37,17 @@
                 {% set convert = 0 %}
             {% endif %}
             <tr>
+                <td>
+                    {% if appro.type == 'ajustement' %}
+                        <span class="badge bg-warning">Ajustement</span>
+                    {% else %}
+                        <span class="badge bg-info">Appro.</span>
+                    {% endif %}
+                </td>
                 <td>{{ appro.produit.code }}</td>
                 <td>{{ appro.produit.designation }}</td>
-                <td>{{ appro.produit.uniteMesure }}</td>
                 <td>Fc {{ appro.produit.prix|number_format(2) }}</td>
-                <td>{{ appro.qty }}</td>
+                <td>{{ appro.qty }} {{ appro.produit.uniteMesure }}</td>
                 <td>Fc {{ appro.cout|number_format(2) }}</td>
                 <td>$ {{ convert|number_format(2) }}</td>
                 <td>{{ appro.taux }}</td>
@@ -58,6 +66,7 @@
         {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
 
 <script src="{{ asset('assets/js/jquery.min.js') }}"></script>

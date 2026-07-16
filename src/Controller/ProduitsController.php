@@ -25,13 +25,6 @@ class ProduitsController extends AbstractController
         ]);
     }
 
-    #[Route('/', name: 'app_produits_excel', methods: ['GET'])]
-    public function excel(ProduitsRepository $produitsRepository): void
-    {
-        $produits = $produitsRepository->findAll();
-
-    }
-
     #[Route('/new', name: 'app_produits_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,

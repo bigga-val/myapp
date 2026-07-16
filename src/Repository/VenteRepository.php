@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Vente;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-Use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @extends ServiceEntityRepository<Vente>
@@ -105,7 +104,7 @@ class VenteRepository extends ServiceEntityRepository
         $query = $em->createQuery(
             '
                 select substring(pv.createdAt, 6, 2) mois, SUM(pv.qty * pv.prixUnitaire) montant
-                from App\Entity\Produits p, App\Entity\ProduitVendu pv, App\Entity\Ventev v
+                from App\Entity\Produits p, App\Entity\ProduitVendu pv, App\Entity\Vente v
                 where p.id = pv.produit
                 and pv.vente = v.id
                 and v.statusVente = :status

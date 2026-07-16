@@ -3,14 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Approvisionnement;
+use App\Form\AjustementStockType;
 use App\Form\ApprovisionnementType;
 use App\Repository\ApprovisionnementRepository;
 use App\Repository\ProduitsRepository;
+use App\Repository\TauxRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/approvisionnement')]
 class ApprovisionnementController extends AbstractController
@@ -19,8 +23,26 @@ class ApprovisionnementController extends AbstractController
     public function index(ApprovisionnementRepository $approvisionnementRepository): Response
     {
         return $this->render('approvisionnement/index.html.twig', [
-            'approvisionnements' => $approvisionnementRepository->findAll(),
+            'approvisionnements' => $approvisionnementRepository->findBy([], ['createdAt' => 'DESC']),
         ]);
+    }
+
+    #[Route('/stock-bas', name: 'app_stock_bas', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function stockBas(ApprovisionnementRepository $approvisionnementRepository): JsonResponse
+    {
+        $stocks = $approvisionnementRepository->stockProduitByDate();
+        $bas = array_values(array_map(
+            fn($s) => [
+                'id'             => $s['produitID'],
+                'designation'    => $s['designation'],
+                'stockDisponible'=> $s['stockDisponible'],
+                'minimum'        => $s['minimum'],
+            ],
+            array_filter($stocks, fn($s) => $s['stockBas'] === 1)
+        ));
+
+        return new JsonResponse($bas);
     }
 
     #[Route('/stock', name: 'app_approvisionnement_stock', methods: ['GET'])]
@@ -49,19 +71,51 @@ class ApprovisionnementController extends AbstractController
         ]);
     }
 
+    #[Route('/ajustement', name: 'app_approvisionnement_ajustement', methods: ['GET', 'POST'])]
+    public function ajustement(Request $request, EntityManagerInterface $entityManager, TauxRepository $tauxRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $approvisionnement = new Approvisionnement();
+        $form = $this->createForm(AjustementStockType::class, $approvisionnement);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $tauxActif = $tauxRepository->findOneBy(['isActive' => true]);
+            $approvisionnement->setType('ajustement');
+            $approvisionnement->setApproDate(new \DateTime());
+            $approvisionnement->setCreatedAt(new \DateTimeImmutable());
+            $approvisionnement->setCreatedBy($this->getUser()->getUserIdentifier());
+            $approvisionnement->setTaux($tauxActif?->getCout());
+            $approvisionnement->setCout(0);
+
+            $entityManager->persist($approvisionnement);
+            $entityManager->flush();
+            $this->addFlash('success', 'Ajustement de stock enregistré avec succès');
+
+            return $this->redirectToRoute('app_approvisionnement_stock', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('approvisionnement/ajustement.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/new', name: 'app_approvisionnement_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, ProduitsRepository $produitsRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, ProduitsRepository $produitsRepository, TauxRepository $tauxRepository): Response
     {
         $approvisionnement = new Approvisionnement();
         $form = $this->createForm(ApprovisionnementType::class, $approvisionnement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $tauxActif = $tauxRepository->findOneBy(['isActive' => true]);
+            $prixUnitaire = (float) ($form->get('prixUnitaire')->getData() ?? $approvisionnement->getProduit()?->getPrix() ?? 0);
+            $approvisionnement->setType('approvisionnement');
             $approvisionnement->setApproDate(new \DateTime());
             $approvisionnement->setCreatedAt(new \DateTimeImmutable());
-            $approvisionnement->setCreatedBy($this->getUser()->getUsername());
-            $approvisionnement->setTaux($request->getSession()->get('tauxactif'));
-            $prixUnitaire = (float) ($form->get('prixUnitaire')->getData() ?? $approvisionnement->getProduit()?->getPrix() ?? 0);
+            $approvisionnement->setCreatedBy($this->getUser()->getUserIdentifier());
+            $approvisionnement->setTaux($tauxActif?->getCout());
             $approvisionnement->setCout(($approvisionnement->getQty() ?? 0) * $prixUnitaire);
 
             $entityManager->persist($approvisionnement);
@@ -100,19 +154,26 @@ class ApprovisionnementController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
+                $prixUnitaire = (float) ($form->get('prixUnitaire')->getData() ?? $approvisionnement->getProduit()?->getPrix() ?? 0);
+                $approvisionnement->setCout(($approvisionnement->getQty() ?? 0) * $prixUnitaire);
                 $entityManager->flush();
                 $this->addFlash('success', "Modifications prises en charge avec succès");
 
                 return $this->redirectToRoute('app_approvisionnement_index', [], Response::HTTP_SEE_OTHER);
             }
 
+            $prixMap = [];
+            foreach ($entityManager->getRepository(\App\Entity\Produits::class)->findAll() as $p) {
+                $prixMap[$p->getId()] = $p->getPrix();
+            }
+
             return $this->renderForm('approvisionnement/edit.html.twig', [
                 'approvisionnement' => $approvisionnement,
+                'prixMap'           => $prixMap,
                 'form' => $form,
             ]);
         } else {
-            return $this->redirectToRoute('erreur401', [], Response::HTTP_SEE_OTHER);
-
+            throw $this->createAccessDeniedException();
         }
 
     }

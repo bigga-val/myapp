@@ -515,10 +515,46 @@
 
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
                 <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
-                    <span>Voir les niveaux de stock actuels</span>
+                    <span>Ajustement de stock</span>
                     <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm space-y-3">
+                        <p>L'ajustement permet de <strong class="text-black dark:text-white">corriger manuellement le niveau de stock</strong> sans passer par un achat fournisseur (pertes, vol, inventaire physique, etc.).</p>
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Approvisionnement → Ajustement stock</strong>.</li>
+                            <li>Sélectionnez le produit à ajuster.</li>
+                            <li>Saisissez la quantité : <strong class="text-black dark:text-white">négative</strong> pour réduire le stock, <strong class="text-black dark:text-white">positive</strong> pour l'augmenter.</li>
+                            <li>Choisissez le motif dans la liste.</li>
+                            <li>Cliquez sur <span class="inline-block bg-warning/10 text-warning text-xs font-bold px-2 py-0.5 rounded">Enregistrer l'ajustement</span>.</li>
+                        </ol>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="p-2 rounded bg-[#f8f9fa] dark:bg-[#1a2035] border border-[#ebedf2] dark:border-[#191e3a]">
+                                <p class="font-bold text-black dark:text-white mb-1">Motifs disponibles</p>
+                                <ul class="list-disc list-inside space-y-0.5 text-white-dark">
+                                    <li>Correction inventaire</li>
+                                    <li>Perte</li>
+                                    <li>Vol</li>
+                                    <li>Produit avarié</li>
+                                    <li>Retour client</li>
+                                    <li>Autre</li>
+                                </ul>
+                            </div>
+                            <div class="p-2 rounded bg-warning/10 border border-warning/20 text-warning">
+                                <p class="font-bold mb-1">À noter</p>
+                                <p>Les ajustements apparaissent dans l'historique avec le badge <span class="font-bold">Ajustement</span> (orange) pour les distinguer des approvisionnements réels.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Voir les niveaux de stock actuels</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
                     <div class="px-5 pb-5 text-white-dark text-sm">
                         <p class="mb-2">Allez dans <strong class="text-black dark:text-white">Approvisionnement → Stock</strong>. Utilisez les filtres de date pour analyser sur une période.</p>
                         <div class="flex items-center gap-2 p-2 rounded bg-danger/10 border border-danger/20 text-danger text-xs">

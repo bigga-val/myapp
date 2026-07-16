@@ -6,7 +6,6 @@ use App\Entity\Approvisionnement;
 use App\Entity\CommandeProduit;
 use App\Entity\CommandeReception;
 use App\Form\CommandeReceptionType;
-use App\Repository\ApprovisionnementRepository;
 use App\Repository\CommandeProduitRepository;
 use App\Repository\CommandeReceptionRepository;
 use App\Repository\TauxRepository;
@@ -23,7 +22,7 @@ class CommandeReceptionController extends AbstractController
     public function index(CommandeReceptionRepository $commandeReceptionRepository): Response
     {
         return $this->render('commande_reception/index.html.twig', [
-            'commande_receptions' => $commandeReceptionRepository->findAll(),
+            'commande_receptions' => $commandeReceptionRepository->findBy([], ['ReceptionDate' => 'DESC']),
         ]);
     }
 
@@ -52,7 +51,6 @@ class CommandeReceptionController extends AbstractController
                                     CommandeProduit $commandeProduit,
                                     CommandeProduitRepository $commandeProduitRepository,
                                     EntityManagerInterface $entityManager,
-                                    Approvisionnement $approvisionnement,
                                     TauxRepository $tauxRepository
     ): Response
     {
@@ -66,13 +64,13 @@ class CommandeReceptionController extends AbstractController
         $entityManager->flush();
         //Approvisionner
         $approvisionnement = new Approvisionnement();
-        $approvisionnement->setProduit($commandeProduit->getproduit());
+        $approvisionnement->setProduit($commandeProduit->getProduit());
         $approvisionnement->setTaux($tauxactif->getCout());
         $approvisionnement->setQty($request->query->get('quantite'));
         $approvisionnement->setCreatedAt(new \DateTimeImmutable());
         $approvisionnement->setCreatedBy($this->getUser()->getUserIdentifier());
         $approvisionnement->setApproDate(new \DateTime());
-        $approvisionnement->setCout($commandeProduit->getproduit()->getPrix() * $request->query->get('quantite'));
+        $approvisionnement->setCout($commandeProduit->getProduit()->getPrix() * $request->query->get('quantite'));
         $entityManager->persist($approvisionnement);
 
         $entityManager->flush();

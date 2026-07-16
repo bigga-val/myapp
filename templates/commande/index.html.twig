@@ -1,5 +1,7 @@
 {% extends 'components/layout/default.html.twig' %}
 {% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
 <div class="panel">
     <div class="flex justify-between items-center mb-4">
         <h1>Liste des Commandes</h1>
@@ -78,7 +80,11 @@
     </table>
 </div>
 
+<script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/js/datatables.js') }}"></script>
 <script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+<script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
 
 <script>
     let table = new DataTable('#datatable', {

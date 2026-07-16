@@ -91,7 +91,21 @@
 
     {# Top 5 produits #}
     <div class="panel">
-        <h5 class="font-semibold text-lg mb-4">Top 5 produits vendus</h5>
+        <h5 class="font-semibold text-lg mb-3">Top 5 produits vendus</h5>
+        <form method="GET" action="{{ path('app_dashboard') }}" class="flex flex-wrap gap-2 mb-4 items-end">
+            <div>
+                <label class="text-xs text-gray-500 block mb-1">Du</label>
+                <input type="date" name="date1" value="{{ topDate1 ?? '' }}" class="form-input text-sm py-1">
+            </div>
+            <div>
+                <label class="text-xs text-gray-500 block mb-1">Au</label>
+                <input type="date" name="date2" value="{{ topDate2 ?? '' }}" class="form-input text-sm py-1">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Filtrer</button>
+            {% if topDate1 or topDate2 %}
+                <a href="{{ path('app_dashboard') }}" class="btn btn-outline-secondary btn-sm">Réinitialiser</a>
+            {% endif %}
+        </form>
         {% if topProduits %}
             <div class="space-y-3">
             {% for prod in topProduits %}

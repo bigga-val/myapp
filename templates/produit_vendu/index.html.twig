@@ -53,12 +53,12 @@
                 <td>{{ produit_vendu.vente ? produit_vendu.vente.numeroVente : '-' }}</td>
                 <td>{{ produit_vendu.produit.designation }}</td>
                 <td>{{ produit_vendu.qty }}</td>
-                <td>{{ produit_vendu.PrixUnitaire }}</td>
-                {% set total = produit_vendu.PrixUnitaire * produit_vendu.qty  %}
+                <td>{{ produit_vendu.prixUnitaire }}</td>
+                {% set total = produit_vendu.prixUnitaire * produit_vendu.qty  %}
                 {% set grandtotal = grandtotal + total %}
                 <td>{{ total }}</td>
                 <td>{{ produit_vendu.createdAt ? produit_vendu.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ produit_vendu.createdBy }}</td>
+                <td>{{ produit_vendu.createdby }}</td>
                 <td>
 {#                    <a href="{{ path('app_produit_vendu_show', {'id': produit_vendu.id}) }}">show</a>#}
 {#                    <a href="{{ path('app_produit_vendu_edit', {'id': produit_vendu.id}) }}">edit</a>#}

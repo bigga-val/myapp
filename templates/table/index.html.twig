@@ -1,6 +1,5 @@
 {% extends 'components/layout/default.html.twig' %}
 
-
 {% block content %}
 
 <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
@@ -8,17 +7,16 @@
     <div class="panel-header flex justify-between mb-3">
         <h1>Tables disponibles</h1>
         <a class="btn btn-primary" href="{{ path('app_table_new') }}">Creer une table</a>
-
     </div>
     <div class="">
-
 
     <table class="table">
         <thead>
             <tr>
                 <th>#</th>
                 <th>Designation</th>
-                <th>actions</th>
+                <th>Lien Menu</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -28,14 +26,23 @@
             <tr>
                 <td>{{ counter }}</td>
                 <td>{{ table.designation }}</td>
-                <td class="flex justify-between">
-{#                    <a href="{{ path('app_table_show', {'id': table.id}) }}">show</a>#}
+                <td>
+                    <a href="{{ url('app_menu_public') }}" target="_blank"
+                       class="text-xs text-primary underline break-all">
+                        /menu
+                    </a>
+                </td>
+                <td class="flex gap-2 items-center">
                     <a class="btn btn-primary btn-sm" href="{{ path('app_table_edit', {'id': table.id}) }}">Modifier</a>
+                    <button class="btn btn-secondary btn-sm"
+                            onclick="ouvrirQrCode('{{ url('app_menu_public') }}', 'Menu Restaurant')">
+                        QR Code
+                    </button>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">no records found</td>
+                <td colspan="4">Aucune table trouvée</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -43,4 +50,88 @@
 
     </div>
 </div>
+
+{# ── Modal QR Code ──────────────────────────────────────────────── #}
+<div id="qrModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60" onclick="fermerQrCode()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-xs w-full text-center">
+        <h3 class="font-bold text-base mb-1">QR Code - Table</h3>
+        <p id="qrTableName" class="text-sm text-gray-500 mb-4"></p>
+        <div id="qrcode" class="flex justify-center mb-4"></div>
+        <p id="qrUrl" class="text-xs text-gray-400 break-all mb-4"></p>
+        <div class="flex gap-2">
+            <button onclick="imprimerQrCode()" class="flex-1 btn btn-primary btn-sm">Imprimer</button>
+            <button onclick="fermerQrCode()" class="flex-1 btn btn-outline-danger btn-sm">Fermer</button>
+        </div>
+    </div>
+</div>
+
+{# QRCode.js via CDN #}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    let qrInstance = null;
+
+    function ouvrirQrCode(url, tableNom) {
+        document.getElementById('qrTableName').textContent = tableNom;
+        document.getElementById('qrUrl').textContent = url;
+
+        const container = document.getElementById('qrcode');
+        container.innerHTML = '';
+
+        qrInstance = new QRCode(container, {
+            text: url,
+            width: 200,
+            height: 200,
+            colorDark: '#1a1a2e',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        document.getElementById('qrModal').classList.remove('hidden');
+    }
+
+    function fermerQrCode() {
+        document.getElementById('qrModal').classList.add('hidden');
+        document.getElementById('qrcode').innerHTML = '';
+        qrInstance = null;
+    }
+
+    function imprimerQrCode() {
+        const tableName = document.getElementById('qrTableName').textContent;
+        const url = document.getElementById('qrUrl').textContent;
+        const qrImg = document.querySelector('#qrcode img');
+
+        if (!qrImg) return;
+
+        const win = window.open('', '_blank');
+        win.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>QR Code - ${tableName}</title>
+                <style>
+                    body { font-family: sans-serif; text-align: center; padding: 40px; }
+                    h2 { margin-bottom: 4px; }
+                    p { color: #666; font-size: 12px; margin-bottom: 20px; }
+                    img { width: 220px; height: 220px; }
+                    .url { font-size: 10px; color: #999; margin-top: 12px; word-break: break-all; max-width: 240px; margin-left: auto; margin-right: auto; }
+                    @media print { button { display: none; } }
+                </style>
+            </head>
+            <body>
+                <h2>Table : ${tableName}</h2>
+                <p>Scannez pour commander</p>
+                <img src="${qrImg.src}" alt="QR Code">
+                <div class="url">${url}</div>
+                <br>
+                <button onclick="window.print()">Imprimer</button>
+            </body>
+            </html>
+        `);
+        win.document.close();
+        win.focus();
+        setTimeout(() => win.print(), 500);
+    }
+</script>
+
 {% endblock %}

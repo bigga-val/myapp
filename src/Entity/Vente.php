@@ -35,6 +35,12 @@ class Vente
     #[ORM\ManyToOne]
     private ?Table $TableServie = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $clientNom = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $clientTel = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -120,6 +126,30 @@ class Vente
     public function setTableServie(?Table $TableServie): static
     {
         $this->TableServie = $TableServie;
+
+        return $this;
+    }
+
+    public function getClientNom(): ?string
+    {
+        return $this->clientNom;
+    }
+
+    public function setClientNom(?string $clientNom): static
+    {
+        $this->clientNom = $clientNom;
+
+        return $this;
+    }
+
+    public function getClientTel(): ?string
+    {
+        return $this->clientTel;
+    }
+
+    public function setClientTel(?string $clientTel): static
+    {
+        $this->clientTel = $clientTel;
 
         return $this;
     }

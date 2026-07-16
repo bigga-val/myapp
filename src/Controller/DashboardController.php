@@ -11,13 +11,16 @@ use App\Repository\PaieEmployeRepository;
 use App\Repository\ProduitVenduRepository;
 use App\Repository\VenteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractController
 {
     #[Route('/board', name: 'app_dashboard')]
+    #[\Symfony\Component\Security\Http\Attribute\IsGranted('ROLE_ADMIN')]
     public function index(
+        Request               $request,
         VenteRepository       $venteRepo,
         CommandeRepository    $commandeRepo,
         CreditRepository      $creditRepo,
@@ -62,8 +65,12 @@ class DashboardController extends AbstractController
         $joursLabels = range(1, $nbJoursMois);
         $joursData   = array_map(fn($j) => $joursIndexe[$j] ?? 0, $joursLabels);
 
-        // Top 5 produits
-        $topProduits = $produitVenduRepo->topProduits(5);
+        // Top 5 produits (avec filtre de dates optionnel)
+        $date1 = $request->query->get('date1');
+        $date2 = $request->query->get('date2');
+        $topDebut = $date1 ? \DateTimeImmutable::createFromFormat('Y-m-d', $date1) : null;
+        $topFin   = $date2 ? \DateTimeImmutable::createFromFormat('Y-m-d', $date2) : null;
+        $topProduits = $produitVenduRepo->topProduits(5, $topDebut, $topFin);
 
         // Tableaux récents
         $dernieresVentes    = $venteRepo->dernieres(5);
@@ -86,6 +93,8 @@ class DashboardController extends AbstractController
             'joursLabels'      => json_encode($joursLabels),
             'joursData'        => json_encode($joursData),
             'topProduits'      => $topProduits,
+            'topDate1'         => $date1,
+            'topDate2'         => $date2,
             'dernieresVentes'  => $dernieresVentes,
             'dernieresCommandes' => $dernieresCommandes,
             'derniersLogs'     => $derniersLogs,

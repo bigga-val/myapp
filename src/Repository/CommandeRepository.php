@@ -46,6 +46,14 @@ class CommandeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
+    public function maxId(): int
+    {
+        return (int) ($this->createQueryBuilder('c')
+            ->select('MAX(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0);
+    }
+
     public function countEnAttente(): int
     {
         return (int) $this->createQueryBuilder('c')

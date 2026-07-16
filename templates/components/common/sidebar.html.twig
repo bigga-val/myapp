@@ -81,13 +81,11 @@
                         <div class="flex items-center">
                             <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                  fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle opacity="0.5" cx="15" cy="6" r="3"
-                                        fill="currentColor" />
-                                <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3"
-                                         fill="currentColor" />
-                                <circle cx="9.00098" cy="6" r="4" fill="currentColor" />
-                                <ellipse cx="9.00098" cy="17.001" rx="7" ry="4"
-                                         fill="currentColor" />
+                                <path opacity="0.5" d="M2 3H3.5L4.5 8M4.5 8H21L19 15H6L4.5 8Z" fill="currentColor"/>
+                                <path d="M4.5 8L6 15H19L21 8H4.5Z" fill="currentColor" opacity="0.3"/>
+                                <circle cx="9" cy="19" r="1.5" fill="currentColor"/>
+                                <circle cx="17" cy="19" r="1.5" fill="currentColor"/>
+                                <path d="M2 3H3.74L4.5 8M4.5 8H21L19 15H6L4.5 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Vente</span>
                         </div>
@@ -100,6 +98,11 @@
                         </div>
                     </button>
                     <ul x-cloak x-show="activeDropdown === 'vente'" x-collapse class="sub-menu text-gray-500">
+                        <li>
+                            <a href="{{ path("app_vente_en_attente") }}" class="flex items-center justify-between">
+                                <span>Commandes en attente</span>
+                            </a>
+                        </li>
                         <li>
                             <a href="{{ path("app_vente_new") }}">Vendre</a>
                         </li>
@@ -165,13 +168,9 @@
 
                             <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                  fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle opacity="0.5" cx="15" cy="6" r="3"
-                                        fill="currentColor" />
-                                <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3"
-                                         fill="currentColor" />
-                                <circle cx="9.00098" cy="6" r="4" fill="currentColor" />
-                                <ellipse cx="9.00098" cy="17.001" rx="7" ry="4"
-                                         fill="currentColor" />
+                                <path opacity="0.5" d="M16 3H8C5.79 3 4 4.79 4 7V19C4 20.1 4.9 21 6 21H18C19.1 21 20 20.1 20 19V7C20 4.79 18.21 3 16 3Z" fill="currentColor"/>
+                                <path d="M8 9H16M8 13H16M8 17H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M9 3V5H15V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             <span
                                     class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Commande Produit</span>
@@ -299,13 +298,8 @@
 
                                 <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                      fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle opacity="0.5" cx="15" cy="6" r="3"
-                                            fill="currentColor" />
-                                    <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3"
-                                             fill="currentColor" />
-                                    <circle cx="9.00098" cy="6" r="4" fill="currentColor" />
-                                    <ellipse cx="9.00098" cy="17.001" rx="7" ry="4"
-                                             fill="currentColor" />
+                                    <path opacity="0.5" d="M4 7L12 3L20 7V17L12 21L4 17V7Z" fill="currentColor"/>
+                                    <path d="M4 7L12 11M12 11L20 7M12 11V21M4 7L12 3L20 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                                 <span
                                         class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Approvisionnement</span>
@@ -340,13 +334,9 @@
 
                                 <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                      fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle opacity="0.5" cx="15" cy="6" r="3"
-                                            fill="currentColor" />
-                                    <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3"
-                                             fill="currentColor" />
-                                    <circle cx="9.00098" cy="6" r="4" fill="currentColor" />
-                                    <ellipse cx="9.00098" cy="17.001" rx="7" ry="4"
-                                             fill="currentColor" />
+                                    <path opacity="0.5" d="M2 9C2 7.34 3.34 6 5 6H19C20.66 6 22 7.34 22 9V18C22 19.66 20.66 21 19 21H5C3.34 21 2 19.66 2 18V9Z" fill="currentColor"/>
+                                    <path d="M2 10H22M6 15H8M11 15H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M7 3L5 6M17 3L19 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                                 </svg>
                                 <span
                                         class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Caisse</span>
@@ -390,13 +380,9 @@
 
                                 <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                      fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle opacity="0.5" cx="15" cy="6" r="3"
-                                            fill="currentColor" />
-                                    <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3"
-                                             fill="currentColor" />
-                                    <circle cx="9.00098" cy="6" r="4" fill="currentColor" />
-                                    <ellipse cx="9.00098" cy="17.001" rx="7" ry="4"
-                                             fill="currentColor" />
+                                    <circle opacity="0.5" cx="12" cy="7" r="4" fill="currentColor"/>
+                                    <path opacity="0.5" d="M4 21C4 17.134 7.582 14 12 14C16.418 14 20 17.134 20 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
                                 </svg>
                                 <span
                                         class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Utilisateur</span>
@@ -426,13 +412,10 @@
 
                                 <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                      fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle opacity="0.5" cx="15" cy="6" r="3"
-                                            fill="currentColor" />
-                                    <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3"
-                                             fill="currentColor" />
-                                    <circle cx="9.00098" cy="6" r="4" fill="currentColor" />
-                                    <ellipse cx="9.00098" cy="17.001" rx="7" ry="4"
-                                             fill="currentColor" />
+                                    <path opacity="0.5" d="M4 5C4 3.895 4.895 3 6 3H18C19.105 3 20 3.895 20 5V21L12 17L4 21V5Z" fill="currentColor"/>
+                                    <path d="M4 5C4 3.895 4.895 3 6 3H18C19.105 3 20 3.895 20 5V21L12 17L4 21V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                    <circle cx="12" cy="9" r="2.5" fill="currentColor"/>
+                                    <path d="M8 14C8 12.343 9.791 11 12 11C14.209 11 16 12.343 16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                                 </svg>
                                 <span
                                         class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Employe</span>
@@ -465,13 +448,8 @@
 
                                 <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                      fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle opacity="0.5" cx="15" cy="6" r="3"
-                                            fill="currentColor" />
-                                    <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3"
-                                             fill="currentColor" />
-                                    <circle cx="9.00098" cy="6" r="4" fill="currentColor" />
-                                    <ellipse cx="9.00098" cy="17.001" rx="7" ry="4"
-                                             fill="currentColor" />
+                                    <path opacity="0.5" d="M3 5C3 3.895 3.895 3 5 3H9L11 7H5C3.895 7 3 6.105 3 5ZM3 5V19C3 20.105 3.895 21 5 21H19C20.105 21 21 20.105 21 19V9C21 7.895 20.105 7 19 7H11L9 3H5C3.895 3 3 3.895 3 5Z" fill="currentColor"/>
+                                    <path d="M3 5C3 3.895 3.895 3 5 3H9L11 7H19C20.105 7 21 7.895 21 9V19C21 20.105 20.105 21 19 21H5C3.895 21 3 20.105 3 19V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                                 </svg>
                                 <span
                                         class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Categorie Produit</span>
@@ -538,8 +516,8 @@
                     </li>
                     <li class="menu nav-item">
                         <button type="button" class="nav-link group"
-                                :class="{ 'active': activeDropdown === 'Tables' }"
-                                @click="activeDropdown === 'tables' ? activeDropdown = null : activeDropdown = 'tables'">
+                                :class="{ 'active': activeDropdown === 'restaurant' }"
+                                @click="activeDropdown === 'restaurant' ? activeDropdown = null : activeDropdown = 'restaurant'">
                             <div class="flex items-center">
 
                                 <svg class="group-hover:!text-primary" width="20" height="20"
@@ -551,9 +529,9 @@
                                           d="M12 5.25C12.4142 5.25 12.75 5.58579 12.75 6V6.31673C14.3804 6.60867 15.75 7.83361 15.75 9.5C15.75 9.91421 15.4142 10.25 15 10.25C14.5858 10.25 14.25 9.91421 14.25 9.5C14.25 8.82154 13.6859 8.10339 12.75 7.84748V11.3167C14.3804 11.6087 15.75 12.8336 15.75 14.5C15.75 16.1664 14.3804 17.3913 12.75 17.6833V18C12.75 18.4142 12.4142 18.75 12 18.75C11.5858 18.75 11.25 18.4142 11.25 18V17.6833C9.61957 17.3913 8.25 16.1664 8.25 14.5C8.25 14.0858 8.58579 13.75 9 13.75C9.41421 13.75 9.75 14.0858 9.75 14.5C9.75 15.1785 10.3141 15.8966 11.25 16.1525V12.6833C9.61957 12.3913 8.25 11.1664 8.25 9.5C8.25 7.83361 9.61957 6.60867 11.25 6.31673V6C11.25 5.58579 11.5858 5.25 12 5.25ZM11.25 7.84748C10.3141 8.10339 9.75 8.82154 9.75 9.5C9.75 10.1785 10.3141 10.8966 11.25 11.1525V7.84748ZM14.25 14.5C14.25 13.8215 13.6859 13.1034 12.75 12.8475V16.1525C13.6859 15.8966 14.25 15.1785 14.25 14.5Z"
                                           fill="currentColor" />
                                 </svg>
-                                <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Tables</span>
+                                <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Restaurant</span>
                             </div>
-                            <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'tables' }">
+                            <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'restaurant' }">
 
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
@@ -562,10 +540,13 @@
                                 </svg>
                             </div>
                         </button>
-                        <ul x-cloak x-show="activeDropdown === 'tables'" x-collapse
+                        <ul x-cloak x-show="activeDropdown === 'restaurant'" x-collapse
                             class="sub-menu text-gray-500">
                             <li>
                                 <a href="{{ path('app_table_index') }}">Tables</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('app_menu_admin_index') }}">Menu Restaurant</a>
                             </li>
                             {#                            <li>#}
                             {#                                <a href="{{ path('app_taux_new') }}">Changer le Taux</a>#}

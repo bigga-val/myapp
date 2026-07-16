@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Positive;
+use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class ApprovisionnementType extends AbstractType
@@ -29,7 +29,7 @@ class ApprovisionnementType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(message: 'La quantité est obligatoire.'),
-                    new Positive(message: 'La quantité doit être supérieure à 0.'),
+                    new NotEqualTo(value: 0, message: 'La quantité ne peut pas être zéro.'),
                 ],
             ])
             ->add('prixUnitaire', NumberType::class, [
