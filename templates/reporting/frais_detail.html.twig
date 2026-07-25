@@ -1,0 +1,145 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold">{{ frais.libelle }}</h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                Année académique {{ annee.libelle }}
+                {% if frais.classes is not empty %}
+                    &nbsp;·&nbsp; {{ frais.classes|map(c => c.nom)|join(', ') }}
+                {% else %}
+                    &nbsp;·&nbsp; Toutes classes
+                {% endif %}
+                &nbsp;·&nbsp; {{ frais.montant|number_format(0, '.', ' ') }} FC / élève
+            </p>
+        </div>
+        <a href="{{ path('app_reporting_financier') }}" class="btn btn-secondary">
+            ← Retour au tableau de bord
+        </a>
+    </div>
+</div>
+
+{# ── KPIs ─────────────────────────────────────────────────────────────────── #}
+{% set nbPayants = ayantPaye|length %}
+{% set taux = nbAttendu > 0 ? (nbPayants / nbAttendu * 100) : 0 %}
+
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Élèves attendus</p>
+        <p class="text-2xl font-bold text-primary">{{ nbAttendu }}</p>
+    </div>
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Ont payé</p>
+        <p class="text-2xl font-bold text-success">{{ nbPayants }}</p>
+    </div>
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">N'ont pas payé</p>
+        <p class="text-2xl font-bold text-danger">{{ impayes|length }}</p>
+    </div>
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Total perçu (FC)</p>
+        <p class="text-2xl font-bold text-warning">{{ totalPercu|number_format(0, '.', ' ') }}</p>
+        <div class="w-full bg-gray-100 rounded-full h-1.5 mt-2">
+            <div class="h-1.5 rounded-full {% if taux >= 80 %}bg-green-500{% elseif taux >= 50 %}bg-yellow-400{% else %}bg-red-400{% endif %}"
+                 style="width: {{ taux > 100 ? 100 : taux }}%"></div>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">{{ taux|number_format(0) }}% de recouvrement</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+    {# ── Ont payé ──────────────────────────────────────────────────────────── #}
+    <div class="panel">
+        <h2 class="font-semibold mb-3 flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-green-500"></span>
+            Ont payé
+            <span class="ml-1 px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700 font-semibold">{{ nbPayants }}</span>
+        </h2>
+
+        {% if ayantPaye is empty %}
+            <p class="text-sm text-gray-400">Aucun paiement enregistré pour ce frais.</p>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover text-sm">
+                    <thead>
+                        <tr>
+                            <th>Élève</th>
+                            <th class="text-right">Montant payé</th>
+                            <th>Date</th>
+                            <th>Mode</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in ayantPaye %}
+                        <tr>
+                            <td>
+                                <div class="font-medium">{{ e.nom }} {{ e.postnom }} {{ e.prenom }}</div>
+                                <div class="text-xs text-gray-400">{{ e.matricule ?? '—' }}</div>
+                            </td>
+                            <td class="text-right font-semibold text-success">
+                                {{ e.totalPaye|number_format(0, '.', ' ') }} FC
+                            </td>
+                            <td class="text-xs text-gray-500">
+                                {{ e.dernierPaiement ? e.dernierPaiement|date('d/m/Y') : '—' }}
+                            </td>
+                            <td>
+                                {% if e.modePaiement == 'mobile_money' %}
+                                    <span class="px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-700">Mobile</span>
+                                {% elseif e.modePaiement == 'virement' %}
+                                    <span class="px-1.5 py-0.5 rounded text-xs bg-blue-100 text-blue-700">Virement</span>
+                                {% elseif e.modePaiement == 'cheque' %}
+                                    <span class="px-1.5 py-0.5 rounded text-xs bg-yellow-100 text-yellow-700">Chèque</span>
+                                {% else %}
+                                    <span class="px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-600">Espèces</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+    {# ── N'ont pas encore payé ─────────────────────────────────────────────── #}
+    <div class="panel">
+        <h2 class="font-semibold mb-3 flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500"></span>
+            N'ont pas encore payé
+            <span class="ml-1 px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700 font-semibold">{{ impayes|length }}</span>
+        </h2>
+
+        {% if impayes is empty %}
+            <p class="text-sm text-gray-500 flex items-center gap-1">
+                <span class="text-green-500 font-bold">✓</span>
+                Tous les élèves ont payé ce frais.
+            </p>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover text-sm">
+                    <thead>
+                        <tr>
+                            <th>Élève</th>
+                            <th>Matricule</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in impayes %}
+                        <tr>
+                            <td class="font-medium">{{ e.nom }} {{ e.postnom }} {{ e.prenom }}</td>
+                            <td class="text-xs text-gray-400">{{ e.matricule ?? '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

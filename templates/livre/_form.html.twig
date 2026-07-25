@@ -1,0 +1,61 @@
+{{ form_start(form) }}
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        <label class="form-label">{{ form_label(form.titre) }}</label>
+        {{ form_widget(form.titre, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.titre) }}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.categorie) }}</label>
+        {{ form_widget(form.categorie, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.categorie) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.auteur) }}</label>
+        {{ form_widget(form.auteur, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.auteur) }}
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">{{ form_label(form.isbn) }}</label>
+        {{ form_widget(form.isbn, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.isbn) }}
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">{{ form_label(form.anneePublication) }}</label>
+        {{ form_widget(form.anneePublication, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.anneePublication) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.nombreExemplaires) }}</label>
+        {{ form_widget(form.nombreExemplaires, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.nombreExemplaires) }}
+    </div>
+    <div class="col-md-8">
+        <label class="form-label">{{ form_label(form.localisation) }}</label>
+        {{ form_widget(form.localisation, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.localisation) }}
+    </div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">{{ form_label(form.description) }}</label>
+    {{ form_widget(form.description, {'attr': {'class': 'form-input', 'rows': 3}}) }}
+    {{ form_errors(form.description) }}
+</div>
+
+<div class="mb-4 flex items-center gap-2">
+    {{ form_widget(form.actif) }}
+    <label class="form-label mb-0">Livre actif (disponible à l'emprunt)</label>
+    {{ form_errors(form.actif) }}
+</div>
+
+<button class="btn btn-primary" type="submit">Enregistrer</button>
+
+{{ form_end(form) }}

@@ -1,0 +1,84 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Examens</h1>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a class="btn btn-primary" href="{{ path('app_examen_new') }}">Nouvel examen</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if annee %}
+    <div class="panel mb-2">
+        <p class="text-sm text-gray-600">Année académique : <strong>{{ annee.libelle }}</strong></p>
+    </div>
+{% endif %}
+
+{% for periode, examens in grouped %}
+<div class="panel mb-4">
+    <h2 class="text-lg font-semibold mb-3">
+        {% if periode == 1 %}1er Trimestre{% elseif periode == 2 %}2ème Trimestre{% else %}3ème Trimestre{% endif %}
+    </h2>
+    <div class="table-responsive">
+        <table class="table table-hover" data-dt>
+            <thead>
+                <tr>
+                    <th>Libellé</th>
+                    <th>Type</th>
+                    <th>Période</th>
+                    <th>Classe</th>
+                    <th>Dates</th>
+                    <th class="no-export">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for examen in examens %}
+                <tr>
+                    <td>{{ examen.libelle }}</td>
+                    <td>
+                        {% if examen.type == 'devoir' %}
+                            <span class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800">Devoir</span>
+                        {% elseif examen.type == 'interro' %}
+                            <span class="px-2 py-1 rounded text-sm bg-teal-100 text-teal-800">Interrogation</span>
+                        {% elseif examen.type == 'examen_partiel' %}
+                            <span class="px-2 py-1 rounded text-sm bg-orange-100 text-orange-800">Examen Partiel</span>
+                        {% elseif examen.type == 'examen_final' %}
+                            <span class="px-2 py-1 rounded text-sm bg-red-100 text-red-800">Examen Final</span>
+                        {% else %}
+                            <span class="px-2 py-1 rounded text-sm bg-gray-100 text-gray-800">{{ examen.type }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if examen.periode == 1 %}1er Trimestre
+                        {% elseif examen.periode == 2 %}2ème Trimestre
+                        {% else %}3ème Trimestre{% endif %}
+                    </td>
+                    <td>{{ examen.classe ? examen.classe.nom : '— Toutes —' }}</td>
+                    <td>
+                        {% if examen.dateDebut %}{{ examen.dateDebut|date('d/m/Y') }}{% else %}—{% endif %}
+                        {% if examen.dateFin %} → {{ examen.dateFin|date('d/m/Y') }}{% endif %}
+                    </td>
+                    <td class="flex gap-1">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a class="btn btn-primary btn-sm" href="{{ path('app_examen_edit', {'id': examen.id}) }}" data-tip="Modifier"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></a>
+                            <form method="post" action="{{ path('app_examen_delete', {'id': examen.id}) }}" style="display:inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ examen.id) }}">
+                                <button class="btn btn-danger btn-sm" type="submit" data-tip="Supprimer" onclick="return confirm('Supprimer cet examen ?')"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="panel">
+    <p class="text-gray-500">Aucun examen trouvé.</p>
+</div>
+{% endfor %}
+
+{% endblock %}

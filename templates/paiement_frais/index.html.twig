@@ -1,0 +1,113 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-3">
+        <h1>Paiements de frais</h1>
+        {% if is_granted('ROLE_SECRETAIRE') %}
+            <a class="btn btn-primary" href="{{ path('app_paiement_frais_new') }}">Nouveau paiement</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="panel">
+    <form method="get" class="mb-4 flex gap-2 items-end flex-wrap">
+        <div>
+            <label class="block text-sm font-medium mb-1">Élève</label>
+            <select name="eleveId" class="form-select">
+                <option value="">— Tous les élèves —</option>
+                {% for eleve in eleves %}
+                    <option value="{{ eleve.id }}" {% if eleveActif and eleveActif.id == eleve.id %}selected{% endif %}>
+                        {{ eleve.nomComplet }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Mois</label>
+            <input type="month" name="mois" value="{{ moisActif ?? '' }}" class="form-input">
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+            {% if eleveActif or moisActif %}
+                <a href="{{ path('app_paiement_frais_index') }}" class="btn btn-secondary">Réinitialiser</a>
+            {% endif %}
+        </div>
+    </form>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success mb-3">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger mb-3">{{ message }}</div>
+    {% endfor %}
+
+    <div class="table-responsive">
+        <table class="table table-hover" data-dt>
+            <thead>
+                <tr>
+                    <th>N° Reçu</th>
+                    <th>Élève</th>
+                    <th>Frais</th>
+                    <th>Montant payé</th>
+                    <th>Date</th>
+                    <th>Mode</th>
+                    <th>Enregistré par</th>
+                    <th class="no-export">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in paiements %}
+                <tr>
+                    <td>
+                        <span class="font-mono text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            {{ p.numeroRecu }}
+                        </span>
+                    </td>
+                    <td>{{ p.eleve.nomComplet }}</td>
+                    <td>{{ p.fraisScolaire.libelle }}</td>
+                    <td class="font-mono">{{ p.montantPaye|number_format(2, ',', ' ') }}</td>
+                    <td>{{ p.datePaiement ? p.datePaiement|date('d/m/Y') : '—' }}</td>
+                    <td>
+                        {% if p.modePaiement == 'especes' %}
+                            <span class="badge bg-green-100 text-green-800">Espèces</span>
+                        {% elseif p.modePaiement == 'mobile_money' %}
+                            <span class="badge bg-orange-100 text-orange-800">Mobile Money</span>
+                        {% elseif p.modePaiement == 'virement' %}
+                            <span class="badge bg-blue-100 text-blue-800">Virement</span>
+                        {% else %}
+                            <span class="badge bg-gray-100 text-gray-800">Chèque</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-sm text-gray-500">{{ p.enregistrePar ?? '—' }}</td>
+                    <td class="flex gap-1">
+                        <a class="btn btn-sm btn-primary" href="{{ path('app_paiement_frais_show', {'id': p.id}) }}" data-tip="Voir le détail"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></a>
+                        <a class="btn btn-sm btn-secondary" href="{{ path('app_paiement_frais_pdf', {'id': p.id}) }}" target="_blank" data-tip="Télécharger le PDF"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg></a>
+                        {% if is_granted('ROLE_SECRETAIRE') %}
+                            <form method="post" action="{{ path('app_paiement_frais_delete', {'id': p.id}) }}" style="display:inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ p.id) }}">
+                                <button class="btn btn-sm btn-danger" type="submit" data-tip="Supprimer"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center text-gray-500 py-4">Aucun paiement trouvé.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if moisActif and totalMois is not null %}
+        <div class="mt-4 flex justify-end">
+            <div class="bg-blue-50 border border-blue-200 rounded px-4 py-2 text-right">
+                <span class="text-sm text-blue-600">Total encaissé pour {{ moisActif }} :</span>
+                <span class="font-bold text-blue-800 ml-2">{{ totalMois|number_format(2, ',', ' ') }}</span>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

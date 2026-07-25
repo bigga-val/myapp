@@ -1,0 +1,143 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <h1 class="mb-4">Nouveau paiement</h1>
+
+    {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+
+    <div>
+        {{ form_label(form.eleve) }}
+        {{ form_widget(form.eleve) }}
+        {{ form_errors(form.eleve) }}
+    </div>
+
+    <div>
+        {{ form_label(form.fraisScolaire) }}
+        {{ form_widget(form.fraisScolaire) }}
+        {{ form_errors(form.fraisScolaire) }}
+        <span class="field-hint" id="frais_hint">Sélectionnez d'abord un élève</span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            {{ form_label(form.montantPaye) }}
+            {{ form_widget(form.montantPaye) }}
+            {{ form_errors(form.montantPaye) }}
+            <span class="field-hint" id="montant_hint">Montant en francs congolais (FC)</span>
+        </div>
+        <div>
+            {{ form_label(form.datePaiement) }}
+            {{ form_widget(form.datePaiement) }}
+            {{ form_errors(form.datePaiement) }}
+        </div>
+    </div>
+
+    <div>
+        {{ form_label(form.modePaiement) }}
+        {{ form_widget(form.modePaiement) }}
+        {{ form_errors(form.modePaiement) }}
+    </div>
+
+    <div>
+        {{ form_label(form.observations) }}
+        {{ form_widget(form.observations) }}
+        {{ form_errors(form.observations) }}
+    </div>
+
+    <div class="flex gap-2 pt-2">
+        <button type="submit" class="btn btn-primary">Enregistrer le paiement</button>
+        <a href="{{ path('app_paiement_frais_index') }}" class="btn btn-secondary">Annuler</a>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+{% endblock %}
+
+{% block page_ready %}
+    // ── Paiement frais : filtre élève → frais ─────────────────────────────────
+    (function () {
+        // Symfony génère les IDs comme : {nom_formulaire}_{nom_champ}
+        // PaiementFraisType → paiement_frais
+        var $eleve  = $('#paiement_frais_eleve');
+        var $frais  = $('#paiement_frais_fraisScolaire');
+        var $montant = $('[name="paiement_frais[montantPaye]"]');
+        var $hintF  = $('#frais_hint');
+        var $hintM  = $('#montant_hint');
+        var apiUrl  = '{{ path('app_paiement_frais_api_frais_eligibles') }}';
+        var montantsMap = {};
+
+        if (!$eleve.length || !$frais.length) {
+            console.warn('[PaiementFrais] Éléments non trouvés. eleve:', $eleve.length, 'frais:', $frais.length);
+            return;
+        }
+
+        // Désactiver le select frais au départ
+        setFraisDisabled('— Sélectionnez d\'abord un élève —');
+
+        // Changement d'élève → charger les frais éligibles via AJAX
+        $eleve.on('change', function () {
+            var eleveId = $(this).val();
+            montantsMap = {};
+            $montant.val('');
+            $hintM.text('Montant en francs congolais (FC)');
+
+            if (!eleveId) {
+                setFraisDisabled('— Sélectionnez d\'abord un élève —');
+                return;
+            }
+
+            setFraisDisabled('Chargement…');
+
+            $.ajax({
+                url: apiUrl,
+                data: { eleveId: eleveId },
+                dataType: 'json',
+                success: function (data) {
+                    if (!data || data.length === 0) {
+                        setFraisDisabled('Aucun frais en attente pour cet élève');
+                        return;
+                    }
+                    // Peupler le select avec les frais éligibles
+                    if ($frais.data('select2')) $frais.select2('destroy');
+                    $frais.empty().append($('<option>', { value: '', text: '— Choisir un frais —' }));
+                    $.each(data, function (i, f) {
+                        montantsMap[f.id] = f.montant;
+                        $frais.append($('<option>', {
+                            value: f.id,
+                            text:  f.libelle + ' (' + Number(f.montant).toLocaleString('fr-FR') + ' FC)',
+                        }));
+                    });
+                    $frais.prop('disabled', false);
+                    $frais.select2({ placeholder: '— Choisir un frais —', allowClear: false });
+                    $hintF.text(data.length + ' frais en attente');
+                },
+                error: function (xhr) {
+                    console.error('[PaiementFrais] Erreur AJAX', xhr.status, xhr.responseText);
+                    setFraisDisabled('Erreur (' + xhr.status + ')');
+                },
+            });
+        });
+
+        // Changement de frais → remplir le montant
+        $frais.on('change', function () {
+            var id = $(this).val();
+            if (id && montantsMap[id] !== undefined) {
+                $montant.val(montantsMap[id]);
+                $hintM.text('Montant fixé par le frais · modifiable si nécessaire');
+            } else {
+                $montant.val('');
+                $hintM.text('Montant en francs congolais (FC)');
+            }
+        });
+
+        function setFraisDisabled(placeholder) {
+            if ($frais.data('select2')) $frais.select2('destroy');
+            $frais.empty().append($('<option>', { value: '', text: placeholder }));
+            $frais.prop('disabled', true);
+            $frais.select2({ placeholder: placeholder, allowClear: false });
+            $hintF.text(placeholder);
+        }
+    })();
+{% endblock %}

@@ -1,0 +1,322 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+
+{# ── En-tête & filtres ────────────────────────────────────────────────────── #}
+<div class="panel">
+    <div class="flex flex-wrap justify-between items-start gap-4 mb-1">
+        <div>
+            <h1 class="text-xl font-bold">Tableau de bord financier</h1>
+            <p class="text-sm text-gray-500 mt-0.5">Vue consolidée</p>
+        </div>
+        <form method="get" class="flex flex-wrap items-end gap-3">
+            <div>
+                <label class="block text-xs text-gray-500 mb-1">Mois (KPIs mensuels)</label>
+                <div class="flex gap-1">
+                    <select name="mois" class="form-select w-auto text-sm">
+                        {% set moisNoms = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'] %}
+                        {% for i in 1..12 %}
+                            <option value="{{ i }}" {% if i == moisCourant %}selected{% endif %}>{{ moisNoms[i-1] }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="anneeMois" class="form-select w-auto text-sm">
+                        {% for a in anneesDisponibles %}
+                            <option value="{{ a }}" {% if a == anneeMois %}selected{% endif %}>{{ a }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs text-gray-500 mb-1">Année (graphiques)</label>
+                <select name="annee" class="form-select w-auto text-sm">
+                    {% for a in anneesDisponibles %}
+                        <option value="{{ a }}" {% if a == annee %}selected{% endif %}>{{ a }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Filtrer</button>
+        </form>
+    </div>
+</div>
+
+{# ── KPI — Mois courant ────────────────────────────────────────────────────── #}
+{% set moisNomsFull = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'] %}
+<h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 mt-4">
+    {{ moisNomsFull[moisCourant - 1] }} {{ anneeMois }}
+</h2>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-2">
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Frais scolaires</p>
+        <p class="text-2xl font-bold text-primary">{{ fraisPercusMois|number_format(0, '.', ' ') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Autres recettes</p>
+        <p class="text-2xl font-bold text-success">{{ totalDebits|number_format(0, '.', ' ') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Dépenses</p>
+        <p class="text-2xl font-bold text-danger">{{ totalCredits|number_format(0, '.', ' ') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Masse salariale</p>
+        <p class="text-2xl font-bold text-warning">{{ masseSalariale|number_format(0, '.', ' ') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Solde trésorerie</p>
+        <p class="text-2xl font-bold {% if soldeMois >= 0 %}text-success{% else %}text-danger{% endif %}">
+            {{ soldeMois|number_format(0, '.', ' ') }}
+        </p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+</div>
+<p class="text-xs text-gray-400 mb-6">Solde = (Frais scolaires + Autres recettes) − (Dépenses + Masse salariale)</p>
+
+{# ── KPI — Année {{ annee }} ───────────────────────────────────────────────── #}
+<h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Année {{ annee }}</h2>
+<div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-2">
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Frais scolaires</p>
+        <p class="text-xl font-bold text-primary">{{ totalFraisAnnee|number_format(0, '.', ' ') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Autres recettes</p>
+        <p class="text-xl font-bold text-success">{{ totalDebitsAnnee|number_format(0, '.', ' ') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Total dépenses</p>
+        <p class="text-xl font-bold text-danger">{{ totalCreditsAnnee|number_format(0, '.', ' ') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Masse salariale</p>
+        <p class="text-xl font-bold text-warning">{{ totalMasseSalAnnee|number_format(0, '.', ' ') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Solde annuel</p>
+        <p class="text-xl font-bold {% if soldeAnnee >= 0 %}text-success{% else %}text-danger{% endif %}">
+            {{ soldeAnnee|number_format(0, '.', ' ') }}
+        </p>
+        <p class="text-xs text-gray-400 mt-0.5">FC</p>
+    </div>
+
+</div>
+<p class="text-xs text-gray-400 mb-6">Solde = (Frais scolaires + Autres recettes) − (Dépenses + Masse salariale)</p>
+
+{# ── Graphiques ────────────────────────────────────────────────────────────── #}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+
+    {# Graphique 1 : Trésorerie (crédits vs débits + solde cumulé) #}
+    <div class="panel lg:col-span-2">
+        <h2 class="font-semibold mb-4">Trésorerie {{ annee }} — Recettes / Dépenses &amp; Solde cumulé</h2>
+        <canvas id="chartTresorerie" height="100"></canvas>
+    </div>
+
+    {# Graphique 2 : Frais scolaires perçus #}
+    <div class="panel">
+        <h2 class="font-semibold mb-4">Frais scolaires perçus {{ annee }}</h2>
+        <canvas id="chartFrais" height="160"></canvas>
+    </div>
+
+    {# Graphique 3 : Masse salariale #}
+    <div class="panel">
+        <h2 class="font-semibold mb-4">Masse salariale {{ annee }}</h2>
+        <canvas id="chartSalaires" height="160"></canvas>
+    </div>
+
+</div>
+
+{# ── Tableau derniers paiements + raccourci recouvrement ──────────────────── #}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+    {# Raccourci vers la page de recouvrement #}
+    <div class="panel flex flex-col justify-between">
+        <div>
+            <h2 class="font-semibold mb-2">Recouvrement des frais</h2>
+            <p class="text-sm text-gray-500">Suivez frais par frais et classe par classe quels élèves ont payé et lesquels sont en attente.</p>
+        </div>
+        <div class="mt-4">
+            <a href="{{ path('app_reporting_recouvrement') }}" class="btn btn-primary w-full text-center">
+                Voir le recouvrement →
+            </a>
+        </div>
+    </div>
+
+    {# Tableau : Derniers paiements #}
+    <div class="panel lg:col-span-2">
+        <h2 class="font-semibold mb-3">10 derniers paiements de frais</h2>
+        {% if derniersPaiements is empty %}
+            <p class="text-sm text-gray-400">Aucun paiement enregistré.</p>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover text-sm">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Élève</th>
+                            <th>Frais</th>
+                            <th class="text-right">Montant</th>
+                            <th>Mode</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in derniersPaiements %}
+                        <tr>
+                            <td>{{ p.datePaiement ? p.datePaiement|date('d/m/Y') : '—' }}</td>
+                            <td>{{ p.eleve.nomComplet }}</td>
+                            <td class="text-gray-500">{{ p.fraisScolaire.libelle }}</td>
+                            <td class="text-right font-semibold">{{ p.montantPaye|number_format(0, '.', ' ') }}</td>
+                            <td>
+                                {% if p.modePaiement == 'mobile_money' %}
+                                    <span class="px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-700">Mobile</span>
+                                {% elseif p.modePaiement == 'virement' %}
+                                    <span class="px-1.5 py-0.5 rounded text-xs bg-blue-100 text-blue-700">Virement</span>
+                                {% elseif p.modePaiement == 'cheque' %}
+                                    <span class="px-1.5 py-0.5 rounded text-xs bg-yellow-100 text-yellow-700">Chèque</span>
+                                {% else %}
+                                    <span class="px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-600">Espèces</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-2 text-right">
+                <a href="{{ path('app_paiement_frais_index') }}" class="text-sm text-primary hover:underline">Voir tous les paiements →</a>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{# ── Chart.js ──────────────────────────────────────────────────────────────── #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const mois    = {{ moisLabels|json_encode|raw }};
+    const frais   = {{ fraisParMois|json_encode|raw }};
+    const debits  = {{ debitsParMois|json_encode|raw }};
+    const credits = {{ creditsParMois|json_encode|raw }};
+    const salaires = {{ masseSalParMois|json_encode|raw }};
+    // Recettes totales = frais scolaires + autres recettes
+    const recettes = {{ recettesTotalesParMois|json_encode|raw }};
+    // Dépenses totales = dépenses + masse salariale
+    const depenses = {{ depensesTotalesParMois|json_encode|raw }};
+    const solde   = {{ soldeParMois|json_encode|raw }};
+
+    // ── Chart 1 : Trésorerie ────────────────────────────────────────────────
+    new Chart(document.getElementById('chartTresorerie'), {
+        data: {
+            labels: mois,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'Recettes totales',
+                    data: recettes,
+                    backgroundColor: 'rgba(34,197,94,0.7)',
+                    borderColor: '#16a34a',
+                    borderWidth: 1,
+                    yAxisID: 'yBar',
+                },
+                {
+                    type: 'bar',
+                    label: 'Dépenses totales',
+                    data: depenses,
+                    backgroundColor: 'rgba(239,68,68,0.7)',
+                    borderColor: '#dc2626',
+                    borderWidth: 1,
+                    yAxisID: 'yBar',
+                },
+                {
+                    type: 'line',
+                    label: 'Solde cumulé',
+                    data: solde,
+                    borderColor: '#4361ee',
+                    backgroundColor: 'rgba(67,97,238,0.1)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    fill: true,
+                    tension: 0.3,
+                    yAxisID: 'yLine',
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { position: 'top' } },
+            scales: {
+                yBar:  { type: 'linear', position: 'left',  title: { display: true, text: 'FC' }, beginAtZero: true },
+                yLine: { type: 'linear', position: 'right', title: { display: true, text: 'Solde cumulé (FC)' }, grid: { drawOnChartArea: false } },
+            },
+        },
+    });
+
+    // ── Chart 2 : Frais scolaires ───────────────────────────────────────────
+    new Chart(document.getElementById('chartFrais'), {
+        type: 'line',
+        data: {
+            labels: mois,
+            datasets: [{
+                label: 'Frais perçus (FC)',
+                data: frais,
+                borderColor: '#4361ee',
+                backgroundColor: 'rgba(67,97,238,0.12)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                borderWidth: 2,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'FC' } },
+            },
+        },
+    });
+
+    // ── Chart 3 : Masse salariale ───────────────────────────────────────────
+    new Chart(document.getElementById('chartSalaires'), {
+        type: 'bar',
+        data: {
+            labels: mois,
+            datasets: [{
+                label: 'Masse salariale (FC)',
+                data: salaires,
+                backgroundColor: 'rgba(251,146,60,0.75)',
+                borderColor: '#ea580c',
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'FC' } },
+            },
+        },
+    });
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Bibliothèque — Emprunts</h1>
+        {% if is_granted('ROLE_SECRETAIRE') %}
+            <a class="btn btn-primary" href="{{ path('app_emprunt_livre_new') }}">Nouvel emprunt</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="panel">
+    {# Filtres par statut #}
+    <div class="flex gap-2 mb-4">
+        <a href="{{ path('app_emprunt_livre_index') }}"
+           class="btn {{ statut == '' ? 'btn-primary' : 'btn-secondary' }}">Tous</a>
+        <a href="{{ path('app_emprunt_livre_index', {'statut': 'en_cours'}) }}"
+           class="btn {{ statut == 'en_cours' ? 'btn-primary' : 'btn-secondary' }}">En cours</a>
+        <a href="{{ path('app_emprunt_livre_index', {'statut': 'en_retard'}) }}"
+           class="btn {{ statut == 'en_retard' ? 'btn-danger' : 'btn-secondary' }}">En retard</a>
+        <a href="{{ path('app_emprunt_livre_index', {'statut': 'rendu'}) }}"
+           class="btn {{ statut == 'rendu' ? 'btn-success' : 'btn-secondary' }}">Rendus</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" data-dt>
+            <thead>
+                <tr>
+                    <th>Élève</th>
+                    <th>Livre</th>
+                    <th>Date emprunt</th>
+                    <th>Date retour prévue</th>
+                    <th>Statut</th>
+                    <th>Enregistré par</th>
+                    <th class="no-export">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for emprunt in emprunts %}
+                <tr>
+                    <td>{{ emprunt.emprunteur.nomComplet }}</td>
+                    <td>
+                        <a href="{{ path('app_livre_show', {'id': emprunt.livre.id}) }}" class="text-blue-600 hover:underline">
+                            {{ emprunt.livre.titre }}
+                        </a>
+                    </td>
+                    <td>{{ emprunt.dateEmprunt ? emprunt.dateEmprunt|date('d/m/Y') : '—' }}</td>
+                    <td>{{ emprunt.dateRetourPrevue ? emprunt.dateRetourPrevue|date('d/m/Y') : '—' }}</td>
+                    <td>
+                        {% if emprunt.statut == 'rendu' %}
+                            <span class="px-2 py-1 rounded text-sm bg-green-100 text-green-800">Rendu</span>
+                            {% if emprunt.dateRetourEffective %}
+                                <br><small class="text-gray-500">{{ emprunt.dateRetourEffective|date('d/m/Y') }}</small>
+                            {% endif %}
+                        {% elseif emprunt.isEnRetard() %}
+                            <span class="px-2 py-1 rounded text-sm bg-red-100 text-red-800 font-semibold">EN RETARD</span>
+                        {% else %}
+                            <span class="px-2 py-1 rounded text-sm bg-orange-100 text-orange-800">En cours</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ emprunt.enregistrePar ?? '—' }}</td>
+                    <td class="flex gap-1">
+                        {% if emprunt.statut != 'rendu' and is_granted('ROLE_SECRETAIRE') %}
+                            <form method="post" action="{{ path('app_emprunt_livre_retour', {'id': emprunt.id}) }}" style="display:inline" data-confirm="Marquer cet emprunt comme rendu ?">
+                                <input type="hidden" name="_token" value="{{ csrf_token('retour' ~ emprunt.id) }}">
+                                <button class="btn btn-success" type="submit" data-tip="Enregistrer le retour">
+                                    Marquer rendu
+                                </button>
+                            </form>
+                        {% endif %}
+                        {% if is_granted('ROLE_SECRETAIRE') %}
+                            <form method="post" action="{{ path('app_emprunt_livre_delete', {'id': emprunt.id}) }}" style="display:inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ emprunt.id) }}">
+                                <button class="btn btn-danger" type="submit" data-tip="Supprimer">Supprimer</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7">Aucun emprunt trouvé.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

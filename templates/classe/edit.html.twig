@@ -1,0 +1,21 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Modifier la classe — {{ classe.nom }}</h1>
+        <a class="btn btn-primary" href="{{ path('app_classe_index') }}">Voir la liste</a>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            {{ include('classe/_form.html.twig') }}
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+
+{% endblock %}

@@ -3,13 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Debit;
-use App\Entity\Vente;
 use App\Form\DebitType;
 use App\Repository\DebitRepository;
-use App\Repository\ProduitVenduRepository;
 use App\Repository\TauxRepository;
-use App\Repository\VenteRepository;
-use App\Service\FPdfGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,7 +57,7 @@ class DebitController extends AbstractController
             $debit->setTaux($request->getSession()->get('tauxactif'));
 
             $entityManager->persist($debit);
-            $this->addFlash('success', "Sortie de caisse enregistrée avec succès");
+            $this->addFlash('success', "Recette enregistrée avec succès");
 
 //            dd($debit);
             $entityManager->flush();
@@ -69,22 +65,6 @@ class DebitController extends AbstractController
 
         return $this->renderForm('debit/new.html.twig', [
             'debits' => $debitRepository->findBy([], ['createdAt' => 'DESC'], 5),
-        ]);
-    }
-
-    #[Route('/debisPdf/{id}', name: 'app_devis_pdf', methods: ['GET'])]
-    public function debisPdf(Debit $debit,
-                                      FPdfGenerator $pdfGenerator,
-                                      DebitRepository $debitRepository ): Response
-    {
-        $pdfContent = $pdfGenerator->generateVersementPdf($debit->getId(), $debitRepository);
-        //dd($pdfContent);
-
-        //return $this->redirectToRoute('app_facture_show', ['id'=>$facture->getId()], Response::HTTP_SEE_OTHER);
-        return new Response($pdfContent, 200, [
-            'Content-Type' => 'application/pdf',
-            'Attachement'=>false
-            //'Content-Disposition' => 'attachment; filename="votre_fichier.pdf"',
         ]);
     }
 

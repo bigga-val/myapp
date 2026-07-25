@@ -1,0 +1,99 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-3">
+        <h1>Emploi du temps</h1>
+        {% if is_granted('ROLE_SECRETAIRE') %}
+            <a class="btn btn-primary" href="{{ path('app_emploi_du_temps_new') }}">Ajouter un créneau</a>
+        {% endif %}
+    </div>
+</div>
+
+{% for type, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ type == 'success' ? 'success' : (type == 'error' ? 'danger' : type) }} mb-3">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="panel">
+    <form method="get" class="mb-4">
+        <div class="flex gap-2 items-center flex-wrap">
+            <label class="form-label mb-0">Classe :</label>
+            <select name="classeId" class="form-select w-auto">
+                <option value="">Toutes les classes</option>
+                {% for c in classes %}
+                    <option value="{{ c.id }}" {% if classeId == c.id ~ '' %}selected{% endif %}>
+                        {{ c.nom }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+            {% if classe %}
+                <a href="{{ path('app_emploi_du_temps_semaine', {'classeId': classe.id}) }}"
+                   class="btn btn-secondary">
+                    Vue semaine — {{ classe.nom }}
+                </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Classe</th>
+                    <th>Matière</th>
+                    <th>Enseignant</th>
+                    <th>Jour</th>
+                    <th>Horaire</th>
+                    <th>Salle</th>
+                    <th>Statut</th>
+                    {% if is_granted('ROLE_SECRETAIRE') %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% set jours = {1: 'Lundi', 2: 'Mardi', 3: 'Mercredi', 4: 'Jeudi', 5: 'Vendredi', 6: 'Samedi'} %}
+            {% for slot in slots %}
+                <tr>
+                    <td>{{ slot.classe.nom }}</td>
+                    <td>{{ slot.matiere.nom }}</td>
+                    <td>{{ slot.enseignant.nomcomplet }}</td>
+                    <td>{{ jours[slot.jourSemaine] ?? slot.jourSemaine }}</td>
+                    <td>{{ slot.heureDebut|date('H:i') }} – {{ slot.heureFin|date('H:i') }}</td>
+                    <td>{{ slot.salle ?? '—' }}</td>
+                    <td>
+                        {% if slot.actif %}
+                            <span class="badge bg-success text-white px-2 py-1 rounded text-xs">Actif</span>
+                        {% else %}
+                            <span class="badge bg-secondary text-white px-2 py-1 rounded text-xs">Inactif</span>
+                        {% endif %}
+                    </td>
+                    {% if is_granted('ROLE_SECRETAIRE') %}
+                    <td class="flex gap-1">
+                        <a class="btn btn-primary btn-sm"
+                           href="{{ path('app_emploi_du_temps_edit', {'id': slot.id}) }}"
+                           data-tip="Modifier">Modifier</a>
+                        <form method="post"
+                              action="{{ path('app_emploi_du_temps_delete', {'id': slot.id}) }}"
+                              style="display:inline">
+                            <input type="hidden" name="_token"
+                                   value="{{ csrf_token('delete' ~ slot.id) }}">
+                            <button class="btn btn-danger btn-sm" type="submit" data-tip="Supprimer">Supprimer</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center text-gray-500">Aucun créneau trouvé.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

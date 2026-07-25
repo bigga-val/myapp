@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Reçu {{ paiement.numeroRecu }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: DejaVu Sans, Arial, sans-serif;
+            font-size: 13px;
+            color: #222;
+            padding: 30px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #1a56db;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        .header .school-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1a56db;
+            letter-spacing: 1px;
+        }
+        .header .recu-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 6px;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .numero-recu {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #93c5fd;
+            border-radius: 4px;
+            padding: 4px 12px;
+            font-family: monospace;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .section {
+            margin-bottom: 18px;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6b7280;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 3px;
+        }
+        .info-grid {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-grid td {
+            padding: 5px 8px;
+            vertical-align: top;
+        }
+        .info-grid td:first-child {
+            width: 40%;
+            color: #6b7280;
+            font-size: 12px;
+        }
+        .info-grid td:last-child {
+            font-weight: 500;
+        }
+        .montant-box {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            padding: 12px 16px;
+            text-align: center;
+            margin: 16px 0;
+        }
+        .montant-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 1px;
+        }
+        .montant-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #166534;
+            margin-top: 4px;
+        }
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 16px;
+            text-align: center;
+        }
+        .footer .merci {
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 20px;
+        }
+        .signature-area {
+            display: inline-block;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .signature-line {
+            border-top: 1px solid #9ca3af;
+            width: 180px;
+            margin: 0 auto;
+            margin-top: 40px;
+        }
+        .signature-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        .footer-note {
+            font-size: 10px;
+            color: #9ca3af;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="school-name">INSOFT MASOMO</div>
+        <div class="recu-title">Reçu de Paiement</div>
+        <div><span class="numero-recu">{{ paiement.numeroRecu }}</span></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Informations élève</div>
+        <table class="info-grid">
+            <tr>
+                <td>Nom complet</td>
+                <td>{{ paiement.eleve.nomComplet }}</td>
+            </tr>
+            <tr>
+                <td>Matricule</td>
+                <td>{{ paiement.eleve.matricule ?? '—' }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Détail du paiement</div>
+        <table class="info-grid">
+            <tr>
+                <td>Frais concerné</td>
+                <td>{{ paiement.fraisScolaire.libelle }}</td>
+            </tr>
+            <tr>
+                <td>Année académique</td>
+                <td>{{ paiement.fraisScolaire.anneeAcademique.libelle }}</td>
+            </tr>
+            <tr>
+                <td>Date de paiement</td>
+                <td>{{ paiement.datePaiement ? paiement.datePaiement|date('d/m/Y') : '—' }}</td>
+            </tr>
+            <tr>
+                <td>Mode de paiement</td>
+                <td>
+                    {% if paiement.modePaiement == 'especes' %}Espèces
+                    {% elseif paiement.modePaiement == 'mobile_money' %}Mobile Money
+                    {% elseif paiement.modePaiement == 'virement' %}Virement bancaire
+                    {% elseif paiement.modePaiement == 'cheque' %}Chèque
+                    {% else %}{{ paiement.modePaiement }}{% endif %}
+                </td>
+            </tr>
+            {% if paiement.observations %}
+            <tr>
+                <td>Observations</td>
+                <td>{{ paiement.observations }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <div class="montant-box">
+        <div class="montant-label">Montant reçu</div>
+        <div class="montant-value">{{ paiement.montantPaye|number_format(2, ',', ' ') }}</div>
+    </div>
+
+    <div class="footer">
+        <div class="merci">Merci pour votre paiement.</div>
+        <div class="signature-area">
+            <div class="signature-line"></div>
+            <div class="signature-label">Signature du caissier / secrétaire</div>
+        </div>
+        <div class="footer-note">
+            Reçu généré le {{ "now"|date("d/m/Y à H:i") }} — INSOFT MASOMO
+        </div>
+    </div>
+
+</body>
+</html>

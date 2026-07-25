@@ -1,0 +1,116 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-3">
+        <h1>Saisie des présences — {{ classe.nom }} — {{ date|date('d/m/Y') }}</h1>
+        <a class="btn btn-secondary" href="{{ path('app_presence_index') }}">Retour</a>
+    </div>
+</div>
+
+<div class="panel mb-3">
+    <form method="get" class="flex gap-2 items-center">
+        <label class="form-label mb-0">Date :</label>
+        <input type="date" name="date" class="form-input w-auto" value="{{ date|date('Y-m-d') }}">
+        <button type="submit" class="btn btn-primary">Changer la date</button>
+    </form>
+</div>
+
+<div class="panel">
+    {% if inscriptions|length == 0 %}
+        <p class="text-gray-500">Aucun élève inscrit dans cette classe.</p>
+    {% else %}
+    <form method="post">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="min-width:200px;">Élève</th>
+                        <th class="text-center">Présent</th>
+                        <th class="text-center">Absent</th>
+                        <th class="text-center">Retard</th>
+                        <th class="text-center">Justifié</th>
+                        <th style="min-width:200px;">Motif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for inscription in inscriptions %}
+                    {% set eleve = inscription.eleve %}
+                    {% set existing = presenceMap[eleve.id] is defined ? presenceMap[eleve.id] : null %}
+                    {% set currentStatut = existing ? existing.statut : 'present' %}
+                    <tr>
+                        <td>
+                            <strong>{{ eleve.nomComplet }}</strong><br>
+                            <small class="text-gray-500 font-mono">{{ eleve.matricule ?? '—' }}</small>
+                        </td>
+                        <td class="text-center">
+                            <input type="radio"
+                                   name="presences[{{ eleve.id }}][statut]"
+                                   value="present"
+                                   class="presence-radio"
+                                   data-eleve="{{ eleve.id }}"
+                                   {% if currentStatut == 'present' %}checked{% endif %}>
+                        </td>
+                        <td class="text-center">
+                            <input type="radio"
+                                   name="presences[{{ eleve.id }}][statut]"
+                                   value="absent"
+                                   class="presence-radio"
+                                   data-eleve="{{ eleve.id }}"
+                                   {% if currentStatut == 'absent' %}checked{% endif %}>
+                        </td>
+                        <td class="text-center">
+                            <input type="radio"
+                                   name="presences[{{ eleve.id }}][statut]"
+                                   value="retard"
+                                   class="presence-radio"
+                                   data-eleve="{{ eleve.id }}"
+                                   {% if currentStatut == 'retard' %}checked{% endif %}>
+                        </td>
+                        <td class="text-center">
+                            <input type="radio"
+                                   name="presences[{{ eleve.id }}][statut]"
+                                   value="justifié"
+                                   class="presence-radio"
+                                   data-eleve="{{ eleve.id }}"
+                                   {% if currentStatut == 'justifié' %}checked{% endif %}>
+                        </td>
+                        <td>
+                            <input type="text"
+                                   name="presences[{{ eleve.id }}][motif]"
+                                   id="motif-{{ eleve.id }}"
+                                   class="form-input w-full"
+                                   placeholder="Motif (facultatif)"
+                                   value="{{ existing ? (existing.motif ?? '') : '' }}"
+                                   {% if currentStatut == 'present' %}style="display:none"{% endif %}>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 flex gap-2">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="{{ path('app_presence_index') }}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const radios = document.querySelectorAll('.presence-radio');
+    radios.forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            const eleveId = this.dataset.eleve;
+            const motifInput = document.getElementById('motif-' + eleveId);
+            if (motifInput) {
+                motifInput.style.display = (this.value === 'present') ? 'none' : '';
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

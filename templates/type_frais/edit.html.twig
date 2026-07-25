@@ -1,0 +1,8 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+<div class="panel max-w-lg">
+    <h1 class="text-xl font-bold mb-4">Modifier — {{ typeFrais.libelle }}</h1>
+    {% include 'type_frais/_form.html.twig' %}
+</div>
+{% endblock %}

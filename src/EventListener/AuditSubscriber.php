@@ -19,19 +19,20 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class AuditSubscriber
 {
     private const AUDITABLE = [
-        'App\Entity\Commande',
-        'App\Entity\Vente',
+        'App\Entity\Employe',
         'App\Entity\Paie',
         'App\Entity\PaieEmploye',
-        'App\Entity\Employe',
-        'App\Entity\Approvisionnement',
         'App\Entity\Credit',
         'App\Entity\Debit',
-        'App\Entity\Produits',
         'App\Entity\Taux',
-        'App\Entity\Table',
-        'App\Entity\ProduitVendu',
         'App\Entity\User',
+        'App\Entity\Eleve',
+        'App\Entity\Inscription',
+        'App\Entity\Note',
+        'App\Entity\PaiementFrais',
+        'App\Entity\EmpruntLivre',
+        'App\Entity\Bulletin',
+        'App\Entity\AnneeAcademique',
     ];
 
     /** @var AuditLog[] */

@@ -14,7 +14,16 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class SecurityController extends AbstractController
 {
     private entityManagerInterface $entityManager;
-    #[Route(path: '/', name: 'app_login')]
+    #[Route(path: '/', name: 'app_home')]
+    public function home(): Response
+    {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_dashboard');
+        }
+        return $this->redirectToRoute('app_login');
+    }
+
+    #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         // if ($this->getUser()) {
@@ -30,12 +39,12 @@ class SecurityController extends AbstractController
     }
 
     #[Route(path: '/setsession', name: 'app_set_sessions')]
-    public function setSessions(Request $request,
-                                TauxRepository $tauxRepository,
-                                EntityManagerInterface $entityManager): Response
+    public function setSessions(Request $request, TauxRepository $tauxRepository): Response
     {
         $tauxactif = $tauxRepository->findOneBy(['isActive' => true]);
-        $request->getSession()->set('tauxactif', $tauxactif->getCout());
+        if ($tauxactif) {
+            $request->getSession()->set('tauxactif', $tauxactif->getCout());
+        }
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
     }
 

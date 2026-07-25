@@ -30,8 +30,17 @@ security:
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
+    role_hierarchy:
+        ROLE_SECRETAIRE:  [ROLE_USER]
+        ROLE_ENSEIGNANT:  [ROLE_USER]
+        ROLE_DIRECTEUR:   [ROLE_SECRETAIRE, ROLE_ENSEIGNANT]
+        ROLE_ADMIN:       [ROLE_DIRECTEUR]
+
     access_control:
-        - { path: ^/menu, roles: PUBLIC_ACCESS }
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/setsession, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/, roles: ROLE_USER }
 #        - { path: '/login', roles: IS_AUTHENTICATED_ANONYMOUSLY }
 #        - { path: '/*', roles: IS_AUTHENTICATED_FULLY }
          #- { path: ^/admin, roles: ROLE_ADMIN }

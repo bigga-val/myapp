@@ -1,145 +1,300 @@
-# CLAUDE.md
+# CLAUDE.md — INSOFT MASOMO
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance pour Claude Code sur ce dépôt.
 
-## Project Overview
+## Vue d'ensemble
 
-Credol App is a full-stack enterprise business management web application built with **Symfony 6.1** and **Doctrine ORM**. It manages orders, inventory, employees, payroll, sales, and financial tracking. The app appears to serve a retail/restaurant/supply chain business.
+**INSOFT MASOMO** est une application web de gestion scolaire privée construite avec **Symfony 6.1** et **Doctrine ORM** (PHP 8.1). Elle couvre la maternelle, le primaire, le secondaire et l'universitaire. L'application a été entièrement transformée depuis une ancienne app de gestion commerciale (Credol App) ; quelques anciens modules (Debit, Credit, Taux, Employe/Paie) coexistent encore avec les nouveaux modules scolaires.
 
-## Common Commands
+**Base de données :** `db_masomo` (MySQL/MariaDB). Connexion dans `.env` (`DATABASE_URL`).
+
+---
+
+## Commandes fréquentes
 
 ### PHP / Symfony
 ```bash
-composer install                          # Install PHP dependencies
-php bin/console server:run                # Start development server
-php bin/console doctrine:migrations:migrate  # Run database migrations
-php bin/console doctrine:migrations:diff     # Generate migration from entity changes
-php bin/console doctrine:fixtures:load    # Load test data fixtures
-php bin/console cache:clear               # Clear Symfony cache
-php bin/console make:entity               # Scaffold new entity
-php bin/console make:controller           # Scaffold new controller
-php bin/console make:form                 # Scaffold new form type
-php bin/console make:migration            # Generate migration file
+composer install
+php bin/console server:run
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console doctrine:migrations:diff
+php bin/console make:migration
+php bin/console doctrine:fixtures:load --no-interaction
+php bin/console cache:clear
+php bin/console make:entity
+php bin/console make:controller
+php bin/console make:form
+php bin/console debug:router
+php bin/console doctrine:schema:validate   # vérifier que le schéma est en sync
 ```
 
 ### Frontend (Tailwind CSS)
 ```bash
-npm install          # Install Node dependencies
-npm run dev          # Watch and recompile Tailwind CSS
-npm run build        # Build Tailwind CSS for production (minified)
+npm install
+npm run dev     # watch + recompile
+npm run build   # production (minifié)
 ```
 
 ### Testing
 ```bash
-php bin/phpunit                           # Run all tests
-php bin/phpunit tests/path/to/TestFile.php  # Run a single test file
-php bin/phpunit --filter testMethodName   # Run a single test by name
+php bin/phpunit
+php bin/phpunit tests/path/to/TestFile.php
+php bin/phpunit --filter testMethodName
 ```
-
-## Architecture
-
-### Request Lifecycle
-```
-HTTP Request → public/index.php → Symfony Kernel → Router →
-  Controller → (Repository query / Form handling) →
-  EntityManager::flush() → Twig render / JsonResponse / RedirectResponse
-```
-
-### Source Structure (`src/`)
-- **Controller/** — one per domain. Use `#[Route]` attributes for routing. Controllers render Twig templates or return JSON/redirects.
-- **Entity/** — Doctrine ORM entities. Changes to entities require generating and running a migration.
-- **Repository/** — One repository per entity. Custom queries go here, not in controllers.
-- **Form/** — Symfony FormType classes bound to entities.
-- **Service/** — `PdfService` and `FPdfGenerator` for PDF generation (invoices/reports).
-- **Security/** — `LoginFormAuthenticator` (form-based login) and `EmailVerifier` (registration confirmation).
-
-### Key Domain Entities
-- **Order flow:** `Commande` → `CommandeApprobateur` (approval) → `CommandeReception` (receiving) → `CommandeProduit` (line items)
-- **Inventory:** `Produits`, `CategorieProduit`, `Approvisionnement`
-- **Sales:** `Vente`, `ProduitVendu`
-- **Finance:** `Credit`, `Debit`, `Taux` (exchange rates)
-- **HR/Payroll:** `Employe`, `Paie`, `PaieEmploye`
-- **Other:** `Table` (restaurant table management), `User` (authentication)
-
-### Templates (`templates/`)
-Organized by domain, mirroring the Controller structure. Shared layout components are in `templates/components/layout/`. Twig templates pull in Tailwind CSS utility classes.
-
-### Frontend
-Tailwind CSS 3.2 with a custom color palette (`primary`, `secondary`, `success`, `danger`, `warning`, `info`, `dark`) and the Nunito font. Also includes Bootstrap and Toastr (notifications) served from `public/assets/`. The `tailwind.config.js` scans `./templates/**/*.twig` for class names.
-
-### Authentication
-Form-based login via `LoginFormAuthenticator`. After login, users are redirected to `app_set_sessions` (a custom session setup route). Registration includes email verification via `EmailVerifier`.
-
-- **Access control:** `ROLE_ADMIN` is required for sensitive routes (dashboard, ajustement stock, gestion utilisateurs). Standard authenticated users can only edit their own account.
-- **Default password** for new users: `Credol@{année}` (ex: `Credol@2025`), affiché dans le flash message à la création. L'utilisateur doit le changer via `/reset_password`.
-
-### Database
-MySQL/MariaDB database named `db_credol`. Connection configured in `.env` (`DATABASE_URL`). Doctrine handles schema via migrations in `migrations/`.
-
-### Async / Messaging
-Symfony Messenger configured with a Doctrine transport (see `config/packages/messenger.yaml`).
 
 ---
 
-## Gestion du stock
+## Architecture
 
-### Calcul du stock disponible
-Le stock n'est **jamais stocké en dur** sur l'entité `Produits`. Il est toujours calculé dynamiquement par `ApprovisionnementRepository::stockProduitByDate()` :
-
+### Cycle de vie d'une requête
 ```
-Stock disponible =
-    SUM(Approvisionnement.qty)
-    - SUM(ProduitVendu.qty WHERE Vente.statusVente = 'paid')
-    - SUM(ProduitVendu.qty WHERE Vente.statusVente = 'progress')
+HTTP Request → public/index.php → Symfony Kernel → Router →
+  Controller → (Repository / Form) →
+  EntityManager::flush() → Twig render / JsonResponse / RedirectResponse
 ```
 
-### Mouvements de stock
-| Source | Impact | Champ clé |
+### Structure `src/`
+- **Controller/** — un par domaine, attributs `#[Route]`. Renvoie Twig, JSON ou redirect.
+- **Entity/** — entités Doctrine ORM. Toute modification nécessite une migration.
+- **Repository/** — une classe par entité. Les requêtes custom vont ici, pas dans les contrôleurs.
+- **Form/** — classes FormType liées aux entités.
+- **Service/** — services métier (voir liste ci-dessous).
+- **Enum/** — `Niveau` (backed enum PHP 8.1).
+- **Security/** — `LoginFormAuthenticator` (login par formulaire).
+
+### Services principaux
+| Service | Rôle |
+|---|---|
+| `AnneeAcademiqueService` | `getCurrent(): ?AnneeAcademique` / `getCurrentOrFail()` |
+| `BulletinService` | `genererBulletin()` — moyenne pondérée, rang, mention |
+| `MatriculeService` | `generateEleveMatricule(int $seq)` → `ELV-2026-00001` / `generateNumeroRecu(int $seq)` → `REC-2026-00001` |
+| `EmpruntRetardService` | `mettreAJourRetards()` — met les emprunts en retard à `en_retard` |
+
+---
+
+## Domaines métier (entités)
+
+### Scolarité (cœur)
+| Entité | Description |
+|---|---|
+| `AnneeAcademique` | Année scolaire avec flag `isCurrent`. Toujours récupérer via `AnneeAcademiqueService`. |
+| `Classe` | Classe / section. Lié à `Niveau` (enum) + `AnneeAcademique`. |
+| `Matiere` | Matière avec `coefficient` (float) et `Niveau`. |
+| `Eleve` | Élève. Matricule auto-généré `ELV-AAAA-NNNNN`. Méthode `getNomComplet()`. |
+| `Inscription` | Enrollment élève ↔ classe ↔ année. UniqueConstraint `(eleve_id, annee_academique_id)`. |
+
+### Personnel
+| Entité | Description |
+|---|---|
+| `Employe` | Enseignants (et anciens employés). Champs teacher : `specialite`, `diplome`, `telephone`, `photo`, `statut`, `niveauEnseignement`. **Ne pas renommer** — des FK `PaieEmploye` en dépendent. |
+
+### Évaluation
+| Entité | Description |
+|---|---|
+| `Examen` | Session d'examen : `type` (devoir/interro/examen_partiel/examen_final), `periode` (1/2/3). |
+| `Note` | Note élève. UniqueConstraint `(eleve_id, matiere_id, examen_id)`. |
+| `Bulletin` | Snapshot JSON calculé par `BulletinService`. UniqueConstraint `(eleve, classe, periode, anneeAcademique)`. Statuts : `brouillon` / `validé` / `distribué`. |
+
+Mentions BulletinService : ≥18 Excellent · ≥16 Très Bien · ≥14 Bien · ≥12 Assez Bien · ≥10 Passable · <10 Échec.
+
+### Présences & Emploi du temps
+| Entité | Description |
+|---|---|
+| `Presence` | Une entrée par élève par jour. UniqueConstraint `(eleve_id, date)`. Statuts : `present` / `absent` / `retard` / `justifié`. |
+| `EmploiDuTemps` | Créneau horaire avec détection de conflit enseignant (`hasConflitEnseignant()`). |
+
+### Finances scolaires
+| Entité | Description |
+|---|---|
+| `FraisScolaire` | Définition d'un frais (inscription/mensuel/examen/autre) par classe et année. |
+| `PaiementFrais` | Paiement élève. `numeroRecu` unique auto-généré. Reçu PDF via dompdf. |
+
+### Bibliothèque
+| Entité | Description |
+|---|---|
+| `Livre` | Catalogue avec `nombreExemplaires`. |
+| `EmpruntLivre` | Emprunt élève. `isEnRetard()` : dateRetourPrevue < today && statut != rendu. Statuts : `en_cours` / `rendu` / `en_retard`. |
+
+### Anciens modules (hérités, ne pas supprimer)
+`Credit`, `Debit`, `Taux`, `Employe`, `Paie`, `PaieEmploye`, `User` — toujours en service.
+
+---
+
+## Enum Niveau
+
+```php
+// src/Enum/Niveau.php — PHP 8.1 backed enum
+enum Niveau: string {
+    case MATERNELLE   = 'maternelle';
+    case PRIMAIRE     = 'primaire';
+    case SECONDAIRE   = 'secondaire';
+    case UNIVERSITAIRE = 'universitaire';
+
+    public function label(): string { ... }
+    public function badgeClass(): string { ... }
+}
+```
+
+Stocké comme `VARCHAR` via `#[ORM\Column(enumType: Niveau::class)]`. Pas de table DB dédiée.
+
+---
+
+## Authentification & Rôles
+
+**Login :** `/login` (FormAuthenticator). Après login → `app_set_sessions` (setup sessions + taux).  
+**Page d'accueil `/` :** redirige vers le dashboard si connecté, sinon vers login.
+
+### Hiérarchie des rôles
+```
+ROLE_SECRETAIRE → ROLE_ENSEIGNANT → ROLE_DIRECTEUR → ROLE_ADMIN
+```
+
+| Rôle | Accès |
+|---|---|
+| `ROLE_USER` | Lecture seule (index, show, rapports) |
+| `ROLE_SECRETAIRE` | Saisie (notes, présences, paiements, emprunts, emploi du temps) |
+| `ROLE_DIRECTEUR` | Validation bulletins, gestion classes/matières |
+| `ROLE_ADMIN` | Tout, y compris gestion utilisateurs |
+
+**Mot de passe par défaut** pour nouveaux utilisateurs : `Credol@{année}` (ex: `Credol@2026`).
+
+### Fixtures de test
+- `admin` / `Admin@2026` → ROLE_ADMIN
+- `secretaire` / `Credol@2026` → ROLE_SECRETAIRE
+
+---
+
+## Templates & Frontend
+
+### Layout
+- **`templates/components/layout/default.html.twig`** — layout principal (sidebar + header + contenu)
+- **`templates/components/layout/auth.html.twig`** — layout login (sans sidebar)
+- **`templates/components/common/sidebar.html.twig`** — menu de navigation par module
+- **`templates/components/common/header.html.twig`** — barre supérieure + cloche notifications
+
+### Bibliothèques JS actives
+| Lib | Usage |
+|---|---|
+| Alpine.js | Réactivité UI (sidebar, header, thème) |
+| Select2 | Dropdowns avec recherche — initialisé globalement sur `form select` |
+| Tippy.js | Tooltips sur `[data-tip="..."]` et `[title="..."]` |
+| SweetAlert2 | Confirmations de suppression (remplace `confirm()` natif) |
+| Toastr | Flash messages (via `raiseToastr()`) |
+| jQuery | Base pour Select2, DataTables, SweetAlert integration |
+| DataTables | Tableaux paginés (certaines pages) |
+| dompdf | Génération PDF (bulletins, reçus) |
+
+### Conventions UI
+
+**Tooltips :**
+```html
+<button data-tip="Modifier cet élève">Modifier</button>
+```
+
+**SweetAlert pour suppression :**
+```html
+<!-- Automatique : tout form avec un bouton .btn-danger est intercepté -->
+<!-- Ou explicite : -->
+<form method="post" data-confirm="Voulez-vous supprimer ce livre ?">...</form>
+```
+
+**Hints de formulaire :**
+```html
+<span class="field-hint">Texte d'aide affiché sous le champ</span>
+```
+
+**Flash messages :** auto-dismiss après 5 secondes avec barre de progression.
+
+**Raccourcis clavier :** `Alt+N` → premier bouton Nouveau · `Alt+F` → premier champ de recherche.
+
+### Tailwind
+- Version 3.2, palette custom : `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `dark`
+- `tailwind.config.js` scanne `./templates/**/*.twig`
+- **Ne pas utiliser** de classes Tailwind dans les templates PDF (dompdf ne charge pas les CSS externes) → inline CSS uniquement dans `*_pdf.html.twig`
+
+---
+
+## API interne
+
+| Route | Contrôleur | Description |
 |---|---|---|
-| `Approvisionnement` (type=`approvisionnement`) | Entrée | `qty` positif |
-| `Approvisionnement` (type=`ajustement`) | Correction | `qty` positif ou négatif |
-| `ProduitVendu` (vente `paid`) | Sortie définitive | `qty` |
-| `ProduitVendu` (vente `progress`) | Réservation | `qty` |
+| `GET /api/notifications` | `NotificationController` | JSON — emprunts en retard, frais en attente, présences manquantes |
 
-### Ajustement de stock
-Route : `/approvisionnement/ajustement` (admin uniquement)
-Formulaire : `AjustementStockType` (produit, quantité, motif)
+---
 
-- Une quantité **négative** réduit le stock (perte, vol, produit avarié, etc.)
-- Une quantité **positive** augmente le stock (correction à la hausse)
-- Le champ `cout` est forcé à `0` (pas d'impact financier)
-- Le champ `type` est forcé à `'ajustement'` pour distinguer des approvisionnements réels
-- Les ajustements apparaissent dans la liste `/approvisionnement/` avec un badge "Ajustement"
+## Génération PDF (dompdf)
 
-Motifs disponibles : Correction inventaire, Perte, Vol, Produit avarié, Retour client, Autre.
+Pattern standard dans un contrôleur :
+```php
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
-### Entité `Approvisionnement` — champs notables
-| Champ | Type | Description |
-|---|---|---|
-| `qty` | float | Quantité (peut être négative) |
-| `cout` | float | Coût total (qty × prixUnitaire), 0 pour les ajustements |
-| `taux` | float | Taux de change actif au moment de l'opération |
-| `type` | string | `approvisionnement` ou `ajustement` |
-| `motif` | string | Motif de l'ajustement (nullable) |
+$options = new Options();
+$options->set('isHtml5ParserEnabled', true);
+$dompdf = new Dompdf($options);
+$html = $this->renderView('mon_template_pdf.html.twig', [...]);
+$dompdf->loadHtml($html);
+$dompdf->setPaper('A4', 'portrait'); // ou 'A5'
+$dompdf->render();
+return new Response($dompdf->output(), 200, [
+    'Content-Type'        => 'application/pdf',
+    'Content-Disposition' => 'inline; filename="nom-du-fichier.pdf"',
+]);
+```
+
+Templates PDF existants :
+- `templates/bulletin/bulletin_pdf.html.twig` — bulletin de notes (A4 portrait)
+- `templates/paiement_frais/recu_pdf.html.twig` — reçu de paiement (A5 portrait)
+
+---
+
+## Notifications (cloche header)
+
+`NotificationController::index()` → `GET /api/notifications` retourne un tableau JSON :
+```json
+[
+  { "id": "retard-livres",       "type": "danger",  "icon": "book",      "title": "...", "message": "...", "url": "...", "time": "..." },
+  { "id": "frais-attente",       "type": "warning", "icon": "money",     "title": "...", "message": "...", "url": "...", "time": "..." },
+  { "id": "presences-manquantes","type": "info",    "icon": "clipboard", "title": "...", "message": "...", "url": "...", "time": "..." }
+]
+```
+
+Icônes supportées dans le header : `book`, `money`, `clipboard`.
 
 ---
 
 ## Pages d'erreur
 
-Les pages d'erreur personnalisées sont dans `templates/bundles/TwigBundle/Exception/` :
-- `error403.html.twig` — Accès refusé
-- `error404.html.twig` — Page introuvable
-- `error500.html.twig` — Erreur serveur
+Dans `templates/bundles/TwigBundle/Exception/` :
+- `error403.html.twig`, `error404.html.twig`, `error500.html.twig`
 
-Ces pages sont servies automatiquement par Symfony en mode production. Pour les déclencher proprement depuis un contrôleur, utiliser `throw $this->createAccessDeniedException()` plutôt qu'une redirection vers une route manuelle.
+Déclencher depuis un contrôleur : `throw $this->createAccessDeniedException()` (pas de redirection manuelle).
 
 ---
 
 ## Conventions à respecter
 
-- Ne jamais importer `PHPUnit\*` dans du code de production.
-- Utiliser `\Exception` (PHP natif) dans les blocs `catch` des contrôleurs, pas `Doctrine\DBAL\Driver\Exception`.
-- Utiliser `getUserIdentifier()` plutôt que `getUsername()` pour récupérer l'identifiant de l'utilisateur connecté (cohérence).
-- Toujours utiliser `findBy([], ['createdAt' => 'DESC'])` plutôt que `findAll()` quand un tri est souhaité (`findAll()` n'accepte pas de paramètres).
-- Les dates nullables dans les contrôleurs : `$date = $raw ? new \DateTime($raw) : new \DateTime('today')` (le `??` ne fonctionne pas sur `new \DateTime()`).
-- `#[IsGranted]` doit être importé via `use Symfony\Component\Security\Http\Attribute\IsGranted`.
+### PHP
+- `#[IsGranted]` → `use Symfony\Component\Security\Http\Attribute\IsGranted`
+- `getUserIdentifier()` et non `getUsername()`
+- `\Exception` dans les blocs `catch` des contrôleurs (pas `Doctrine\DBAL\Driver\Exception`)
+- Ne jamais importer `PHPUnit\*` en production
+- Dates nullables : `$date = $raw ? new \DateTime($raw) : new \DateTime('today')` (le `??` ne fonctionne pas sur `new \DateTime()`)
+- `findBy([], ['createdAt' => 'DESC'])` plutôt que `findAll()` quand un tri est souhaité
+- Ne **pas** utiliser `renderForm()` (deprecated Symfony 6.4+) → utiliser `render()` avec `$form->createView()`
+
+### Migrations
+Sur une base vide, ne pas rejouer les anciennes migrations incrémentales :
+```bash
+php bin/console doctrine:schema:create
+php bin/console doctrine:migrations:version --add --all
+```
+
+### Entités
+- Le stock n'est jamais stocké en dur ; `Niveau` est un enum PHP 8.1 (pas une table DB)
+- `Employe` ne doit **pas** être renommé en `Enseignant` (FK `PaieEmploye` en dépend)
+- Les bulletins stockent un **snapshot JSON** calculé (`donneesJson`) — ne pas recalculer à la volée en production
+
+### Twig
+- `annee.id ~ ''` pour convertir un int en string (le filtre `|string` n'existe pas en Twig)
+- Les templates PDF (`*_pdf.html.twig`) **n'étendent pas** le layout principal et n'utilisent que du CSS inline

@@ -44,7 +44,7 @@ class CreditController extends AbstractController
             $credit->setTaux($request->getSession()->get('tauxactif'));
 
             $entityManager->persist($credit);
-            $this->addFlash('success', "Sortie de caisse enregistrée avec succès");
+            $this->addFlash('success', "Dépense enregistrée avec succès");
 
 //            dd($credit);
             $entityManager->flush();
@@ -85,7 +85,7 @@ class CreditController extends AbstractController
 //            $credit->setCreatedAt(new \DateTimeImmutable());
             $credit->setDateCredit(new \DateTime());
             $entityManager->persist($credit);
-            $this->addFlash('success', "Sortie de caisse modifiée avec succès");
+            $this->addFlash('success', "Dépense modifiée avec succès");
 
 //            dd($credit);
             $entityManager->flush();
@@ -101,7 +101,7 @@ class CreditController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$credit->getId(), $request->request->get('_token'))) {
             $entityManager->remove($credit);
             $entityManager->flush();
-            $this->addFlash('success', "Sortie de caisse supprimée avec succès");
+            $this->addFlash('success', "Dépense supprimée avec succès");
         }
         return $this->redirectToRoute('app_credit_index', [], Response::HTTP_SEE_OTHER);
     }

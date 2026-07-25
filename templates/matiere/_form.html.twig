@@ -1,0 +1,29 @@
+{{ form_start(form) }}
+<div class="mb-3">
+    <label class="form-label">Nom de la matière</label>
+    {{ form_widget(form.nom, {'attr': {'class': 'form-input'}}) }}
+    {{ form_errors(form.nom) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Code</label>
+    {{ form_widget(form.code, {'attr': {'class': 'form-input', 'placeholder': 'ex: MATH-P4'}}) }}
+    {{ form_errors(form.code) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Coefficient</label>
+    {{ form_widget(form.coefficient, {'attr': {'class': 'form-input', 'step': '0.5', 'min': '0.5'}}) }}
+    {{ form_errors(form.coefficient) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Niveau scolaire</label>
+    {{ form_widget(form.niveau, {'attr': {'class': 'form-select'}}) }}
+    {{ form_errors(form.niveau) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Description</label>
+    {{ form_widget(form.description, {'attr': {'class': 'form-textarea', 'rows': 3}}) }}
+    {{ form_errors(form.description) }}
+</div>
+<br>
+<button class="btn btn-primary" type="submit">Enregistrer</button>
+{{ form_end(form) }}

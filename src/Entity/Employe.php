@@ -32,6 +32,28 @@ class Employe
     #[ORM\Column(nullable: true)]
     private ?float $salaireJournalier = null;
 
+    // Champs enseignant ajoutés
+    #[ORM\Column(length: 150, nullable: true)]
+    private ?string $specialite = null;
+
+    #[ORM\Column(length: 200, nullable: true)]
+    private ?string $diplome = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $telephone = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $adresse = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $photo = null;
+
+    #[ORM\Column(length: 20, nullable: false, options: ['default' => 'actif'])]
+    private string $statut = 'actif';
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $niveauEnseignement = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -45,7 +67,6 @@ class Employe
     public function setNomcomplet(?string $nomcomplet): static
     {
         $this->nomcomplet = $nomcomplet;
-
         return $this;
     }
 
@@ -57,7 +78,6 @@ class Employe
     public function setMatricule(?string $matricule): static
     {
         $this->matricule = $matricule;
-
         return $this;
     }
 
@@ -69,7 +89,6 @@ class Employe
     public function setDateembauche(?\DateTimeInterface $dateembauche): static
     {
         $this->dateembauche = $dateembauche;
-
         return $this;
     }
 
@@ -81,7 +100,6 @@ class Employe
     public function setCategorie(?string $categorie): static
     {
         $this->categorie = $categorie;
-
         return $this;
     }
 
@@ -93,7 +111,6 @@ class Employe
     public function setTitre(?string $Titre): static
     {
         $this->Titre = $Titre;
-
         return $this;
     }
 
@@ -105,7 +122,83 @@ class Employe
     public function setSalaireJournalier(?float $salaireJournalier): static
     {
         $this->salaireJournalier = $salaireJournalier;
+        return $this;
+    }
 
+    public function getSpecialite(): ?string
+    {
+        return $this->specialite;
+    }
+
+    public function setSpecialite(?string $specialite): static
+    {
+        $this->specialite = $specialite;
+        return $this;
+    }
+
+    public function getDiplome(): ?string
+    {
+        return $this->diplome;
+    }
+
+    public function setDiplome(?string $diplome): static
+    {
+        $this->diplome = $diplome;
+        return $this;
+    }
+
+    public function getTelephone(): ?string
+    {
+        return $this->telephone;
+    }
+
+    public function setTelephone(?string $telephone): static
+    {
+        $this->telephone = $telephone;
+        return $this;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(?string $adresse): static
+    {
+        $this->adresse = $adresse;
+        return $this;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): static
+    {
+        $this->photo = $photo;
+        return $this;
+    }
+
+    public function getStatut(): string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(string $statut): static
+    {
+        $this->statut = $statut;
+        return $this;
+    }
+
+    public function getNiveauEnseignement(): ?string
+    {
+        return $this->niveauEnseignement;
+    }
+
+    public function setNiveauEnseignement(?string $niveauEnseignement): static
+    {
+        $this->niveauEnseignement = $niveauEnseignement;
         return $this;
     }
 }

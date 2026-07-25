@@ -36,17 +36,31 @@ class DebitRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-    public function totalMoisCourant(): float
+    /**
+     * Somme en FC équivalent (USD converti via taux stocké).
+     */
+    private function sumFcQb(string $alias): string
     {
-        $debut = new \DateTime('first day of this month');
-        $fin   = new \DateTime('last day of this month');
+        return "SUM(CASE WHEN $alias.devise = 'USD' THEN $alias.montant * COALESCE($alias.taux, 1) ELSE COALESCE($alias.montant, 0) END)";
+    }
+
+    public function sumFcMois(int $annee, int $mois): float
+    {
+        $debut = new \DateTime(sprintf('%d-%02d-01', $annee, $mois));
+        $fin   = (clone $debut)->modify('last day of this month');
         $result = $this->createQueryBuilder('d')
-            ->select('SUM(d.montant)')
+            ->select($this->sumFcQb('d'))
             ->where('d.DateDebit BETWEEN :debut AND :fin')
             ->setParameter('debut', $debut->format('Y-m-d'))
             ->setParameter('fin', $fin->format('Y-m-d'))
             ->getQuery()->getSingleScalarResult();
         return (float) ($result ?? 0);
+    }
+
+    /** @deprecated Utiliser sumFcMois() */
+    public function totalMoisCourant(): float
+    {
+        return $this->sumFcMois((int) date('Y'), (int) date('n'));
     }
 
     public function totauxParPeriode(?\DateTimeInterface $debut, ?\DateTimeInterface $fin): array
@@ -66,6 +80,28 @@ class DebitRepository extends ServiceEntityRepository
             $totaux[$devise] = (float) ($row['total'] ?? 0);
         }
         return $totaux;
+    }
+
+    /**
+     * Totaux des débits mois par mois pour une année civile donnée.
+     * Retourne [1 => total_jan, ..., 12 => total_dec].
+     */
+    public function totauxParMoisAnnee(int $annee): array
+    {
+        $data = array_fill(1, 12, 0.0);
+        for ($m = 1; $m <= 12; $m++) {
+            $debut  = new \DateTime(sprintf('%d-%02d-01', $annee, $m));
+            $fin    = (clone $debut)->modify('last day of this month');
+            $result = $this->createQueryBuilder('d')
+                ->select($this->sumFcQb('d'))
+                ->where('d.DateDebit BETWEEN :debut AND :fin')
+                ->setParameter('debut', $debut->format('Y-m-d'))
+                ->setParameter('fin', $fin->format('Y-m-d'))
+                ->getQuery()
+                ->getSingleScalarResult();
+            $data[$m] = (float) ($result ?? 0);
+        }
+        return $data;
     }
 
     public function findDebitByDatesIntervalle($date1, $date2): array

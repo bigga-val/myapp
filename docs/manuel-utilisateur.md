@@ -1,8 +1,9 @@
-# Manuel Utilisateur — Credol App
+# Manuel Utilisateur — INSOFT MASOMO
 
-> **Version :** 1.1  
-> **Date :** Mai 2026  
-> **Application :** Credol App — Gestion d'entreprise
+> **Version :** 2.0  
+> **Date :** Juillet 2026  
+> **Application :** INSOFT MASOMO — Système de gestion scolaire  
+> **Développé par :** InSoftware SARL
 
 ---
 
@@ -11,37 +12,42 @@
 1. [Introduction](#1-introduction)
 2. [Connexion et accès](#2-connexion-et-accès)
 3. [Tableau de bord](#3-tableau-de-bord)
-4. [Ventes et facturation](#4-ventes-et-facturation)
-5. [Historique des ventes](#5-historique-des-ventes)
-6. [Gestion des produits](#6-gestion-des-produits)
-7. [Catégories de produits](#7-catégories-de-produits)
-8. [Commandes fournisseurs](#8-commandes-fournisseurs)
-9. [Approvisionnement et stock](#9-approvisionnement-et-stock)
-10. [Caisse et flux de trésorerie](#10-caisse-et-flux-de-trésorerie)
-11. [Gestion des employés](#11-gestion-des-employés)
-12. [Paie et salaires](#12-paie-et-salaires)
-13. [Taux de change](#13-taux-de-change)
-14. [Gestion des tables](#14-gestion-des-tables)
-15. [Gestion des utilisateurs](#15-gestion-des-utilisateurs)
-16. [Rôles et permissions](#16-rôles-et-permissions)
-17. [Questions fréquentes](#17-questions-fréquentes)
+4. [Années académiques](#4-années-académiques)
+5. [Classes et niveaux](#5-classes-et-niveaux)
+6. [Matières](#6-matières)
+7. [Gestion des élèves](#7-gestion-des-élèves)
+8. [Inscriptions](#8-inscriptions)
+9. [Gestion des enseignants](#9-gestion-des-enseignants)
+10. [Examens](#10-examens)
+11. [Notes et saisie des notes](#11-notes-et-saisie-des-notes)
+12. [Bulletins scolaires](#12-bulletins-scolaires)
+13. [Présences](#13-présences)
+14. [Emploi du temps](#14-emploi-du-temps)
+15. [Frais scolaires](#15-frais-scolaires)
+16. [Paiements des frais](#16-paiements-des-frais)
+17. [Bibliothèque](#17-bibliothèque)
+18. [Notifications](#18-notifications)
+19. [Gestion des utilisateurs](#19-gestion-des-utilisateurs)
+20. [Rôles et permissions](#20-rôles-et-permissions)
+21. [Questions fréquentes](#21-questions-fréquentes)
 
 ---
 
 ## 1. Introduction
 
-**Credol App** est une application de gestion d'entreprise complète qui couvre :
+**INSOFT MASOMO** est un système de gestion scolaire complet destiné aux établissements privés couvrant les niveaux **maternelle, primaire, secondaire et universitaire**.
 
-- La **vente** et la facturation (avec impression PDF)
-- La gestion des **produits** et des **catégories**
-- Les **commandes fournisseurs** avec workflow d'approbation
-- L'**approvisionnement** et le suivi des stocks
-- La **caisse** (entrées et sorties de trésorerie)
-- La gestion des **employés** et de la **paie**
-- Le suivi des **taux de change** FC / USD
-- La gestion des **tables** (contexte restaurant / bar)
+L'application permet de gérer :
 
-L'application supporte deux devises : le **Franc Congolais (FC)** et le **Dollar Américain (USD)**.
+- Les **élèves** et leurs inscriptions
+- Les **enseignants** et leurs affectations
+- Les **classes**, **matières** et **années académiques**
+- Les **examens**, **notes** et **bulletins** (avec génération PDF)
+- Les **présences** quotidiennes
+- L'**emploi du temps** hebdomadaire
+- Les **frais scolaires** et les **paiements** (avec reçu PDF)
+- La **bibliothèque** (emprunts et retours de livres)
+- Un système de **notifications** en temps réel (retards, impayés, absences)
 
 ---
 
@@ -50,630 +56,655 @@ L'application supporte deux devises : le **Franc Congolais (FC)** et le **Dollar
 ### 2.1 Se connecter
 
 1. Ouvrez l'application dans votre navigateur.
-2. Sur la page de connexion, saisissez votre **adresse e-mail** et votre **mot de passe**.
-3. Cliquez sur **Se connecter**.
+2. Sur la page de connexion, saisissez votre **nom d'utilisateur** et votre **mot de passe**.
+3. Cliquez sur **Se connecter →**.
 
-> Si vous n'avez pas encore de compte, contactez votre administrateur pour qu'il en crée un.
+> Si vous n'avez pas de compte, contactez votre administrateur.
 
-### 2.2 Se déconnecter
+### 2.2 Première connexion
 
-- Cliquez sur votre nom ou l'icône de profil en haut à droite.
-- Sélectionnez **Se déconnecter**.
+Le mot de passe par défaut attribué par l'administrateur est de la forme `Credol@{année}` (ex : `Credol@2026`). Changez-le dès votre première connexion depuis votre profil utilisateur.
 
-### 2.3 Première connexion
+### 2.3 Se déconnecter
 
-Lors de votre première connexion, l'application peut vous demander de configurer votre session. Suivez les instructions affichées à l'écran.
+Cliquez sur votre nom en haut à droite → **Se déconnecter**.
 
 ---
 
 ## 3. Tableau de bord
 
-**Accessible à :** administrateurs uniquement
+**Accessible à :** tous les utilisateurs connectés
 
-Le tableau de bord est la page d'accueil de l'application. Il affiche une synthèse en temps réel de l'activité de l'entreprise.
+La page d'accueil affiche une synthèse en temps réel de l'établissement.
 
 ### 3.1 Indicateurs clés (KPI)
 
 | Indicateur | Description |
 |---|---|
-| **CA Hier** | Chiffre d'affaires réalisé la veille, avec variation en % |
-| **CA du mois** | Chiffre d'affaires du mois en cours |
-| **Transactions du mois** | Nombre de ventes effectuées ce mois |
-| **Commandes en attente** | Nombre de commandes fournisseurs en attente d'approbation |
-| **Masse salariale** | Total des salaires versés ce mois |
-| **Flux de trésorerie** | Solde global (crédits et débits) |
-| **Employés** | Nombre total d'employés actifs |
+| **Élèves inscrits** | Nombre total d'élèves pour l'année courante |
+| **Enseignants** | Nombre d'enseignants actifs |
+| **Classes** | Nombre de classes de l'année courante |
+| **Frais perçus ce mois** | Total des paiements de frais reçus dans le mois |
+| **Paiements en attente** | Nombre de frais scolaires non encore réglés |
+| **Livres empruntés** | Nombre d'emprunts en cours à la bibliothèque |
+| **Masse salariale** | Total des salaires du mois courant |
+| **Solde** | Crédits − Débits (trésorerie générale) |
 
-### 3.2 Graphiques
+### 3.2 Activité récente
 
-- **Tendance des revenus (6 mois)** — courbe d'évolution du chiffre d'affaires sur les 6 derniers mois.
-- **Ventes journalières (mois en cours)** — graphique en barres des ventes jour par jour.
-- **Top 5 des produits** — les 5 produits les plus vendus, avec filtre de période (champ **Du** / **Au**) pour analyser n'importe quelle plage de dates.
+En bas du tableau de bord, le **journal d'audit** affiche les 8 dernières actions effectuées dans le système (création, modification, suppression d'enregistrements).
 
-### 3.3 Activité récente
+### 3.3 Cloche de notifications
 
-En bas du tableau de bord, vous trouverez :
+L'icône cloche en haut à droite affiche les alertes actives :
+- **Rouge — Emprunts en retard :** livres non retournés après la date prévue.
+- **Orange — Frais en attente :** frais scolaires définis mais non encore payés.
+- **Bleu — Présences manquantes :** classes pour lesquelles les présences du jour n'ont pas encore été saisies.
 
-- Les **5 dernières ventes** effectuées.
-- Les **5 dernières commandes** passées.
-- Les **derniers journaux d'audit** (actions système).
-
-### 3.4 Accès Finance (admin uniquement)
-
-Le lien **Finance** dans le menu donne accès à un tableau de bord analytique avancé avec des tendances journalières, hebdomadaires, mensuelles et annuelles.
+Cliquez sur une alerte pour accéder directement à la section concernée.
 
 ---
 
-## 4. Ventes et facturation
+## 4. Années académiques
 
-**Accessible à :** tous les rôles
+**Accessible à :** ROLE_SECRETAIRE et supérieur
 
-### 4.1 Créer une nouvelle vente
+L'année académique est la base de toute l'organisation : classes, inscriptions, notes et frais y sont rattachés.
 
-1. Dans le menu latéral, cliquez sur **Vente** → **Vendre**.
-2. L'écran de vente s'affiche avec les champs suivants :
+### 4.1 Voir les années académiques
 
-| Champ | Description |
-|---|---|
-| **Table** | Sélectionnez la table du client (si applicable) |
-| **Devise** | Choisissez FC ou USD |
-| **Produit** | Recherchez et sélectionnez un produit |
-| **Quantité** | Saisissez la quantité vendue |
-| **Prix unitaire** | Renseigné automatiquement selon le produit |
+Menu : **Configuration** → **Années académiques**
 
-3. Ajoutez autant de lignes de produits que nécessaire.
-4. Vérifiez le **total** affiché en bas.
-5. Cliquez sur **Enregistrer** pour finaliser la vente.
+### 4.2 Créer une nouvelle année académique
 
-> Le numéro de facture est généré automatiquement (ex : V00001, V00002...).
-
-### 4.2 Vente avec prépaiement
-
-Pour enregistrer une vente déjà payée à l'avance, utilisez l'option **Vente Prépayée** si disponible sur l'écran de vente.
-
-### 4.3 Confirmer une vente (marquer comme payée)
-
-1. Allez dans **Vente** → **Factures**.
-2. Trouvez la vente concernée.
-3. Cliquez sur **Confirmer** pour marquer la vente comme payée.
-
-### 4.4 Annuler une vente
-
-1. Allez dans **Vente** → **Factures**.
-2. Trouvez la vente à annuler.
-3. Cliquez sur **Annuler**.
-
-> Une vente annulée ne peut pas être relancée. Créez une nouvelle vente si nécessaire.
-
-### 4.5 Modifier une vente
-
-1. Allez dans **Vente** → **Factures**.
-2. Cliquez sur la vente à modifier, puis sur **Modifier**.
-3. Effectuez vos changements et cliquez sur **Enregistrer**.
-
-### 4.6 Imprimer / Exporter une facture en PDF
-
-1. Allez dans **Vente** → **Factures**.
-2. Cliquez sur la vente souhaitée pour afficher ses détails.
-3. Cliquez sur **Imprimer** ou **Télécharger PDF**.
-
-### 4.7 Consulter la liste des factures
-
-Allez dans **Vente** → **Factures** pour voir toutes les factures avec leur statut (en cours, payée, annulée).
-
----
-
-## 5. Historique des ventes
-
-**Accessible à :** tous les rôles
-
-### 5.1 Voir l'historique des produits vendus
-
-1. Allez dans **Vente** → **Historique**.
-2. Vous voyez la liste de tous les articles vendus, avec la date, le produit, la quantité et le prix.
-
-### 5.2 Filtrer par période
-
-- Utilisez les champs **Date de début** et **Date de fin** pour filtrer l'historique sur une période spécifique.
-- Cliquez sur **Filtrer** pour appliquer.
-
----
-
-## 6. Gestion des produits
-
-**Accessible à :** tous les rôles sauf `ROLE_COMMANDE`
-
-### 6.1 Voir la liste des produits
-
-Allez dans **Produit** → **Liste**. Vous y trouverez :
-
-- Le **code produit** (généré automatiquement)
-- Le **nom** du produit
-- La **catégorie**
-- Le **prix de vente**
-- Le **niveau de stock** actuel
-
-### 6.2 Ajouter un nouveau produit
-
-1. Allez dans **Produit** → **Nouveau Produit**.
-2. Remplissez le formulaire :
-
-| Champ | Description |
-|---|---|
-| **Nom** | Nom du produit |
-| **Catégorie** | Catégorie à laquelle appartient le produit |
-| **Prix de vente** | Prix unitaire de vente |
-| **Unité de mesure** | Ex : pièce, kg, litre... |
-| **Stock minimum** | Seuil d'alerte de stock bas |
-| **Stock maximum** | Quantité maximale à stocker |
-| **Image** | Photo du produit (optionnel) |
-
-3. Cliquez sur **Enregistrer**.
-
-> Le code produit est généré automatiquement par le système.
-
-### 6.3 Voir les détails d'un produit
-
-Cliquez sur le nom d'un produit dans la liste pour afficher sa fiche complète, incluant le niveau de stock actuel.
-
-### 6.4 Exporter les produits en Excel
-
-Dans la liste des produits, cliquez sur le bouton **Exporter Excel** pour télécharger la liste complète au format Excel.
-
----
-
-## 7. Catégories de produits
-
-**Accessible à :** administrateurs uniquement
-
-### 7.1 Voir les catégories
-
-Allez dans **Catégorie Produit** → **Liste des Catégories**.
-
-### 7.2 Créer une nouvelle catégorie
-
-1. Allez dans **Catégorie Produit** → **Nouvelle Catégorie**.
-2. Saisissez le **nom** de la catégorie.
-3. Cliquez sur **Enregistrer**.
-
-> Vous pouvez aussi créer une catégorie directement depuis la liste via le formulaire intégré en haut de page.
-
----
-
-## 8. Commandes fournisseurs
-
-**Accessible à :** tous les rôles
-
-Cette section gère les commandes passées auprès des fournisseurs, avec un **workflow d'approbation** en plusieurs étapes.
-
-### 8.1 Cycle de vie d'une commande
-
-```
-Brouillon → Soumise → Approuvée / Rejetée → Réception des articles
-```
-
-### 8.2 Créer une nouvelle commande
-
-1. Allez dans **Commande Produit** → **Commander**.
-2. L'écran de commande s'affiche. Ajoutez les produits à commander :
-
-| Champ | Description |
-|---|---|
-| **Produit** | Sélectionnez le produit à commander |
-| **Quantité** | Quantité souhaitée |
-| **Prix unitaire** | Prix d'achat estimé |
-
-3. Ajoutez autant de lignes que nécessaire.
-4. Cliquez sur **Enregistrer en brouillon** pour sauvegarder sans soumettre, ou sur **Soumettre** pour envoyer à l'approbation.
-
-> Le numéro de commande est généré automatiquement (ex : COM00001).
-
-### 8.3 Soumettre une commande pour approbation
-
-Si vous avez sauvegardé une commande en brouillon :
-
-1. Allez dans **Commande Produit** → **Historique**.
-2. Trouvez votre commande avec le statut **Brouillon**.
-3. Cliquez sur **Soumettre**.
-
-### 8.4 Approuver ou rejeter une commande (approbateurs uniquement)
-
-1. Allez dans **Commande Produit** → **Historique**.
-2. Trouvez la commande avec le statut **Soumise**.
-3. Cliquez sur **Approuver** ou **Rejeter**.
-4. En cas de rejet, saisissez le motif si demandé.
-
-> Seuls les utilisateurs désignés comme **approbateurs** peuvent approuver ou rejeter des commandes.
-
-### 8.5 Gérer les approbateurs (admin uniquement)
-
-1. Allez dans **Commande Produit** → **Approbateur**.
-2. Ajoutez ou retirez des utilisateurs de la liste des approbateurs.
-
-### 8.6 Réceptionner une commande
-
-Après approbation, lorsque les articles arrivent :
-
-1. Ouvrez la commande approuvée.
-2. Dans la section **Réception**, confirmez les quantités reçues pour chaque ligne.
-3. Cliquez sur **Confirmer la réception**.
-
-### 8.7 Annuler une commande
-
-Une commande en brouillon ou soumise peut être annulée :
-
-1. Ouvrez la commande.
-2. Cliquez sur **Annuler la commande**.
-
-### 8.8 Imprimer une commande
-
-Depuis le détail d'une commande, cliquez sur **Imprimer** pour générer un bon de commande imprimable.
-
-### 8.9 Modifier ou supprimer une commande
-
-- Une commande en **brouillon** peut être modifiée ou supprimée.
-- Une commande **soumise ou approuvée** ne peut plus être modifiée.
-
----
-
-## 9. Approvisionnement et stock
-
-**Accessible à :** administrateurs uniquement
-
-### 9.1 Ajouter du stock (approvisionner)
-
-1. Allez dans **Approvisionnement** → **Approvisionner**.
-2. Remplissez le formulaire :
-
-| Champ | Description |
-|---|---|
-| **Produit** | Produit à réapprovisionner |
-| **Quantité** | Quantité ajoutée au stock (peut être négative pour une correction) |
-| **Prix unitaire** | Coût d'achat unitaire (calculé automatiquement selon le produit) |
-| **Coût total** | Calculé automatiquement — non modifiable |
-
-3. Cliquez sur **Enregistrer**.
-
-### 9.2 Ajustement de stock
-
-L'ajustement de stock permet de **corriger manuellement le niveau de stock** sans passer par un achat fournisseur. Il est utile pour enregistrer des pertes, vols, ou corrections après inventaire physique.
-
-1. Allez dans **Approvisionnement** → **Ajustement stock**.
-2. Remplissez le formulaire :
-
-| Champ | Description |
-|---|---|
-| **Produit** | Produit à ajuster |
-| **Quantité** | Positive = augmentation du stock / Négative = réduction du stock |
-| **Motif** | Raison de l'ajustement |
-
-3. Cliquez sur **Enregistrer l'ajustement**.
-
-**Motifs disponibles :**
-- Correction inventaire
-- Perte
-- Vol
-- Produit avarié
-- Retour client
-- Autre
-
-> Les ajustements apparaissent dans la liste des approvisionnements avec le badge **Ajustement** (orange), contrairement aux approvisionnements réels qui affichent le badge **Appro.** (bleu).
-
-### 9.3 Voir l'historique des approvisionnements
-
-Allez dans **Approvisionnement** → **Historique** pour consulter tous les mouvements de stock (approvisionnements et ajustements). La colonne **Type** permet de distinguer les deux.
-
-### 9.4 Voir les niveaux de stock actuels
-
-1. Allez dans **Approvisionnement** → **Stock**.
-2. Vous voyez le stock disponible par produit.
-3. Utilisez les filtres **Date de début** et **Date de fin** pour analyser le stock sur une période donnée.
-
-> Un stock en dessous du seuil minimum apparaît en **rouge** (alerte de stock bas).
-
----
-
-## 10. Caisse et flux de trésorerie
-
-**Accessible à :** administrateurs uniquement
-
-### 10.1 Bilan de caisse
-
-Allez dans **Caisse** → **Bilan de caisse** pour consulter l'état de la trésorerie :
-
-| Section | Description |
-|---|---|
-| **Entrées** | Total des ventes + débits enregistrés |
-| **Sorties** | Total des crédits + salaires versés |
-| **Solde** | Entrées − Sorties |
-
-Le bilan est affiché séparément pour chaque devise (**FC** et **USD**).
-
-Utilisez les filtres de date pour analyser une période spécifique.
-
-### 10.2 Enregistrer une entrée de caisse (Débit)
-
-Un **débit** représente une entrée d'argent dans la caisse autre que les ventes (ex : un apport de fonds, un remboursement reçu).
-
-1. Allez dans **Caisse** → **Nouvelle Entrée**.
+1. Cliquez sur **Nouvelle année**.
 2. Remplissez :
 
 | Champ | Description |
 |---|---|
-| **Montant** | Somme reçue |
-| **Devise** | FC ou USD |
-| **Motif** | Raison de l'entrée |
-| **Date** | Date de l'opération |
+| **Libellé** | Ex : "2025-2026" |
+| **Date de début** | Début de l'année scolaire |
+| **Date de fin** | Fin de l'année scolaire |
+| **Année courante** | Cochez pour en faire l'année active |
 
 3. Cliquez sur **Enregistrer**.
 
-### 10.3 Consulter les entrées récentes
+> Une seule année peut être marquée comme **courante** à la fois. C'est celle qui est utilisée par défaut dans tous les modules.
 
-Allez dans **Caisse** → **Récentes Entrées** pour voir les dernières entrées enregistrées, avec possibilité de filtrer par date.
+---
 
-### 10.4 Enregistrer une sortie de caisse (Crédit)
+## 5. Classes et niveaux
 
-Un **crédit** représente une sortie d'argent de la caisse (ex : achat de fournitures, frais divers).
+**Accessible à :** ROLE_SECRETAIRE et supérieur
 
-1. Allez dans **Caisse** → **Nouvelle Sortie**.
+### 5.1 Niveaux disponibles
+
+| Niveau | Description |
+|---|---|
+| **Maternelle** | Classes de la petite enfance |
+| **Primaire** | Classes 1ère à 6ème |
+| **Secondaire** | Classes de 7ème à terminale |
+| **Universitaire** | Années de faculté / grande école |
+
+### 5.2 Créer une classe
+
+1. Menu : **Classes** → **Nouvelle classe**.
 2. Remplissez :
 
 | Champ | Description |
 |---|---|
-| **Montant** | Somme dépensée |
-| **Devise** | FC ou USD |
-| **Motif** | Raison de la dépense |
-| **Date** | Date de l'opération |
+| **Nom** | Ex : "6ème A", "Terminale Sciences" |
+| **Niveau** | Maternelle / Primaire / Secondaire / Universitaire |
+| **Année académique** | Année à laquelle appartient la classe |
 
 3. Cliquez sur **Enregistrer**.
 
-### 10.5 Consulter les sorties récentes
+### 5.3 Voir la liste des classes
 
-Allez dans **Caisse** → **Récentes Sorties** pour voir les dernières sorties enregistrées.
+Menu : **Classes** → **Liste des classes**. Les classes sont regroupées par niveau et filtrables par année académique.
 
 ---
 
-## 11. Gestion des employés
+## 6. Matières
 
-**Accessible à :** administrateurs uniquement
+**Accessible à :** ROLE_SECRETAIRE et supérieur
 
-### 11.1 Voir la liste des employés
+Les matières définissent les cours enseignés et leur poids dans le calcul des moyennes.
 
-Allez dans **Employe** → **Liste des Employés** pour voir tous les employés actifs avec leurs informations de base.
+### 6.1 Créer une matière
 
-### 11.2 Ajouter un nouvel employé
+1. Menu : **Matières** → **Nouvelle matière**.
+2. Remplissez :
 
-1. Allez dans **Employe** → **Nouvel Employé**.
+| Champ | Description |
+|---|---|
+| **Nom** | Ex : "Mathématiques", "Français" |
+| **Coefficient** | Poids de la matière dans la moyenne (ex : 3) |
+| **Niveau** | Niveau scolaire concerné |
+
+3. Cliquez sur **Enregistrer**.
+
+> Le coefficient est utilisé par le système pour calculer automatiquement la **moyenne pondérée** des bulletins.
+
+---
+
+## 7. Gestion des élèves
+
+**Accessible à :** ROLE_SECRETAIRE et supérieur pour la création ; ROLE_USER pour la consultation
+
+### 7.1 Voir la liste des élèves
+
+Menu : **Élèves** → **Liste des élèves**
+
+### 7.2 Ajouter un élève
+
+1. Menu : **Élèves** → **Nouvel élève**.
 2. Remplissez le formulaire :
 
 | Champ | Description |
 |---|---|
-| **Nom** | Nom de l'employé |
-| **Prénom** | Prénom de l'employé |
-| **Poste / Fonction** | Titre du poste occupé |
-| **Date d'embauche** | Date de début de contrat |
-| **Salaire de base** | Montant du salaire mensuel |
-| **Devise du salaire** | FC ou USD |
+| **Nom** | Nom de famille |
+| **Postnom** | Postnom (deuxième nom) |
+| **Prénom** | Prénom(s) |
+| **Sexe** | Masculin / Féminin |
+| **Date de naissance** | Format JJ/MM/AAAA |
+| **Lieu de naissance** | Ville ou localité |
+| **Adresse** | Adresse de résidence |
+| **Photo** | Photo de profil (optionnel) |
+| **Nom du tuteur** | Parent ou tuteur légal |
+| **Téléphone du tuteur** | Numéro de contact |
+| **Email du tuteur** | Adresse e-mail (optionnel) |
+| **Relation** | Père / Mère / Tuteur / Autre |
 
 3. Cliquez sur **Enregistrer**.
 
-### 11.3 Voir le profil d'un employé
+> Le **matricule** est généré automatiquement au format `ELV-AAAA-NNNNN` (ex : `ELV-2026-00042`).
 
-Cliquez sur le nom d'un employé dans la liste pour afficher sa fiche complète, incluant l'historique des paiements de salaire.
+### 7.3 Voir le profil d'un élève
 
-### 11.4 Modifier les informations d'un employé
+Cliquez sur **Voir** en face de l'élève pour accéder à sa fiche complète (informations personnelles, inscriptions, historique de présence).
 
-1. Ouvrez la fiche de l'employé.
+### 7.4 Modifier les informations d'un élève
+
+1. Ouvrez la fiche de l'élève.
 2. Cliquez sur **Modifier**.
-3. Effectuez les changements nécessaires.
-4. Cliquez sur **Enregistrer**.
-
-### 11.5 Payer le salaire d'un employé
-
-1. Ouvrez la fiche de l'employé.
-2. Cliquez sur **Payer le salaire**.
-3. Sélectionnez la **période de paie** concernée.
-4. Confirmez le paiement.
-
-> Le système empêche de payer deux fois le salaire d'un même employé pour la même période.
+3. Effectuez les changements et cliquez sur **Enregistrer**.
 
 ---
 
-## 12. Paie et salaires
+## 8. Inscriptions
 
-**Accessible à :** administrateurs uniquement
+**Accessible à :** ROLE_SECRETAIRE et supérieur
 
-### 12.1 Voir les périodes de paie
+L'inscription lie un élève à une classe pour une année académique donnée.
 
-Allez dans **Employe** → **Listes des Frais** pour voir toutes les périodes de paie créées (ex : Janvier 2026, Février 2026...).
+### 8.1 Inscrire un élève
 
-### 12.2 Créer une nouvelle période de paie
+1. Menu : **Inscriptions** → **Nouvelle inscription** (ou depuis la fiche de l'élève).
+2. Remplissez :
 
-1. Allez dans **Employe** → **Listes des Frais**.
-2. Cliquez sur **Nouvelle Période**.
-3. Saisissez le **nom** de la période (ex : "Mars 2026") et les dates de début/fin.
-4. Cliquez sur **Enregistrer**.
+| Champ | Description |
+|---|---|
+| **Élève** | Sélectionnez l'élève dans la liste |
+| **Classe** | Classe de destination |
+| **Année académique** | Année concernée |
+| **Statut** | Actif / Transféré / Exclu / Diplômé |
 
-### 12.3 Voir le détail d'une période de paie
+3. Cliquez sur **Enregistrer**.
 
-Cliquez sur une période pour voir tous les employés payés lors de cette période et les montants versés.
+> Un élève ne peut être inscrit qu'une seule fois par année académique. Le système bloque les doublons.
 
-### 12.4 Modifier ou supprimer une période
+### 8.2 Changer le statut d'une inscription
 
-- Cliquez sur **Modifier** pour changer les informations d'une période.
-- Cliquez sur **Supprimer** pour effacer une période (uniquement si aucun paiement n'y est attaché).
+Pour marquer un élève comme transféré, exclu ou diplômé, modifiez son inscription et changez le **statut**.
 
 ---
 
-## 13. Taux de change
+## 9. Gestion des enseignants
 
-**Accessible à :** administrateurs uniquement
+**Accessible à :** ROLE_SECRETAIRE et supérieur pour la création ; ROLE_USER pour la consultation
 
-Le taux de change actif est utilisé dans tout le système pour convertir les montants entre FC et USD.
+### 9.1 Voir la liste des enseignants
 
-### 13.1 Voir les taux récents
+Menu : **Enseignants** → **Liste des enseignants**
 
-Allez dans **Taux** → **Taux Récents** pour voir l'historique des taux de change enregistrés.
+### 9.2 Ajouter un enseignant
 
-### 13.2 Mettre à jour le taux actif
+1. Menu : **Enseignants** → **Nouvel enseignant**.
+2. Remplissez :
 
-1. Allez dans **Taux** → **Taux Récents**.
-2. Cliquez sur **Nouveau Taux** ou **Modifier le taux actif**.
-3. Saisissez le nouveau taux (ex : 1 USD = 2800 FC).
-4. Marquez-le comme **actif**.
+| Champ | Description |
+|---|---|
+| **Nom / Prénom** | Identité de l'enseignant |
+| **Spécialité** | Matière(s) enseignée(s) |
+| **Diplôme** | Niveau académique |
+| **Téléphone** | Numéro de contact |
+| **Adresse** | Adresse de résidence |
+| **Niveau d'enseignement** | Maternelle / Primaire / Secondaire / Universitaire |
+| **Statut** | Actif / Inactif |
+| **Photo** | Photo de profil (optionnel) |
+
+3. Cliquez sur **Enregistrer**.
+
+### 9.3 Payer le salaire d'un enseignant
+
+Depuis la fiche de l'enseignant, cliquez sur **Payer le salaire**, sélectionnez la période et confirmez. Le système empêche les doublons de paiement pour une même période.
+
+---
+
+## 10. Examens
+
+**Accessible à :** ROLE_SECRETAIRE et supérieur
+
+Les examens servent de cadre de référence pour la saisie des notes.
+
+### 10.1 Créer un examen
+
+1. Menu : **Examens** → **Nouvel examen**.
+2. Remplissez :
+
+| Champ | Description |
+|---|---|
+| **Libellé** | Ex : "Examen partiel 1er trimestre" |
+| **Type** | Devoir / Interrogation / Examen partiel / Examen final |
+| **Période** | 1er, 2e ou 3e trimestre/semestre |
+| **Date de début** | Début de la session |
+| **Date de fin** | Fin de la session |
+| **Année académique** | Année concernée |
+| **Classe** | Laissez vide pour un examen transversal |
+
+3. Cliquez sur **Enregistrer**.
+
+---
+
+## 11. Notes et saisie des notes
+
+**Accessible à :** ROLE_SECRETAIRE et supérieur pour la saisie ; ROLE_USER pour la consultation
+
+### 11.1 Saisir les notes par classe
+
+La saisie en lot permet d'entrer les notes de tous les élèves d'une classe pour un examen donné en une seule opération.
+
+1. Menu : **Notes** → **Saisir par classe**.
+2. Sélectionnez la **classe**, la **matière** et l'**examen**.
+3. Un tableau s'affiche avec une ligne par élève. Renseignez la note (sur 20 par défaut).
+4. Cliquez sur **Enregistrer**.
+
+> Les notes déjà saisies sont pré-remplies. Vous pouvez les corriger directement.
+
+### 11.2 Voir la liste des notes
+
+Menu : **Notes** → **Liste des notes**. Filtrable par classe, matière et examen.
+
+---
+
+## 12. Bulletins scolaires
+
+**Accessible à :** ROLE_DIRECTEUR et supérieur pour la génération et validation ; ROLE_USER pour la consultation
+
+### 12.1 Générer un bulletin
+
+1. Menu : **Bulletins** → **Générer**.
+2. Sélectionnez la **classe** et la **période**.
+3. Cliquez sur **Générer pour toute la classe**.
+
+Le système calcule automatiquement pour chaque élève :
+- La **moyenne par matière** (note × coefficient)
+- La **moyenne générale pondérée**
+- Le **rang dans la classe**
+- La **mention** selon le barème :
+
+| Moyenne | Mention |
+|---|---|
+| ≥ 18 / 20 | Excellent |
+| ≥ 16 / 20 | Très Bien |
+| ≥ 14 / 20 | Bien |
+| ≥ 12 / 20 | Assez Bien |
+| ≥ 10 / 20 | Passable |
+| < 10 / 20 | Échec |
+
+### 12.2 Valider un bulletin
+
+Un bulletin en statut **Brouillon** doit être validé avant distribution :
+
+1. Ouvrez le bulletin depuis la liste.
+2. Cliquez sur **Valider**.
+
+> Un bulletin validé ne peut plus être modifié. Si une correction est nécessaire, régénérez le bulletin.
+
+### 12.3 Distribuer et imprimer un bulletin en PDF
+
+1. Depuis la liste des bulletins, cliquez sur **PDF** en face du bulletin souhaité.
+2. Le bulletin s'ouvre dans votre navigateur au format PDF imprimable.
+3. Utilisez la fonction d'impression de votre navigateur (`Ctrl+P`) pour imprimer.
+
+---
+
+## 13. Présences
+
+**Accessible à :** ROLE_SECRETAIRE et supérieur pour la saisie ; ROLE_USER pour la consultation
+
+### 13.1 Saisir les présences du jour
+
+1. Menu : **Présences** → **Saisir les présences**.
+2. Sélectionnez la **classe** et la **date** (par défaut : aujourd'hui).
+3. Pour chaque élève, cochez le statut approprié :
+
+| Statut | Description |
+|---|---|
+| **Présent** | L'élève est en cours |
+| **Absent** | L'élève est absent |
+| **Retard** | L'élève est arrivé en retard |
+| **Justifié** | Absence justifiée (avec motif) |
+
+4. Ajoutez un **motif** si nécessaire (visible pour absent, retard, justifié).
 5. Cliquez sur **Enregistrer**.
 
-> Un seul taux peut être **actif** à la fois. L'ancien taux actif est automatiquement désactivé.
+> Si les présences ont déjà été saisies pour cette classe et cette date, elles sont pré-remplies et modifiables.
+
+### 13.2 Consulter les présences
+
+Menu : **Présences** → **Liste des présences**. Filtrez par classe et par date pour voir les enregistrements.
+
+### 13.3 Rapport de présence d'un élève
+
+Depuis la liste des présences, cliquez sur **Rapport** en face d'un élève pour voir son historique complet avec statistiques (nombre de présences, absences, retards, justifiés) sur une période donnée.
 
 ---
 
-## 14. Gestion des tables
+## 14. Emploi du temps
 
-**Accessible à :** administrateurs uniquement
+**Accessible à :** ROLE_SECRETAIRE et supérieur pour la gestion ; ROLE_USER pour la consultation
 
-Cette section est utile dans un contexte **restaurant ou bar** pour associer des ventes à des tables.
+### 14.1 Voir l'emploi du temps d'une classe
 
-### 14.1 Voir les tables
+1. Menu : **Emploi du temps** → **Vue semaine**.
+2. Sélectionnez la classe.
+3. La grille hebdomadaire s'affiche avec les créneaux colorés par matière.
 
-Allez dans **Tables** → **Tables** pour voir la liste de toutes les tables configurées.
+### 14.2 Ajouter un créneau
 
-### 14.2 Ajouter une table
+1. Menu : **Emploi du temps** → **Ajouter un créneau**.
+2. Remplissez :
 
-1. Dans la liste des tables, cliquez sur **Nouvelle Table**.
-2. Saisissez le **numéro ou nom** de la table.
+| Champ | Description |
+|---|---|
+| **Classe** | Classe concernée |
+| **Matière** | Matière enseignée |
+| **Enseignant** | Enseignant affecté |
+| **Jour** | Lundi à Samedi |
+| **Heure de début** | Heure de début du cours |
+| **Heure de fin** | Heure de fin du cours |
+| **Salle** | Salle ou local (optionnel) |
+| **Année académique** | Année concernée |
+
 3. Cliquez sur **Enregistrer**.
 
-### 14.3 Modifier ou supprimer une table
-
-- Cliquez sur **Modifier** pour changer le nom d'une table.
-- Cliquez sur **Supprimer** pour retirer une table (uniquement si aucune vente active ne lui est associée).
+> Le système détecte automatiquement les **conflits** : si l'enseignant est déjà programmé à ce créneau pour une autre classe, un message d'erreur s'affiche.
 
 ---
 
-## 15. Gestion des utilisateurs
+## 15. Frais scolaires
 
-**Accessible à :** administrateurs uniquement
+**Accessible à :** ROLE_SECRETAIRE et supérieur
 
-### 15.1 Voir la liste des utilisateurs
+Les frais scolaires définissent les montants à payer par les élèves. Ils sont ensuite utilisés pour enregistrer les paiements.
 
-Allez dans **Utilisateur** → **Liste des Utilisateurs** pour voir tous les comptes créés dans le système.
+### 15.1 Créer un frais scolaire
 
-### 15.2 Créer un nouvel utilisateur
+1. Menu : **Frais scolaires** → **Nouveau frais**.
+2. Remplissez :
 
-1. Allez dans **Utilisateur** → **Nouvel Utilisateur**.
-2. Remplissez le formulaire :
+| Champ | Description |
+|---|---|
+| **Libellé** | Ex : "Frais d'inscription 2026", "Minerval octobre" |
+| **Montant** | Montant en FC |
+| **Type** | Inscription / Mensuel / Examen / Autre |
+| **Mois** | Si type = Mensuel, précisez le mois (1–12) |
+| **Classe** | Laissez vide pour appliquer à toutes les classes |
+| **Année académique** | Année concernée |
+| **Actif** | Décochez pour désactiver sans supprimer |
+
+3. Cliquez sur **Enregistrer**.
+
+### 15.2 Voir la liste des frais
+
+Menu : **Frais scolaires** → **Liste des frais**. Filtrable par année académique.
+
+---
+
+## 16. Paiements des frais
+
+**Accessible à :** ROLE_SECRETAIRE et supérieur pour l'enregistrement ; ROLE_USER pour la consultation
+
+### 16.1 Enregistrer un paiement
+
+1. Menu : **Paiements** → **Nouveau paiement**.
+2. Remplissez :
+
+| Champ | Description |
+|---|---|
+| **Élève** | Sélectionnez l'élève |
+| **Frais scolaire** | Type de frais payé |
+| **Montant payé** | Montant effectivement versé (en FC) |
+| **Date de paiement** | Date du paiement |
+| **Mode de paiement** | Espèces / Mobile Money / Virement / Chèque |
+| **Observations** | Remarque éventuelle (optionnel) |
+
+3. Cliquez sur **Enregistrer**.
+
+> Le **numéro de reçu** est généré automatiquement au format `REC-AAAA-NNNNN` (ex : `REC-2026-00015`).
+
+### 16.2 Voir et imprimer un reçu PDF
+
+1. Depuis la liste des paiements, cliquez sur **PDF** en face du paiement.
+2. Le reçu s'affiche dans le navigateur — prêt à imprimer.
+
+### 16.3 Filtrer les paiements
+
+Depuis la liste des paiements, filtrez par :
+- **Élève** : pour voir tous les paiements d'un élève
+- **Mois** : pour voir les paiements d'un mois donné
+
+---
+
+## 17. Bibliothèque
+
+**Accessible à :** ROLE_SECRETAIRE et supérieur pour la gestion ; ROLE_USER pour la consultation
+
+### 17.1 Catalogue des livres
+
+Menu : **Bibliothèque** → **Livres**
+
+La liste affiche tous les livres du catalogue avec le nombre d'exemplaires disponibles.
+
+### 17.2 Ajouter un livre au catalogue
+
+1. Menu : **Bibliothèque** → **Livres** → **Ajouter un livre**.
+2. Remplissez :
+
+| Champ | Description |
+|---|---|
+| **Titre** | Titre du livre |
+| **Auteur** | Nom de l'auteur |
+| **ISBN** | Numéro ISBN (optionnel) |
+| **Catégorie** | Ex : Roman, Sciences, Histoire |
+| **Année de publication** | Année d'édition |
+| **Nombre d'exemplaires** | Quantité disponible dans l'établissement |
+| **Localisation** | Ex : "Rayon A, Étagère 3" |
+| **Description** | Résumé ou description (optionnel) |
+
+3. Cliquez sur **Enregistrer**.
+
+### 17.3 Enregistrer un emprunt
+
+1. Menu : **Bibliothèque** → **Emprunts** → **Nouvel emprunt**.
+2. Remplissez :
+
+| Champ | Description |
+|---|---|
+| **Livre** | Livre emprunté |
+| **Emprunteur** | Élève qui emprunte |
+| **Date d'emprunt** | Date du jour (ou date effective) |
+| **Date de retour prévue** | Durée recommandée : 14 jours |
+| **Observations** | Remarque éventuelle |
+
+3. Cliquez sur **Enregistrer**.
+
+> Le système vérifie qu'il reste des **exemplaires disponibles** avant d'autoriser l'emprunt. Si tous les exemplaires sont déjà empruntés, un message d'erreur s'affiche.
+
+### 17.4 Enregistrer un retour
+
+1. Menu : **Bibliothèque** → **Emprunts**.
+2. Filtrez par statut **En cours**.
+3. Cliquez sur **Marquer rendu** en face de l'emprunt concerné.
+
+La date de retour effective est enregistrée automatiquement.
+
+### 17.5 Emprunts en retard
+
+Le système détecte automatiquement les emprunts dont la date de retour prévue est dépassée et affiche leur statut en **EN RETARD** (badge rouge). Une alerte apparaît également dans la cloche de notifications.
+
+---
+
+## 18. Notifications
+
+Le système génère automatiquement des alertes visibles dans la **cloche** en haut à droite de l'écran.
+
+| Type | Couleur | Déclenchement |
+|---|---|---|
+| Emprunts en retard | 🔴 Rouge | Un ou plusieurs livres non retournés après la date prévue |
+| Frais en attente | 🟠 Orange | Frais scolaires actifs sans paiement correspondant |
+| Présences manquantes | 🔵 Bleu | Classes sans saisie de présence pour la journée en cours |
+
+Cliquez sur une notification pour accéder directement à la section concernée. Vous pouvez fermer une alerte individuellement avec le bouton **×**.
+
+---
+
+## 19. Gestion des utilisateurs
+
+**Accessible à :** ROLE_ADMIN uniquement
+
+### 19.1 Voir la liste des utilisateurs
+
+Menu : **Utilisateurs** → **Liste des utilisateurs**
+
+### 19.2 Créer un nouvel utilisateur
+
+1. Menu : **Utilisateurs** → **Nouvel utilisateur**.
+2. Remplissez :
 
 | Champ | Description |
 |---|---|
 | **Nom d'utilisateur** | Identifiant de connexion |
-| **Adresse e-mail** | Adresse e-mail de l'utilisateur |
-| **Rôle** | Niveau d'accès (voir section 16) |
+| **Email** | Adresse email |
+| **Rôle** | Niveau d'accès (voir section 20) |
 
 3. Cliquez sur **Enregistrer**.
 
-> Un mot de passe par défaut est automatiquement attribué et affiché dans le message de confirmation (format : `Credol@{année}`). Communiquez-le à l'utilisateur et demandez-lui de le changer dès sa première connexion via **Réinitialiser le mot de passe**.
+> Le mot de passe par défaut est affiché dans le message de confirmation (`Credol@{année}`). Communiquez-le à l'utilisateur et demandez-lui de le changer dès sa première connexion.
 
-### 15.3 Voir et modifier le profil d'un utilisateur
+### 19.3 Modifier un utilisateur
 
-- **Administrateur** : cliquez sur n'importe quel utilisateur dans la liste pour accéder à son profil, puis sur **Modifier** pour changer ses informations ou son rôle.
-- **Utilisateur standard** : chaque utilisateur peut modifier **son propre compte** (nom, email) depuis son profil. Il ne peut pas modifier les comptes des autres.
+Un administrateur peut modifier n'importe quel compte. Un utilisateur standard peut uniquement modifier **son propre profil**.
 
-### 15.4 Réinitialiser un mot de passe
+### 19.4 Réinitialiser un mot de passe
 
-1. Dans la liste des utilisateurs, cliquez sur **Réinit. MDP** en face de l'utilisateur concerné.
-2. Saisissez le nouveau mot de passe.
+1. Dans la liste des utilisateurs, cliquez sur **Réinit. MDP**.
+2. Saisissez et confirmez le nouveau mot de passe.
 3. Cliquez sur **Enregistrer**.
-
-> Si un utilisateur réinitialise son propre mot de passe, il est automatiquement déconnecté et doit se reconnecter avec le nouveau mot de passe.
 
 ---
 
-## 16. Rôles et permissions
+## 20. Rôles et permissions
 
-L'application dispose de plusieurs niveaux d'accès. Chaque utilisateur se voit attribuer un rôle par l'administrateur.
+L'application dispose de 4 niveaux d'accès, en plus du rôle utilisateur de base.
 
-### 16.1 Tableau des permissions par rôle
+### 20.1 Hiérarchie des rôles
 
-| Fonctionnalité | Utilisateur standard | ROLE_COMMANDE | Administrateur |
-|---|:---:|:---:|:---:|
-| Tableau de bord | ❌ | ❌ | ✅ |
-| Créer une vente | ✅ | ✅ | ✅ |
-| Voir les factures | ✅ | ✅ | ✅ |
-| Historique des ventes | ✅ | ✅ | ✅ |
-| Voir la liste des produits | ✅ | ❌ | ✅ |
-| Ajouter / modifier un produit | ✅ | ❌ | ✅ |
-| Créer une commande fournisseur | ✅ | ✅ | ✅ |
-| Voir l'historique des commandes | ✅ | ✅ | ✅ |
-| Approuver / rejeter une commande | ✅ (si approbateur) | ✅ (si approbateur) | ✅ |
-| Gérer les approbateurs | ✅ | ❌ | ✅ |
-| Approvisionnement & stock | ❌ | ❌ | ✅ |
-| Ajustement de stock | ❌ | ❌ | ✅ |
-| Caisse (entrées / sorties / bilan) | ❌ | ❌ | ✅ |
-| Gestion des employés | ❌ | ❌ | ✅ |
-| Gestion de la paie | ❌ | ❌ | ✅ |
-| Catégories de produits | ❌ | ❌ | ✅ |
-| Taux de change | ❌ | ❌ | ✅ |
-| Gestion des tables | ❌ | ❌ | ✅ |
-| Gestion des utilisateurs | ❌ | ❌ | ✅ |
-| Modifier son propre compte | ✅ | ✅ | ✅ |
-| Tableau de bord Finance | ❌ | ❌ | ✅ |
+```
+ROLE_USER (base) < ROLE_SECRETAIRE < ROLE_ENSEIGNANT < ROLE_DIRECTEUR < ROLE_ADMIN
+```
 
-### 16.2 Description des rôles
+Chaque rôle hérite de tous les droits des rôles inférieurs.
 
-**Utilisateur standard**
-- Peut créer des ventes et gérer les factures.
-- Peut créer des commandes fournisseurs et les soumettre à l'approbation.
-- Peut voir et gérer le catalogue produits.
-- N'a pas accès à la caisse, aux employés, ni aux paramètres système.
+### 20.2 Tableau des permissions
 
-**ROLE_COMMANDE**
-- Peut uniquement créer des ventes et des commandes fournisseurs.
-- Ne peut pas accéder au catalogue produits ni gérer les approbateurs.
-- Accès limité à l'essentiel des opérations quotidiennes.
+| Fonctionnalité | Utilisateur | Secrétaire | Directeur | Admin |
+|---|:---:|:---:|:---:|:---:|
+| Tableau de bord | ✅ | ✅ | ✅ | ✅ |
+| Voir élèves / enseignants | ✅ | ✅ | ✅ | ✅ |
+| Voir notes / présences | ✅ | ✅ | ✅ | ✅ |
+| Voir emploi du temps | ✅ | ✅ | ✅ | ✅ |
+| Voir paiements / reçus PDF | ✅ | ✅ | ✅ | ✅ |
+| Voir emprunts bibliothèque | ✅ | ✅ | ✅ | ✅ |
+| Saisir présences | ❌ | ✅ | ✅ | ✅ |
+| Saisir notes | ❌ | ✅ | ✅ | ✅ |
+| Créer élèves / inscriptions | ❌ | ✅ | ✅ | ✅ |
+| Gérer frais & paiements | ❌ | ✅ | ✅ | ✅ |
+| Gérer emprunts | ❌ | ✅ | ✅ | ✅ |
+| Gérer emploi du temps | ❌ | ✅ | ✅ | ✅ |
+| Valider bulletins | ❌ | ❌ | ✅ | ✅ |
+| Gérer classes / matières | ❌ | ❌ | ✅ | ✅ |
+| Gérer enseignants | ❌ | ❌ | ✅ | ✅ |
+| Gestion des utilisateurs | ❌ | ❌ | ❌ | ✅ |
+| Gestion des années académiques | ❌ | ❌ | ❌ | ✅ |
+| Caisse (débit / crédit) | ❌ | ❌ | ❌ | ✅ |
+| Journal d'audit | ❌ | ❌ | ❌ | ✅ |
+
+### 20.3 Description des rôles
+
+**Utilisateur (ROLE_USER)**
+Accès en lecture seule. Peut consulter les données mais ne peut rien créer ni modifier. Peut modifier son propre profil.
+
+**Secrétaire (ROLE_SECRETAIRE)**
+Opérations courantes : saisie des présences et des notes, inscriptions, paiements, gestion de la bibliothèque et de l'emploi du temps.
+
+**Directeur (ROLE_DIRECTEUR)**
+Tout ce que fait le secrétaire, plus la validation des bulletins et la gestion pédagogique (classes, matières, enseignants).
 
 **Administrateur (ROLE_ADMIN)**
-- Accès complet à toutes les fonctionnalités.
-- Gère les utilisateurs, les employés, la caisse, les stocks, les taux et les tables.
-- Peut consulter les analyses financières avancées.
-- Seul habilité à approuver des commandes sans être dans la liste des approbateurs.
+Accès complet. Gère les utilisateurs, les paramètres système, la trésorerie et l'audit.
 
 ---
 
-## 17. Questions fréquentes
+## 21. Questions fréquentes
 
-**Q : Je ne vois pas le menu "Produit" dans la barre latérale.**  
-R : Ce menu est masqué pour les utilisateurs ayant le rôle `ROLE_COMMANDE`. Contactez votre administrateur si vous pensez avoir besoin de cet accès.
+**Q : Comment générer les bulletins de toute une classe en une seule fois ?**  
+R : Menu **Bulletins** → **Générer**, sélectionnez la classe et la période, puis cliquez sur **Générer pour toute la classe**. Le système calcule toutes les moyennes et les rangs automatiquement.
 
-**Q : Je ne peux pas approuver une commande.**  
-R : Pour approuver des commandes, vous devez être ajouté à la liste des approbateurs par un administrateur (menu **Commande Produit** → **Approbateur**).
+**Q : Un élève est inscrit deux fois par erreur — que faire ?**  
+R : Le système empêche les doublons d'inscription (un élève = une inscription par année). Si une inscription erronée existe, modifiez son statut à **Exclu** ou supprimez-la depuis la liste des inscriptions.
 
-**Q : Le système m'indique que le salaire a déjà été payé pour cette période.**  
-R : Le système empêche les doublons de paiement. Si une erreur a été commise, contactez votre administrateur.
+**Q : Je ne vois pas le bouton "Saisir les présences".**  
+R : Ce bouton est réservé au rôle **Secrétaire** et supérieur. Contactez votre administrateur pour obtenir les droits nécessaires.
 
-**Q : Comment savoir si le stock d'un produit est insuffisant ?**  
-R : Dans la section **Stock** (Approvisionnement → Stock), les produits dont le stock est en dessous du seuil minimum sont mis en évidence. Une alerte peut aussi apparaître lors d'une vente si le stock est insuffisant.
+**Q : Comment corriger une note déjà saisie ?**  
+R : Retournez dans **Notes** → **Saisir par classe**, sélectionnez la même classe, matière et examen. Les notes existantes sont pré-remplies et modifiables.
 
-**Q : Puis-je modifier une facture après confirmation ?**  
-R : Une fois confirmée, une facture ne peut plus être modifiée directement. Annulez-la et créez une nouvelle vente si nécessaire.
+**Q : Le système refuse l'emprunt d'un livre.**  
+R : Tous les exemplaires sont probablement déjà empruntés. Vérifiez les emprunts en cours pour ce livre dans **Bibliothèque** → **Emprunts** → filtrer par statut **En cours**.
 
-**Q : Comment changer le taux de change ?**  
-R : Allez dans **Taux** → **Taux Récents**, puis créez un nouveau taux et marquez-le comme actif. L'ancien taux sera automatiquement désactivé.
+**Q : Comment imprimer le reçu d'un paiement ?**  
+R : Dans **Paiements** → liste, cliquez sur **PDF** en face du paiement. Le reçu s'affiche dans le navigateur — utilisez `Ctrl+P` pour imprimer.
 
-**Q : Où voir le journal des actions effectuées dans le système ?**  
-R : Le tableau de bord affiche les dernières entrées du journal d'audit en bas de page. Pour un historique complet, contactez votre administrateur.
+**Q : La cloche de notifications affiche "présences manquantes" mais nous n'avons pas cours ce jour.**  
+R : La détection est basée sur toutes les classes actives. Si une classe n'a pas cours un jour donné, il suffit d'ignorer l'alerte. Une fonctionnalité de calendrier scolaire (jours fériés, congés) pourra être ajoutée dans une future version.
 
-**Q : Quelle est la différence entre un approvisionnement et un ajustement de stock ?**  
-R : Un **approvisionnement** correspond à un achat réel auprès d'un fournisseur (entrée de marchandise avec un coût). Un **ajustement** est une correction manuelle du stock pour refléter la réalité physique (perte, vol, erreur de comptage) — il n'a pas d'impact financier sur la caisse.
+**Q : Comment changer le taux de change FC/USD ?**  
+R : Menu **Taux** → **Nouveau taux**. Saisissez le nouveau taux et marquez-le comme actif. L'ancien taux est automatiquement désactivé.
 
-**Q : Puis-je entrer une quantité négative lors d'un approvisionnement ?**  
-R : Oui, une quantité négative est autorisée et représente une réduction de stock (retour fournisseur, correction). Pour les corrections liées à des pertes ou vols, préférez utiliser la fonction **Ajustement de stock** qui permet de préciser le motif.
-
-**Q : Je ne vois plus le tableau de bord depuis la mise à jour.**  
-R : Le tableau de bord est désormais réservé aux administrateurs. Si vous avez besoin d'y accéder, contactez votre administrateur pour qu'il vous attribue le rôle `ROLE_ADMIN`.
+**Q : Puis-je avoir plusieurs années académiques actives simultanément ?**  
+R : Non. Une seule année peut être marquée comme **courante**. C'est cette année qui est utilisée par défaut dans tous les modules.
 
 **Q : Quel est le mot de passe par défaut d'un nouvel utilisateur ?**  
-R : Le mot de passe par défaut est affiché dans le message de confirmation lors de la création du compte. Il est de la forme `Credol@{année}` (ex : `Credol@2026`). Changez-le dès la première connexion via **Réinitialiser le mot de passe**.
+R : Il est affiché dans le message de confirmation lors de la création du compte. Il est de la forme `Credol@{année}` (ex : `Credol@2026`). Demandez à l'utilisateur de le changer dès sa première connexion.
+
+**Q : Comment voir qui a fait quoi dans le système ?**  
+R : Le **journal d'audit** (menu **Journal d'audit**, accessible aux administrateurs) enregistre toutes les actions effectuées : création, modification et suppression, avec l'utilisateur, la date et l'adresse IP.
 
 ---
 
-*Document rédigé pour Credol App — Toute reproduction ou diffusion doit être autorisée par l'administrateur système.*
+*Document rédigé pour INSOFT MASOMO v2.0 — Juillet 2026*  
+*Développé par [InSoftware SARL](https://insoftware.tech)*  
+*Toute reproduction doit être autorisée par l'administrateur système.*

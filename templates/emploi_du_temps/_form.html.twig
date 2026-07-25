@@ -1,0 +1,56 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+        {{ form_label(form.classe) }}
+        {{ form_widget(form.classe, {'attr': {'class': 'form-select w-full'}}) }}
+        {{ form_errors(form.classe) }}
+    </div>
+    <div>
+        {{ form_label(form.matiere) }}
+        {{ form_widget(form.matiere, {'attr': {'class': 'form-select w-full'}}) }}
+        {{ form_errors(form.matiere) }}
+    </div>
+    <div>
+        {{ form_label(form.enseignant) }}
+        {{ form_widget(form.enseignant, {'attr': {'class': 'form-select w-full'}}) }}
+        {{ form_errors(form.enseignant) }}
+    </div>
+    <div>
+        {{ form_label(form.anneeAcademique) }}
+        {{ form_widget(form.anneeAcademique, {'attr': {'class': 'form-select w-full'}}) }}
+        {{ form_errors(form.anneeAcademique) }}
+    </div>
+    <div>
+        {{ form_label(form.jourSemaine) }}
+        {{ form_widget(form.jourSemaine, {'attr': {'class': 'form-select w-full'}}) }}
+        {{ form_errors(form.jourSemaine) }}
+    </div>
+    <div>
+        {{ form_label(form.salle) }}
+        {{ form_widget(form.salle, {'attr': {'class': 'form-input w-full', 'placeholder': 'ex. Salle A'}}) }}
+        {{ form_errors(form.salle) }}
+    </div>
+    <div>
+        {{ form_label(form.heureDebut) }}
+        {{ form_widget(form.heureDebut, {'attr': {'class': 'form-input w-full'}}) }}
+        {{ form_errors(form.heureDebut) }}
+    </div>
+    <div>
+        {{ form_label(form.heureFin) }}
+        {{ form_widget(form.heureFin, {'attr': {'class': 'form-input w-full'}}) }}
+        {{ form_errors(form.heureFin) }}
+    </div>
+    <div class="flex items-center gap-2 mt-2">
+        {{ form_widget(form.actif) }}
+        {{ form_label(form.actif) }}
+        {{ form_errors(form.actif) }}
+    </div>
+</div>
+
+<div class="mt-4 flex gap-2">
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <a href="{{ path('app_emploi_du_temps_index') }}" class="btn btn-secondary">Annuler</a>
+</div>
+
+{{ form_end(form) }}

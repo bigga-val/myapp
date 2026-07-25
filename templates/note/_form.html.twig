@@ -1,0 +1,62 @@
+{{ form_start(form) }}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.eleve) }}</label>
+        {{ form_widget(form.eleve, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.eleve) }}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.classe) }}</label>
+        {{ form_widget(form.classe, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.classe) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.matiere) }}</label>
+        {{ form_widget(form.matiere, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.matiere) }}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.examen) }}</label>
+        {{ form_widget(form.examen, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.examen) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.valeur) }}</label>
+        {{ form_widget(form.valeur, {'attr': {'class': 'form-input', 'min': 0, 'max': 20, 'step': '0.5'}}) }}
+        {{ form_errors(form.valeur) }}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.valeurMax) }}</label>
+        {{ form_widget(form.valeurMax, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.valeurMax) }}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.periode) }}</label>
+        {{ form_widget(form.periode, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.periode) }}
+    </div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">{{ form_label(form.anneeAcademique) }}</label>
+    {{ form_widget(form.anneeAcademique, {'attr': {'class': 'form-select'}}) }}
+    {{ form_errors(form.anneeAcademique) }}
+</div>
+
+<div class="mb-3">
+    <label class="form-label">{{ form_label(form.observationsProf) }}</label>
+    {{ form_widget(form.observationsProf, {'attr': {'class': 'form-input', 'rows': 2}}) }}
+    {{ form_errors(form.observationsProf) }}
+</div>
+
+<br>
+<button class="btn btn-primary" type="submit">Enregistrer</button>
+
+{{ form_end(form) }}

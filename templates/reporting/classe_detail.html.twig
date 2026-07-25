@@ -1,0 +1,130 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold">{{ classe.nom }} — Suivi des paiements</h1>
+            <p class="text-sm text-gray-500 mt-0.5">Année académique {{ annee.libelle }}</p>
+        </div>
+        <a href="{{ path('app_reporting_financier') }}" class="btn btn-secondary">
+            ← Retour au tableau de bord
+        </a>
+    </div>
+</div>
+
+{# ── KPIs rapides ─────────────────────────────────────────────────────────── #}
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Élèves inscrits</p>
+        <p class="text-2xl font-bold text-primary">{{ nbTotal }}</p>
+    </div>
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Ont payé</p>
+        <p class="text-2xl font-bold text-success">{{ payants|length }}</p>
+    </div>
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">N'ont pas payé</p>
+        <p class="text-2xl font-bold text-danger">{{ impayes|length }}</p>
+    </div>
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Total perçu (FC)</p>
+        <p class="text-2xl font-bold text-warning">{{ totalPercu|number_format(0, '.', ' ') }}</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+    {# ── Élèves ayant payé ─────────────────────────────────────────────────── #}
+    <div class="panel">
+        <h2 class="font-semibold mb-3 flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-green-500"></span>
+            Ont payé
+            <span class="ml-1 px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700 font-semibold">{{ payants|length }}</span>
+        </h2>
+
+        {% if payants is empty %}
+            <p class="text-sm text-gray-400">Aucun paiement enregistré pour cette classe.</p>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover text-sm">
+                    <thead>
+                        <tr>
+                            <th>Élève</th>
+                            <th>Matricule</th>
+                            <th class="text-right">Total payé (FC)</th>
+                            <th class="text-right">Nb paiem.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in payants %}
+                        <tr>
+                            <td class="font-medium">
+                                {{ e.nom }} {{ e.postnom }} {{ e.prenom }}
+                            </td>
+                            <td class="text-gray-400 text-xs">{{ e.matricule ?? '—' }}</td>
+                            <td class="text-right font-semibold text-success">
+                                {{ e.totalPaye|number_format(0, '.', ' ') }}
+                            </td>
+                            <td class="text-right">
+                                <span class="px-1.5 py-0.5 rounded text-xs bg-green-100 text-green-700">
+                                    {{ e.nbPaiements }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-bold bg-gray-50">
+                            <td colspan="2">Total</td>
+                            <td class="text-right">
+                                {{ payants|reduce((carry, e) => carry + e.totalPaye, 0)|number_format(0, '.', ' ') }}
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+    {# ── Élèves n'ayant pas payé ───────────────────────────────────────────── #}
+    <div class="panel">
+        <h2 class="font-semibold mb-3 flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500"></span>
+            N'ont pas encore payé
+            <span class="ml-1 px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700 font-semibold">{{ impayes|length }}</span>
+        </h2>
+
+        {% if impayes is empty %}
+            <p class="text-sm text-gray-400 flex items-center gap-1">
+                <span class="text-green-500">✓</span> Tous les élèves ont effectué un paiement.
+            </p>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover text-sm">
+                    <thead>
+                        <tr>
+                            <th>Élève</th>
+                            <th>Matricule</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in impayes %}
+                        <tr>
+                            <td class="font-medium">
+                                {{ e.nom }} {{ e.postnom }} {{ e.prenom }}
+                            </td>
+                            <td class="text-gray-400 text-xs">{{ e.matricule ?? '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

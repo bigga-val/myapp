@@ -1,0 +1,21 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Saisir une note</h1>
+        <a class="btn btn-primary" href="{{ path('app_note_index') }}">Voir la liste</a>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            {{ include('note/_form.html.twig') }}
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+
+{% endblock %}

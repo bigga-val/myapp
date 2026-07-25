@@ -1,0 +1,61 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Nouvel emprunt</h1>
+        <a class="btn btn-secondary" href="{{ path('app_emprunt_livre_index') }}">Voir la liste</a>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            {{ form_start(form) }}
+
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">{{ form_label(form.livre) }}</label>
+                    {{ form_widget(form.livre, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.livre) }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">{{ form_label(form.emprunteur) }}</label>
+                    {{ form_widget(form.emprunteur, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.emprunteur) }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form_label(form.dateEmprunt) }}</label>
+                    {{ form_widget(form.dateEmprunt, {'attr': {'class': 'form-input'}}) }}
+                    {{ form_errors(form.dateEmprunt) }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form_label(form.dateRetourPrevue) }}</label>
+                    {{ form_widget(form.dateRetourPrevue, {'attr': {'class': 'form-input'}}) }}
+                    {{ form_errors(form.dateRetourPrevue) }}
+                    <span class="field-hint">Durée maximale recommandée : 14 jours</span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">{{ form_label(form.observations) }}</label>
+                {{ form_widget(form.observations, {'attr': {'class': 'form-input', 'rows': 2}}) }}
+                {{ form_errors(form.observations) }}
+            </div>
+
+            <button class="btn btn-primary" type="submit">Enregistrer l'emprunt</button>
+
+            {{ form_end(form) }}
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+
+{% endblock %}

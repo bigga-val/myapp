@@ -4,7 +4,7 @@
 <head>
     <meta charset='utf-8' />
     <meta http-equiv='X-UA-Compatible' content='IE=edge' />
-    <title>19-24 | Gestion Des Ventes</title>
+    <title>INSOFT MASOMO</title>
 
     <meta name='viewport' content='width=device-width, initial-scale=1' />
     <link rel="icon" type="image/svg" href="{{ asset('assets/favicon.png') }}" />
@@ -22,14 +22,48 @@
     <link rel='stylesheet' type='text/css' media='screen' href="{{ asset('assets/css/style.css') }}" />
     <link defer rel='stylesheet' type='text/css' media='screen' href="{{ asset('assets/css/animate.css') }}" />
     <link defer rel='stylesheet' type='text/css' media='screen' href="{{ asset('assets/css/datatables.min.css') }}" />\
-    <link rel='stylesheet' type='text/css' href='{{ asset('assets/css/nice-select2.css') }}'>
-{#    <link rel='stylesheet' type='text/css' href='{{ asset('assets/css/select2.css') }}'>#}
+    <link rel='stylesheet' type='text/css' href='{{ asset('assets/css/select2.min.css') }}'>
+    <style>
+        /* Tooltip custom */
+        .tippy-box[data-theme~='masomo'] {
+            background: #1e293b;
+            color: #f8fafc;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            padding: 2px 4px;
+        }
+        .tippy-box[data-theme~='masomo'][data-placement^='top'] > .tippy-arrow::before { border-top-color: #1e293b; }
+        .tippy-box[data-theme~='masomo'][data-placement^='bottom'] > .tippy-arrow::before { border-bottom-color: #1e293b; }
+
+        /* Button loading state */
+        .btn-loading { opacity: 0.7; pointer-events: none; }
+        .btn-loading::after {
+            content: ' ⏳';
+            font-size: 0.8em;
+        }
+
+        /* Form field hint badge */
+        .field-hint {
+            font-size: 0.72rem;
+            color: #6b7280;
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* Flash message progress bar */
+        .flash-bar {
+            height: 3px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 0 0 4px 4px;
+            animation: shrink 4s linear forwards;
+        }
+        @keyframes shrink { from { width: 100%; } to { width: 0%; } }
+    </style>
     <script src="{{ asset('assets/js/perfect-scrollbar.min.js') }}"></script>
     <script defer src="{{ asset('assets/js/popper.min.js') }}"></script>
     <script defer src="{{ asset('assets/js/tippy-bundle.umd.min.js') }}"></script>
     <script defer src="{{ asset('assets/js/sweetalert.min.js') }}"></script>
     <script defer src="{{ asset('assets/toastr/myRaisingToastr.js') }}"></script>
-    <script src="{{ asset('assets/js/nice-select2.js') }}"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 {#    <script src="{{ asset('assets/js/select2.min.js') }}"></script>#}
 
@@ -154,11 +188,58 @@
     <script defer src="{{ asset('assets/js/alpine-ui.min.js') }}"></script>
     <script defer src="{{ asset('assets/js/alpine-focus.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/select2.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatables.js') }}"></script>
     <script src="{{ asset('assets/toastr/toastr.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <style>
+        /* DataTables toolbar */
+        .dt-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
+        .dt-toolbar .dataTables_filter { order: 1; }
+        .dt-toolbar .dataTables_filter label { display: flex; align-items: center; gap: 6px; font-size: 0.875rem; color: #6b7280; }
+        .dt-toolbar .dataTables_filter input { border: 1px solid #e0e6ed; border-radius: 6px; padding: 5px 10px; font-size: 0.875rem; outline: none; }
+        .dt-toolbar .dataTables_filter input:focus { border-color: #4361ee; }
+        .dt-toolbar .dt-buttons { order: 2; display: flex; gap: 6px; flex-wrap: wrap; }
+
+        /* Select2 — adaptation au thème */
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+            padding: 4px 8px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 28px;
+            color: #1f2937;
+            padding-left: 4px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px;
+        }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #4361ee;
+        }
+        .select2-dropdown {
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #e0e6ed;
+            border-radius: 4px;
+            padding: 4px 8px;
+            outline: none;
+        }
+        .select2-container { width: 100% !important; }
+    </style>
     <script>
         $(document).ready(function(){
             let status = $("#tempStatus")
@@ -173,9 +254,213 @@
                 });
                 raiseToastr(status.val(), message.val())
 
-
+            // Activer Select2 sur tous les <select> des formulaires
+            $('form select:not([data-no-select2])').each(function () {
+                var placeholder = $(this).data('placeholder') || 'Rechercher…';
+                var allowClear = $(this).find('option[value=""]').length > 0;
+                $(this).select2({
+                    placeholder: placeholder,
+                    allowClear: allowClear,
+                    language: {
+                        noResults: function () { return 'Aucun résultat'; },
+                        searching: function () { return 'Recherche…'; }
+                    }
+                });
             });
 
+            // ── Tippy tooltips on elements with [data-tip] or [title] ──
+            if (typeof tippy !== 'undefined') {
+                tippy('[data-tip]', {
+                    theme: 'masomo',
+                    placement: 'top',
+                    delay: [150, 0],
+                    content(ref) { return ref.getAttribute('data-tip'); }
+                });
+                tippy('[title]:not(head [title])', {
+                    theme: 'masomo',
+                    placement: 'top',
+                    delay: [150, 0],
+                    onShow(instance) {
+                        const t = instance.reference.getAttribute('title');
+                        if (!t) return false;
+                        instance.setContent(t);
+                        instance.reference.removeAttribute('title');
+                    }
+                });
+            }
+
+            // ── SweetAlert for forms with [data-confirm] ──
+            $(document).on('submit', 'form[data-confirm]', function(e) {
+                e.preventDefault();
+                const form = this;
+                const msg = $(form).data('confirm') || 'Cette action est irréversible.';
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Confirmation',
+                        text: msg,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#e11d48',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Oui, supprimer',
+                        cancelButtonText: 'Annuler',
+                        reverseButtons: true
+                    }).then(result => { if (result.isConfirmed) form.submit(); });
+                } else {
+                    if (confirm(msg)) form.submit();
+                }
+            });
+
+            // ── Tag danger-button forms with data-confirm to use SweetAlert ──
+            $('form').not('[data-confirm]').each(function() {
+                const hasDanger = $(this).find('.btn-danger[type=submit], button.btn-danger').length > 0;
+                if (hasDanger) {
+                    $(this).attr('data-confirm', 'Voulez-vous vraiment supprimer cet élément ?');
+                    $(this).removeAttr('onsubmit');
+                    const $btns = $(this).find('.btn-danger[type=submit], button.btn-danger');
+                    $btns.removeAttr('onclick');
+                }
+            });
+
+            // ── Auto-dismiss flash alerts after 5s ──
+            $('.alert').each(function() {
+                const $alert = $(this);
+                $alert.append('<div class="flash-bar"></div>');
+                setTimeout(() => {
+                    $alert.fadeOut(400, () => $alert.remove());
+                }, 5000);
+            });
+
+            // ── Loading state on submit buttons ──
+            $('form').on('submit', function() {
+                const $form = $(this);
+                // Delay slightly so SweetAlert cancel still works
+                setTimeout(() => {
+                    if (!$form.data('swal-pending')) {
+                        $form.find('[type=submit]').each(function() {
+                            $(this).addClass('btn-loading').text('Enregistrement…').prop('disabled', true);
+                        });
+                    }
+                }, 100);
+            });
+
+            // ── DataTables auto-init (tables marquées data-dt) ──────────────
+            $('table[data-dt]').each(function () {
+                var $t = $(this);
+                if ($.fn.DataTable.isDataTable($t)) return; // déjà initialisé
+                var pageTitle = (document.querySelector('h1') || {}).innerText || 'Export';
+                $t.DataTable({
+                    language: {
+                        search:       'Rechercher :',
+                        lengthMenu:   'Afficher _MENU_ lignes',
+                        info:         '_START_–_END_ sur _TOTAL_',
+                        infoEmpty:    'Aucun résultat',
+                        infoFiltered: '(filtré de _MAX_)',
+                        zeroRecords:  'Aucun résultat trouvé',
+                        emptyTable:   'Aucune donnée disponible',
+                        paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                    },
+                    dom: '<"dt-toolbar"fB>rtip',
+                    buttons: [
+                        {
+                            extend: 'excelHtml5',
+                            text: '⬇ Excel',
+                            className: 'btn btn-success btn-sm',
+                            title: 'INSOFT MASOMO',
+                            filename: pageTitle,
+                            exportOptions: { columns: ':not(.no-export)' },
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: '⬇ PDF',
+                            className: 'btn btn-danger btn-sm',
+                            title: 'INSOFT MASOMO',
+                            filename: pageTitle,
+                            orientation: 'portrait',
+                            pageSize: 'A4',
+                            exportOptions: { columns: ':not(.no-export)' },
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: '⬇ CSV',
+                            className: 'btn btn-secondary btn-sm',
+                            title: 'INSOFT MASOMO',
+                            filename: pageTitle,
+                            exportOptions: { columns: ':not(.no-export)' },
+                        },
+                        {
+                            extend: 'print',
+                            text: '🖨 Imprimer',
+                            className: 'btn btn-secondary btn-sm',
+                            title: '',
+                            exportOptions: { columns: ':not(.no-export)' },
+                            customize: function (win) {
+                                var now = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+                                var pageName = document.querySelector('h1') ? document.querySelector('h1').innerText : document.title;
+
+                                $(win.document.body)
+                                    .css({ fontFamily: "'Segoe UI', Arial, sans-serif", color: '#1f2937', margin: '0', padding: '0' });
+
+                                win.document.title = ' ';
+
+                                $(win.document.head).append('<style>' +
+                                    '@page { size: A4 portrait; margin: 0; }' +
+                                    'body { font-family: "Segoe UI", Arial, sans-serif; font-size: 11px; color: #1f2937; padding: 14mm 12mm; }' +
+                                    '.dt-print-header { display: flex; justify-content: space-between; align-items: flex-end; ' +
+                                        'border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-bottom: 16px; }' +
+                                    '.dt-print-header .title { font-size: 18px; font-weight: 700; color: #4361ee; }' +
+                                    '.dt-print-header .meta { font-size: 10px; color: #6b7280; text-align: right; line-height: 1.6; }' +
+                                    'table { width: 100%; border-collapse: collapse; }' +
+                                    'thead tr { background: #4361ee; color: #fff; }' +
+                                    'thead th { padding: 7px 10px; text-align: left; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; }' +
+                                    'tbody tr:nth-child(even) { background: #f8f9ff; }' +
+                                    'tbody tr:nth-child(odd)  { background: #fff; }' +
+                                    'tbody td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; font-size: 11px; vertical-align: middle; }' +
+                                    '.dt-print-footer { margin-top: 14px; font-size: 9px; color: #9ca3af; display: flex; justify-content: space-between; border-top: 1px solid #e5e7eb; padding-top: 6px; }' +
+                                '</style>');
+
+                                var header = '<div class="dt-print-header">' +
+                                    '<div class="title">' + pageName + '</div>' +
+                                    '<div class="meta">INSOFT MASOMO<br>Imprimé le ' + now + '</div>' +
+                                '</div>';
+                                var footer = '<div class="dt-print-footer">' +
+                                    '<span>INSOFT MASOMO — Document généré automatiquement</span>' +
+                                    '<span>Imprimé le ' + now + '</span>' +
+                                '</div>';
+
+                                $(win.document.body).prepend(header).append(footer);
+                            },
+                        },
+                    ],
+                    pageLength: 25,
+                    order: [],
+                });
+            });
+
+            // ── Keyboard shortcuts Alt+N and Alt+F ──
+            $(document).on('keydown', function(e) {
+                if (e.altKey && e.key === 'n') {
+                    const $btn = $('a.btn-primary[href]').first();
+                    if ($btn.length) { e.preventDefault(); window.location = $btn.attr('href'); }
+                }
+                if (e.altKey && e.key === 'f') {
+                    e.preventDefault();
+                    const $inp = $('input[type=text], input[type=search], .select2-selection').first();
+                    $inp.trigger('focus').trigger('click');
+                }
+            });
+
+        {% block page_ready %}{% endblock %}
+
+        });
+
         </script>
+
+    <div id="kbd-hint" style="position:fixed;bottom:16px;left:16px;z-index:40;font-size:0.7rem;color:#9ca3af;background:rgba(255,255,255,0.85);border:1px solid #e5e7eb;border-radius:8px;padding:6px 10px;backdrop-filter:blur(4px);line-height:1.8;" title="Raccourcis clavier">
+        <strong style="color:#6b7280;">Raccourcis</strong><br>
+        <kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:3px;padding:1px 4px;font-size:0.65rem;">Alt+N</kbd> Nouveau &nbsp;
+        <kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:3px;padding:1px 4px;font-size:0.65rem;">Alt+F</kbd> Rechercher
+    </div>
+    {% block extra_scripts %}{% endblock %}
     </body>
 </html>

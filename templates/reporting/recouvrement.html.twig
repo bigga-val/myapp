@@ -1,0 +1,398 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-4">
+        <div>
+            <h1 class="text-xl font-bold">Recouvrement des frais scolaires</h1>
+            <p class="text-sm text-gray-500 mt-0.5">Année académique {{ annee.libelle }}</p>
+        </div>
+        <a href="{{ path('app_reporting_financier') }}" class="btn btn-secondary">← Tableau de bord</a>
+    </div>
+
+    {# ── Formulaire de filtre ──────────────────────────────────────────────── #}
+    <form method="get" class="flex flex-wrap gap-4 items-end">
+        <div class="flex-1 min-w-48">
+            <label class="form-label">Frais <span class="text-danger">*</span></label>
+            <select name="fraisId" class="form-select" required>
+                <option value="">— Choisir un frais —</option>
+                {% for f in tousLesFrais %}
+                    <option value="{{ f.id }}"
+                        {% if fraisId == f.id ~ '' %}selected{% endif %}
+                        data-classes="{{ f.classes|map(c => c.id)|join(',') }}">
+                        {{ f.libelle }}
+                        {% if f.classes is not empty %} — {{ f.classes|map(c => c.nom)|join(', ') }}{% else %} (toutes classes){% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="flex-1 min-w-48" id="filtreClasse">
+            <label class="form-label">Classe <span class="text-gray-400 text-xs">(frais globaux uniquement)</span></label>
+            <select name="classeId" class="form-select">
+                <option value="">— Toutes les classes —</option>
+                {% for c in toutesClasses %}
+                    <option value="{{ c.id }}" {% if classeId == c.id ~ '' %}selected{% endif %}>
+                        {{ c.nom }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary">Afficher</button>
+            {% if fraisId %}
+                <a href="{{ path('app_reporting_recouvrement') }}" class="btn btn-secondary ml-2">Réinitialiser</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{# ── Résultats ─────────────────────────────────────────────────────────────── #}
+{% if fraisSelectionne %}
+
+    {% set taux = nbAttendu > 0 ? (ayantPaye|length / nbAttendu * 100) : 0 %}
+
+    {# En-tête résultat #}
+    <div class="panel bg-gray-50 border border-gray-200">
+        <p class="font-semibold text-gray-700">
+            {{ fraisSelectionne.libelle }}
+            {% if fraisSelectionne.classes is not empty %}
+                &nbsp;·&nbsp; {{ fraisSelectionne.classes|map(c => c.nom)|join(', ') }}
+            {% elseif classeSelectionnee %}
+                &nbsp;·&nbsp; {{ classeSelectionnee.nom }}
+            {% else %}
+                &nbsp;·&nbsp; Toutes classes
+            {% endif %}
+            &nbsp;·&nbsp; <span class="text-primary">{{ fraisSelectionne.montant|number_format(0, '.', ' ') }} FC / élève</span>
+        </p>
+    </div>
+
+    {# KPIs #}
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+        <div class="panel text-center">
+            <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Élèves attendus</p>
+            <p class="text-3xl font-bold text-primary">{{ nbAttendu }}</p>
+        </div>
+        <div class="panel text-center">
+            <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Ont payé</p>
+            <p class="text-3xl font-bold text-success">{{ ayantPaye|length }}</p>
+        </div>
+        <div class="panel text-center">
+            <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">N'ont pas payé</p>
+            <p class="text-3xl font-bold text-danger">{{ impayes|length }}</p>
+        </div>
+        <div class="panel text-center">
+            <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Total perçu (FC)</p>
+            <p class="text-2xl font-bold text-warning">{{ totalPercu|number_format(0, '.', ' ') }}</p>
+            <div class="w-full bg-gray-100 rounded-full h-1.5 mt-2">
+                <div class="h-1.5 rounded-full {% if taux >= 80 %}bg-green-500{% elseif taux >= 50 %}bg-yellow-400{% else %}bg-red-400{% endif %}"
+                     style="width: {{ taux > 100 ? 100 : taux }}%"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">{{ taux|number_format(0) }}%</p>
+        </div>
+    </div>
+
+    {# Tables #}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        <div class="panel">
+            <h2 class="font-semibold mb-3 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                Ont payé
+                <span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700 font-semibold ml-1">{{ ayantPaye|length }}</span>
+            </h2>
+            {% if ayantPaye is empty %}
+                <p class="text-sm text-gray-400">Aucun paiement enregistré.</p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover text-sm">
+                        <thead>
+                            <tr>
+                                <th>Élève</th>
+                                <th class="text-right">Montant payé</th>
+                                <th>Date</th>
+                                <th>Mode</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in ayantPaye %}
+                            <tr>
+                                <td>
+                                    <div class="font-medium">{{ e.nom }} {{ e.postnom }} {{ e.prenom }}</div>
+                                    <div class="text-xs text-gray-400">{{ e.matricule ?? '—' }}</div>
+                                </td>
+                                <td class="text-right font-semibold text-success">
+                                    {{ e.totalPaye|number_format(0, '.', ' ') }} FC
+                                </td>
+                                <td class="text-xs text-gray-500">
+                                    {{ e.dernierPaiement ? e.dernierPaiement|date('d/m/Y') : '—' }}
+                                </td>
+                                <td>
+                                    {% if e.modePaiement == 'mobile_money' %}
+                                        <span class="px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-700">Mobile</span>
+                                    {% elseif e.modePaiement == 'virement' %}
+                                        <span class="px-1.5 py-0.5 rounded text-xs bg-blue-100 text-blue-700">Virement</span>
+                                    {% elseif e.modePaiement == 'cheque' %}
+                                        <span class="px-1.5 py-0.5 rounded text-xs bg-yellow-100 text-yellow-700">Chèque</span>
+                                    {% else %}
+                                        <span class="px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-600">Espèces</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="panel" x-data="paiementModal()">
+            <h2 class="font-semibold mb-3 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                N'ont pas encore payé
+                <span class="px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700 font-semibold ml-1">{{ impayes|length }}</span>
+            </h2>
+            {% if impayes is empty %}
+                <p class="text-sm text-gray-500"><span class="text-green-500 font-bold">✓</span> Tous les élèves ont payé.</p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover text-sm">
+                        <thead>
+                            <tr>
+                                <th>Élève</th>
+                                <th>Matricule</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in impayes %}
+                            <tr>
+                                <td class="font-medium">{{ e.nom }} {{ e.postnom }} {{ e.prenom }}</td>
+                                <td class="text-xs text-gray-400">{{ e.matricule ?? '—' }}</td>
+                                <td class="text-center">
+                                    <button type="button"
+                                        class="btn btn-success btn-sm text-xs py-0.5 px-2"
+                                        data-tip="Confirmer le paiement de ce frais"
+                                        data-eleve-id="{{ e.id }}"
+                                        data-eleve-name="{{ (e.nom ~ ' ' ~ e.postnom ~ ' ' ~ e.prenom)|trim }}"
+                                        data-matricule="{{ e.matricule ?? '' }}"
+                                        data-frais-id="{{ fraisSelectionne.id }}"
+                                        data-frais-name="{{ fraisSelectionne.libelle }}"
+                                        data-montant="{{ fraisSelectionne.montant }}"
+                                        @click="openFromBtn($event.currentTarget)">
+                                        Enregistrer paiement
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+
+            {# ── Modal de confirmation de paiement ──────────────────────────── #}
+            {# ── Modal ── #}
+            <template x-teleport="body">
+            <div x-show="show" x-cloak
+                 class="fixed inset-0 z-[999] flex items-center justify-center p-4"
+                 @keydown.escape.window="show = false"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0">
+
+                {# Backdrop #}
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="show = false"></div>
+
+                {# Carte modale #}
+                <div class="relative w-full max-w-lg bg-white dark:bg-[#0e1726] rounded-2xl shadow-2xl overflow-hidden"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+
+                    {# Header coloré #}
+                    <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-5 text-white">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">💰</div>
+                                <div>
+                                    <h3 class="text-base font-bold leading-tight">Enregistrer un paiement</h3>
+                                    <p class="text-xs text-green-100 mt-0.5" x-text="fraisName"></p>
+                                </div>
+                            </div>
+                            <button @click="show = false"
+                                    class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {# Bandeau élève #}
+                    <div class="px-6 py-3 bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/10 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm" x-text="eleveName.charAt(0).toUpperCase()"></div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800 dark:text-white" x-text="eleveName"></p>
+                            <p class="text-xs text-gray-400">Élève</p>
+                        </div>
+                    </div>
+
+                    {# Corps — formulaire #}
+                    <form action="{{ path('app_reporting_recouvrement_payer') }}" method="post" class="px-6 py-5">
+                        <input type="hidden" name="eleveId"  :value="eleveId">
+                        <input type="hidden" name="fraisId"  :value="fraisId">
+                        <input type="hidden" name="redirect" value="{{ app.request.uri }}">
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Montant (FC)</label>
+                                <input type="number" name="montant" x-ref="montantInput"
+                                       class="form-input text-lg font-bold text-success"
+                                       min="0" step="100" required>
+                                <p class="text-xs text-gray-400 mt-1">Modifiable si nécessaire</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Date</label>
+                                <input type="date" name="datePaiement" class="form-input"
+                                       value="{{ 'now'|date('Y-m-d') }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Mode de paiement</label>
+                            <div class="grid grid-cols-4 gap-2">
+                                {% set modes = [
+                                    {val: 'especes',      label: 'Espèces',  icon: '💵'},
+                                    {val: 'mobile_money', label: 'Mobile',   icon: '📱'},
+                                    {val: 'virement',     label: 'Virement', icon: '🏦'},
+                                    {val: 'cheque',       label: 'Chèque',   icon: '📄'}
+                                ] %}
+                                {% for m in modes %}
+                                <label class="flex flex-col items-center gap-1 p-2 rounded-xl border-2 border-gray-200 hover:border-primary cursor-pointer text-center transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                    <input type="radio" name="modePaiement" value="{{ m.val }}" class="sr-only" {% if m.val == 'especes' %}checked{% endif %}>
+                                    <span class="text-xl">{{ m.icon }}</span>
+                                    <span class="text-xs font-medium text-gray-600">{{ m.label }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Observations <span class="font-normal normal-case">(optionnel)</span></label>
+                            <textarea name="observations" class="form-input resize-none" rows="2" placeholder="Remarques éventuelles…"></textarea>
+                        </div>
+
+                        {# Footer formulaire #}
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/10">
+                            <p class="text-xs text-gray-400">
+                                Par <span class="font-medium text-gray-600">{{ app.user.userIdentifier }}</span>
+                            </p>
+                            <div class="flex gap-2">
+                                <button type="button" @click="show = false"
+                                        class="btn btn-secondary btn-sm">
+                                    Annuler
+                                </button>
+                                <button type="submit"
+                                        class="btn btn-success btn-sm flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                    Confirmer
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            </template>
+        </div>
+
+    </div>
+
+{% elseif fraisId %}
+    <div class="panel">
+        <p class="text-gray-400">Frais introuvable.</p>
+    </div>
+{% else %}
+    <div class="panel text-center py-12 text-gray-400">
+        <p class="text-lg mb-1">Sélectionnez un frais pour afficher le suivi des paiements.</p>
+        <p class="text-sm">Vous pouvez aussi filtrer par classe pour les frais globaux.</p>
+    </div>
+{% endif %}
+
+{# Filtrage dynamique des classes + composant modal Alpine #}
+<script>
+(function () {
+    const fraisSelect   = document.querySelector('select[name="fraisId"]');
+    const classeSelect  = document.querySelector('select[name="classeId"]');
+    const filtreClasse  = document.getElementById('filtreClasse');
+    const allOptions    = Array.from(classeSelect.options); // snapshot complet
+
+    function updateClasses() {
+        const opt      = fraisSelect.options[fraisSelect.selectedIndex];
+        const raw      = opt ? opt.dataset.classes : '';
+        const classeIds = raw ? raw.split(',').map(Number) : [];
+
+        if (classeIds.length === 0) {
+            // Frais global → toutes les classes visibles
+            allOptions.forEach(o => {
+                if (!classeSelect.contains(o)) classeSelect.add(o);
+            });
+            filtreClasse.style.opacity = '1';
+            classeSelect.disabled = false;
+        } else {
+            // Frais limité → ne garder que les classes concernées
+            const currentVal = classeSelect.value;
+            while (classeSelect.options.length > 1) {
+                classeSelect.remove(1); // retirer toutes sauf placeholder
+            }
+            allOptions.forEach(o => {
+                if (!o.value || classeIds.includes(Number(o.value))) {
+                    classeSelect.add(o.cloneNode(true));
+                }
+            });
+            // Rétablir la sélection si la classe est encore dans la liste
+            if (classeIds.includes(Number(currentVal))) {
+                classeSelect.value = currentVal;
+            }
+            filtreClasse.style.opacity = '0.9';
+            classeSelect.disabled = false; // reste actif mais filtré
+        }
+    }
+
+    fraisSelect.addEventListener('change', updateClasses);
+    updateClasses();
+})();
+
+document.addEventListener('alpine:init', () => {
+    Alpine.data('paiementModal', () => ({
+        show:      false,
+        eleveId:   null,
+        eleveName: '',
+        fraisId:   null,
+        fraisName: '',
+
+        openFromBtn(btn) {
+            const d = btn.dataset;
+            this.eleveId   = d.eleveId;
+            this.fraisId   = d.fraisId;
+            this.eleveName = d.eleveName + (d.matricule ? ' (' + d.matricule + ')' : '');
+            this.fraisName = d.fraisName;
+            this.show      = true;
+            // Injecter le montant via $nextTick pour éviter le problème de caching DOM
+            this.$nextTick(() => {
+                if (this.$refs.montantInput) {
+                    this.$refs.montantInput.value = d.montant;
+                    this.$refs.montantInput.focus();
+                }
+            });
+        },
+    }));
+});
+</script>
+
+{% endblock %}

@@ -7,7 +7,7 @@
                     <img class="w-8 ml-[5px] flex-none" src="{{ asset('assets/images/credol.png') }}"
                         alt="image" />
                     <span
-                        class="text-2xl ltr:ml-1.5 rtl:mr-1.5  font-semibold  align-middle lg:inline dark:text-white-light">Espace 19-24</span>
+                        class="text-2xl ltr:ml-1.5 rtl:mr-1.5  font-semibold  align-middle lg:inline dark:text-white-light">Masomo</span>
                 </a>
                 <a href="javascript:;"
                     class="collapse-icon w-8 h-8 rounded-full flex items-center hover:bg-gray-500/10 dark:hover:bg-dark-light/10 dark:text-white-light transition duration-300 rtl:rotate-180"
@@ -23,11 +23,11 @@
             </div>
             <ul class="perfect-scrollbar relative font-semibold space-y-0.5 h-[calc(100vh-80px)] overflow-y-auto overflow-x-hidden  p-4 py-0"
                 x-data="{ activeDropdown: null }">
-                <li class="menu nav-item">
-                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'dashboard' }"
-                        @click="activeDropdown === 'dashboard' ? activeDropdown = null : activeDropdown = 'dashboard'">
-                        <div class="flex items-center">
 
+                {# ===== Dashboard ===== #}
+                <li class="menu nav-item">
+                    <a href="{{ path('app_dashboard') }}" class="nav-link group">
+                        <div class="flex items-center">
                             <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                 fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path opacity="0.5"
@@ -37,576 +37,218 @@
                                     d="M9 17.25C8.58579 17.25 8.25 17.5858 8.25 18C8.25 18.4142 8.58579 18.75 9 18.75H15C15.4142 18.75 15.75 18.4142 15.75 18C15.75 17.5858 15.4142 17.25 15 17.25H9Z"
                                     fill="currentColor" />
                             </svg>
-
-                            <span
-                                class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Dashboard</span>
+                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Dashboard</span>
                         </div>
-                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'dashboard' }">
-
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </div>
-                    </button>
-                    <ul x-cloak x-show="activeDropdown === 'dashboard'" x-collapse class="sub-menu text-gray-500">
-                        <li>
-                            <a href="{{ path("app_dashboard") }}">Tableau de bord</a>
-                        </li>
-                        {% if is_granted('ROLE_ADMIN') %}
-                        <li>
-                            <a href="{{ path("app_vente_finance") }}">Finance</a>
-                        </li>
-                        {% endif %}
-                    </ul>
+                    </a>
                 </li>
 
-{#                <h2#}
-{#                    class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">#}
-
-{#                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"#}
-{#                        fill="none" stroke-linecap="round" stroke-linejoin="round">#}
-{#                        <line x1="5" y1="12" x2="19" y2="12"></line>#}
-{#                    </svg>#}
-{#                    <span>Apps</span>#}
-{#                </h2>#}
-
-
-{#                Vente block#}
-                {% if not is_granted('ROLE_COMMANDE') %}
+                {# ===== Élèves ===== #}
                 <li class="menu nav-item">
-                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'vente' }"
-                            @click="activeDropdown === 'vente' ? activeDropdown = null : activeDropdown = 'vente'">
+                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'eleves' }"
+                            @click="activeDropdown === 'eleves' ? activeDropdown = null : activeDropdown = 'eleves'">
                         <div class="flex items-center">
                             <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                  fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path opacity="0.5" d="M2 3H3.5L4.5 8M4.5 8H21L19 15H6L4.5 8Z" fill="currentColor"/>
-                                <path d="M4.5 8L6 15H19L21 8H4.5Z" fill="currentColor" opacity="0.3"/>
-                                <circle cx="9" cy="19" r="1.5" fill="currentColor"/>
-                                <circle cx="17" cy="19" r="1.5" fill="currentColor"/>
-                                <path d="M2 3H3.74L4.5 8M4.5 8H21L19 15H6L4.5 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle opacity="0.5" cx="12" cy="6" r="4" fill="currentColor"/>
+                                <path opacity="0.5" d="M20 17.5C20 19.985 20 22 12 22C4 22 4 19.985 4 17.5C4 15.015 7.582 13 12 13C16.418 13 20 15.015 20 17.5Z" fill="currentColor"/>
+                                <circle cx="12" cy="6" r="4" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M20 17.5C20 19.985 20 22 12 22C4 22 4 19.985 4 17.5C4 15.015 7.582 13 12 13C16.418 13 20 15.015 20 17.5Z" stroke="currentColor" stroke-width="1.5"/>
                             </svg>
-                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Vente</span>
+                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Élèves</span>
                         </div>
-                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'vente' }">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                      stroke-linecap="round" stroke-linejoin="round" />
+                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'eleves' }">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                         </div>
                     </button>
-                    <ul x-cloak x-show="activeDropdown === 'vente'" x-collapse class="sub-menu text-gray-500">
-                        <li>
-                            <a href="{{ path("app_vente_en_attente") }}" class="flex items-center justify-between">
-                                <span>Commandes en attente</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ path("app_vente_new") }}">Vendre</a>
-                        </li>
-                        <li>
-                            <a href="{{ path("app_vente_index") }}">Factures</a>
-                        </li>
-                        <li>
-                            <a href="{{ path("app_produit_vendu_index") }}">Historique</a>
-                        </li>
+                    <ul x-cloak x-show="activeDropdown === 'eleves'" x-collapse class="sub-menu text-gray-500">
+                        <li><a href="{{ path('app_eleve_index') }}">Liste des élèves</a></li>
+                        <li><a href="{{ path('app_eleve_new') }}">Nouvel élève</a></li>
+                        <li><a href="{{ path('app_inscription_index') }}">Inscriptions</a></li>
                     </ul>
                 </li>
 
-                {#                End vente block#}
-                    {#                Produit block#}
+                {# ===== Enseignants ===== #}
                 <li class="menu nav-item">
-                    <button type="button" class="nav-link group"
-                            :class="{ 'active': activeDropdown === 'Produit' }"
-                            @click="activeDropdown === 'produit' ? activeDropdown = null : activeDropdown = 'produit'">
+                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'enseignants' }"
+                            @click="activeDropdown === 'enseignants' ? activeDropdown = null : activeDropdown = 'enseignants'">
                         <div class="flex items-center">
-
-                            <svg class="group-hover:!text-primary" width="20" height="20"
-                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"
-                                      d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
-                                      fill="currentColor" />
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                      d="M12 5.25C12.4142 5.25 12.75 5.58579 12.75 6V6.31673C14.3804 6.60867 15.75 7.83361 15.75 9.5C15.75 9.91421 15.4142 10.25 15 10.25C14.5858 10.25 14.25 9.91421 14.25 9.5C14.25 8.82154 13.6859 8.10339 12.75 7.84748V11.3167C14.3804 11.6087 15.75 12.8336 15.75 14.5C15.75 16.1664 14.3804 17.3913 12.75 17.6833V18C12.75 18.4142 12.4142 18.75 12 18.75C11.5858 18.75 11.25 18.4142 11.25 18V17.6833C9.61957 17.3913 8.25 16.1664 8.25 14.5C8.25 14.0858 8.58579 13.75 9 13.75C9.41421 13.75 9.75 14.0858 9.75 14.5C9.75 15.1785 10.3141 15.8966 11.25 16.1525V12.6833C9.61957 12.3913 8.25 11.1664 8.25 9.5C8.25 7.83361 9.61957 6.60867 11.25 6.31673V6C11.25 5.58579 11.5858 5.25 12 5.25ZM11.25 7.84748C10.3141 8.10339 9.75 8.82154 9.75 9.5C9.75 10.1785 10.3141 10.8966 11.25 11.1525V7.84748ZM14.25 14.5C14.25 13.8215 13.6859 13.1034 12.75 12.8475V16.1525C13.6859 15.8966 14.25 15.1785 14.25 14.5Z"
-                                      fill="currentColor" />
-                            </svg>
-                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Produit</span>
-                        </div>
-                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'produit' }">
-
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                      stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </div>
-                    </button>
-                    <ul x-cloak x-show="activeDropdown === 'produit'" x-collapse
-                        class="sub-menu text-gray-500">
-                        <li>
-                            <a href="{{ path('app_produits_index') }}">Liste</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('app_produits_new') }}">Nouveau Produit</a>
-                        </li>
-{#                        <li>#}
-{#                            <a href="/apps/invoice/add">Add</a>#}
-{#                        </li>#}
-{#                        <li>#}
-{#                            <a href="/apps/invoice/edit">Edit</a>#}
-{#                        </li>#}
-                    </ul>
-                </li>
-                    {#                End Produit block#}
-                {% endif %}
-                <li class="menu nav-item">
-                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'commande' }"
-                            @click="activeDropdown === 'commande' ? activeDropdown = null : activeDropdown = 'commande'">
-                        <div class="flex items-center">
-
                             <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                  fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path opacity="0.5" d="M16 3H8C5.79 3 4 4.79 4 7V19C4 20.1 4.9 21 6 21H18C19.1 21 20 20.1 20 19V7C20 4.79 18.21 3 16 3Z" fill="currentColor"/>
-                                <path d="M8 9H16M8 13H16M8 17H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M9 3V5H15V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path opacity="0.5" d="M4 5C4 3.895 4.895 3 6 3H18C19.105 3 20 3.895 20 5V21L12 17L4 21V5Z" fill="currentColor"/>
+                                <path d="M4 5C4 3.895 4.895 3 6 3H18C19.105 3 20 3.895 20 5V21L12 17L4 21V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                <circle cx="12" cy="9" r="2.5" fill="currentColor"/>
+                                <path d="M8 14C8 12.343 9.791 11 12 11C14.209 11 16 12.343 16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                             </svg>
-                            <span
-                                    class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Commande Produit</span>
+                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Enseignants</span>
                         </div>
-                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'commande' }">
-
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                      stroke-linecap="round" stroke-linejoin="round" />
+                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'enseignants' }">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                         </div>
                     </button>
-                    <ul x-cloak x-show="activeDropdown === 'commande'" x-collapse class="sub-menu text-gray-500">
-
-                        <li>
-                            <a href="{{ path("app_commander") }}">Commander</a>
-                        </li>
-                        <li>
-                            <a href="{{ path("app_commande_index") }}">Historique</a>
-                        </li>
-                        {% if not is_granted('ROLE_COMMANDE') %}
-                        <li>
-                            <a href="{{ path("app_commande_approbateur_index") }}">Approbateur</a>
-                        </li>
-                        {% endif %}
+                    <ul x-cloak x-show="activeDropdown === 'enseignants'" x-collapse class="sub-menu text-gray-500">
+                        <li><a href="{{ path('app_employe_index') }}">Liste des enseignants</a></li>
+                        <li><a href="{{ path('app_employe_new') }}">Nouvel enseignant</a></li>
+                        <li><a href="{{ path('app_paie_index') }}">Paie / Salaires</a></li>
                     </ul>
                 </li>
 
-                {#                <li class="menu nav-item">#}
-{#                    <button type="button" class="nav-link group"#}
-{#                            :class="{ 'active': activeDropdown === 'Produit' }"#}
-{#                            @click="activeDropdown === 'produit' ? activeDropdown = null : activeDropdown = 'produit'">#}
-{#                        <div class="flex items-center">#}
-
-{#                            <svg class="group-hover:!text-primary" width="20" height="20"#}
-{#                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">#}
-{#                                <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"#}
-{#                                      d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"#}
-{#                                      fill="currentColor" />#}
-{#                                <path fill-rule="evenodd" clip-rule="evenodd"#}
-{#                                      d="M12 5.25C12.4142 5.25 12.75 5.58579 12.75 6V6.31673C14.3804 6.60867 15.75 7.83361 15.75 9.5C15.75 9.91421 15.4142 10.25 15 10.25C14.5858 10.25 14.25 9.91421 14.25 9.5C14.25 8.82154 13.6859 8.10339 12.75 7.84748V11.3167C14.3804 11.6087 15.75 12.8336 15.75 14.5C15.75 16.1664 14.3804 17.3913 12.75 17.6833V18C12.75 18.4142 12.4142 18.75 12 18.75C11.5858 18.75 11.25 18.4142 11.25 18V17.6833C9.61957 17.3913 8.25 16.1664 8.25 14.5C8.25 14.0858 8.58579 13.75 9 13.75C9.41421 13.75 9.75 14.0858 9.75 14.5C9.75 15.1785 10.3141 15.8966 11.25 16.1525V12.6833C9.61957 12.3913 8.25 11.1664 8.25 9.5C8.25 7.83361 9.61957 6.60867 11.25 6.31673V6C11.25 5.58579 11.5858 5.25 12 5.25ZM11.25 7.84748C10.3141 8.10339 9.75 8.82154 9.75 9.5C9.75 10.1785 10.3141 10.8966 11.25 11.1525V7.84748ZM14.25 14.5C14.25 13.8215 13.6859 13.1034 12.75 12.8475V16.1525C13.6859 15.8966 14.25 15.1785 14.25 14.5Z"#}
-{#                                      fill="currentColor" />#}
-{#                            </svg>#}
-{#                            <span#}
-{#                                    class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Produit</span>#}
-{#                        </div>#}
-{#                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'produit' }">#}
-
-{#                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"#}
-{#                                 xmlns="http://www.w3.org/2000/svg">#}
-{#                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"#}
-{#                                      stroke-linecap="round" stroke-linejoin="round" />#}
-{#                            </svg>#}
-{#                        </div>#}
-{#                    </button>#}
-{#                    <ul x-cloak x-show="activeDropdown === 'produit'" x-collapse#}
-{#                        class="sub-menu text-gray-500">#}
-{#                        <li>#}
-{#                            <a href="{{ path('app_produit_index') }}">Liste</a>#}
-{#                        </li>#}
-{#                        <li>#}
-{#                            <a href="{{ path('app_produit_new') }}">Nouveau Produit</a>#}
-{#                        </li>#}
-{#                        <li>#}
-{#                            <a href="{{ path('app_facture_index') }}">Factures</a>#}
-{#                        </li>#}
-{#                        <li>#}
-{#                            <a href="{{ path("app_facture_new") }}">Nouvelle Facture</a>#}
-{#                        </li>#}
-{#                    </ul>#}
-{#                </li>#}
-{#                <li class="menu nav-item">#}
-{#                    <button type="button" class="nav-link group"#}
-{#                            :class="{ 'active': activeDropdown === 'Service' }"#}
-{#                            @click="activeDropdown === 'service' ? activeDropdown = null : activeDropdown = 'service'">#}
-{#                        <div class="flex items-center">#}
-
-{#                            <svg class="group-hover:!text-primary" width="20" height="20"#}
-{#                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">#}
-{#                                <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"#}
-{#                                      d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"#}
-{#                                      fill="currentColor" />#}
-{#                                <path fill-rule="evenodd" clip-rule="evenodd"#}
-{#                                      d="M12 5.25C12.4142 5.25 12.75 5.58579 12.75 6V6.31673C14.3804 6.60867 15.75 7.83361 15.75 9.5C15.75 9.91421 15.4142 10.25 15 10.25C14.5858 10.25 14.25 9.91421 14.25 9.5C14.25 8.82154 13.6859 8.10339 12.75 7.84748V11.3167C14.3804 11.6087 15.75 12.8336 15.75 14.5C15.75 16.1664 14.3804 17.3913 12.75 17.6833V18C12.75 18.4142 12.4142 18.75 12 18.75C11.5858 18.75 11.25 18.4142 11.25 18V17.6833C9.61957 17.3913 8.25 16.1664 8.25 14.5C8.25 14.0858 8.58579 13.75 9 13.75C9.41421 13.75 9.75 14.0858 9.75 14.5C9.75 15.1785 10.3141 15.8966 11.25 16.1525V12.6833C9.61957 12.3913 8.25 11.1664 8.25 9.5C8.25 7.83361 9.61957 6.60867 11.25 6.31673V6C11.25 5.58579 11.5858 5.25 12 5.25ZM11.25 7.84748C10.3141 8.10339 9.75 8.82154 9.75 9.5C9.75 10.1785 10.3141 10.8966 11.25 11.1525V7.84748ZM14.25 14.5C14.25 13.8215 13.6859 13.1034 12.75 12.8475V16.1525C13.6859 15.8966 14.25 15.1785 14.25 14.5Z"#}
-{#                                      fill="currentColor" />#}
-{#                            </svg>#}
-{#                            <span#}
-{#                                    class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Service</span>#}
-{#                        </div>#}
-{#                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'service' }">#}
-
-{#                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"#}
-{#                                 xmlns="http://www.w3.org/2000/svg">#}
-{#                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"#}
-{#                                      stroke-linecap="round" stroke-linejoin="round" />#}
-{#                            </svg>#}
-{#                        </div>#}
-{#                    </button>#}
-{#                    <ul x-cloak x-show="activeDropdown === 'service'" x-collapse#}
-{#                        class="sub-menu text-gray-500">#}
-{#                        <li>#}
-{#                            <a href="{{ path('app_service_index') }}">Liste</a>#}
-{#                        </li>#}
-{#                        <li>#}
-{#                            <a href="{{ path('app_service_new') }}">Nouveau Service</a>#}
-{#                        </li>#}
-
-{#                        <li>#}
-{#                            <a href="{{ path('app_facture_index_service') }}">Factures</a>#}
-{#                        </li>#}
-{#                        <li>#}
-{#                            <a href="{{ path("app_facture_new_service") }}">Nouvelle facture</a>#}
-{#                        </li>#}
-
-{#                    </ul>#}
-{#                </li>#}
-
-                {% if is_granted('ROLE_ADMIN') %}
-
-                    <li class="menu nav-item">
-                        <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'approvisionnement' }"
-                                @click="activeDropdown === 'approvisionnement' ? activeDropdown = null : activeDropdown = 'approvisionnement'">
-                            <div class="flex items-center">
-
-                                <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
-                                     fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.5" d="M4 7L12 3L20 7V17L12 21L4 17V7Z" fill="currentColor"/>
-                                    <path d="M4 7L12 11M12 11L20 7M12 11V21M4 7L12 3L20 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span
-                                        class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Approvisionnement</span>
-                            </div>
-                            <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'approvisionnement' }">
-
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                          stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                        </button>
-                        <ul x-cloak x-show="activeDropdown === 'approvisionnement'" x-collapse class="sub-menu text-gray-500">
-
-                            <li>
-                                <a href="{{ path("app_approvisionnement_new") }}">Approvisionner</a>
-                            </li>
-                            <li>
-                                <a href="{{ path("app_approvisionnement_index") }}">Historique</a>
-                            </li>
-                            <li>
-                                <a href="{{ path("app_approvisionnement_stock") }}">Stock</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="menu nav-item">
-                        <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'caisse' }"
-                                @click="activeDropdown === 'caisse' ? activeDropdown = null : activeDropdown = 'caisse'">
-                            <div class="flex items-center">
-
-                                <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
-                                     fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.5" d="M2 9C2 7.34 3.34 6 5 6H19C20.66 6 22 7.34 22 9V18C22 19.66 20.66 21 19 21H5C3.34 21 2 19.66 2 18V9Z" fill="currentColor"/>
-                                    <path d="M2 10H22M6 15H8M11 15H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                    <path d="M7 3L5 6M17 3L19 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                                <span
-                                        class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Caisse</span>
-                            </div>
-                            <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'caisse' }">
-
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                          stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                        </button>
-                        <ul x-cloak x-show="activeDropdown === 'caisse'" x-collapse class="sub-menu text-gray-500">
-
-                            {% if is_granted('ROLE_ADMIN') %}
-                            <li>
-                                <a href="{{ path("app_caisse_index") }}">Bilan de caisse</a>
-                            </li>
-                            {% endif %}
-                            <li>
-                                <a href="{{ path("app_debit_new") }}">Nouvelle Entrée</a>
-                            </li>
-                            <li>
-                                <a href="{{ path("app_debit_index") }}">Récentes Entrées</a>
-                            </li>
-                            <li>
-                                <a href="{{ path("app_credit_new") }}">Nouvelle Sortie</a>
-                            </li>
-
-                            <li>
-                                <a href="{{ path("app_credit_index") }}">Récentes Sorties</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="menu nav-item">
-                        <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'user' }"
-                                @click="activeDropdown === 'user' ? activeDropdown = null : activeDropdown = 'user'">
-                            <div class="flex items-center">
-
-                                <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
-                                     fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle opacity="0.5" cx="12" cy="7" r="4" fill="currentColor"/>
-                                    <path opacity="0.5" d="M4 21C4 17.134 7.582 14 12 14C16.418 14 20 17.134 20 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                    <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
-                                </svg>
-                                <span
-                                        class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Utilisateur</span>
-                            </div>
-                            <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'user' }">
-
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                          stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                        </button>
-                        <ul x-cloak x-show="activeDropdown === 'user'" x-collapse class="sub-menu text-gray-500">
-                            <li>
-                                <a href="{{ path("app_user_index") }}">Liste des utilisateurs</a>
-                            </li>
-                            <li>
-                                <a href="{{ path("app_user_new") }}">Nouvel utilisateur</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu nav-item">
-                        <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'employe' }"
-                                @click="activeDropdown === 'employe' ? activeDropdown = null : activeDropdown = 'employe'">
-                            <div class="flex items-center">
-
-                                <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
-                                     fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.5" d="M4 5C4 3.895 4.895 3 6 3H18C19.105 3 20 3.895 20 5V21L12 17L4 21V5Z" fill="currentColor"/>
-                                    <path d="M4 5C4 3.895 4.895 3 6 3H18C19.105 3 20 3.895 20 5V21L12 17L4 21V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                                    <circle cx="12" cy="9" r="2.5" fill="currentColor"/>
-                                    <path d="M8 14C8 12.343 9.791 11 12 11C14.209 11 16 12.343 16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                                <span
-                                        class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Employe</span>
-                            </div>
-                            <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'employe' }">
-
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                          stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                        </button>
-                        <ul x-cloak x-show="activeDropdown === 'employe'" x-collapse class="sub-menu text-gray-500">
-                            <li>
-                                <a href="{{ path("app_employe_index") }}">Liste des Employes</a>
-                            </li>
-                            <li>
-                                <a href="{{ path("app_employe_new") }}">Nouvel Employe</a>
-                            </li>
-                            <li>
-                                <a href="{{ path("app_paie_index") }}">Listes des Frais</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu nav-item">
-                        <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'categorie' }"
-                                @click="activeDropdown === 'categorie' ? activeDropdown = null : activeDropdown = 'categorie'">
-                            <div class="flex items-center">
-
-                                <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
-                                     fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.5" d="M3 5C3 3.895 3.895 3 5 3H9L11 7H5C3.895 7 3 6.105 3 5ZM3 5V19C3 20.105 3.895 21 5 21H19C20.105 21 21 20.105 21 19V9C21 7.895 20.105 7 19 7H11L9 3H5C3.895 3 3 3.895 3 5Z" fill="currentColor"/>
-                                    <path d="M3 5C3 3.895 3.895 3 5 3H9L11 7H19C20.105 7 21 7.895 21 9V19C21 20.105 20.105 21 19 21H5C3.895 21 3 20.105 3 19V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                                </svg>
-                                <span
-                                        class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Categorie Produit</span>
-                            </div>
-                            <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'categorie' }">
-
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                          stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                        </button>
-                        <ul x-cloak x-show="activeDropdown === 'categorie'" x-collapse class="sub-menu text-gray-500">
-                            <li>
-                                <a href="{{ path("app_categorie_produit_index") }}">Liste des Categories</a>
-                            </li>
-                            <li>
-                                <a href="{{ path("app_categorie_produit_new") }}">Nouvelle Categorie</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu nav-item">
-                        <button type="button" class="nav-link group"
-                                :class="{ 'active': activeDropdown === 'Taux' }"
-                                @click="activeDropdown === 'taux' ? activeDropdown = null : activeDropdown = 'taux'">
-                            <div class="flex items-center">
-
-                                <svg class="group-hover:!text-primary" width="20" height="20"
-                                     viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"
-                                          d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
-                                          fill="currentColor" />
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                          d="M12 5.25C12.4142 5.25 12.75 5.58579 12.75 6V6.31673C14.3804 6.60867 15.75 7.83361 15.75 9.5C15.75 9.91421 15.4142 10.25 15 10.25C14.5858 10.25 14.25 9.91421 14.25 9.5C14.25 8.82154 13.6859 8.10339 12.75 7.84748V11.3167C14.3804 11.6087 15.75 12.8336 15.75 14.5C15.75 16.1664 14.3804 17.3913 12.75 17.6833V18C12.75 18.4142 12.4142 18.75 12 18.75C11.5858 18.75 11.25 18.4142 11.25 18V17.6833C9.61957 17.3913 8.25 16.1664 8.25 14.5C8.25 14.0858 8.58579 13.75 9 13.75C9.41421 13.75 9.75 14.0858 9.75 14.5C9.75 15.1785 10.3141 15.8966 11.25 16.1525V12.6833C9.61957 12.3913 8.25 11.1664 8.25 9.5C8.25 7.83361 9.61957 6.60867 11.25 6.31673V6C11.25 5.58579 11.5858 5.25 12 5.25ZM11.25 7.84748C10.3141 8.10339 9.75 8.82154 9.75 9.5C9.75 10.1785 10.3141 10.8966 11.25 11.1525V7.84748ZM14.25 14.5C14.25 13.8215 13.6859 13.1034 12.75 12.8475V16.1525C13.6859 15.8966 14.25 15.1785 14.25 14.5Z"
-                                          fill="currentColor" />
-                                </svg>
-                                <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Taux</span>
-                            </div>
-                            <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'taux' }">
-
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                          stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                        </button>
-                        <ul x-cloak x-show="activeDropdown === 'taux'" x-collapse
-                            class="sub-menu text-gray-500">
-                            <li>
-                                <a href="{{ path('app_taux_index') }}">Taux Recents</a>
-                            </li>
-{#                            <li>#}
-{#                                <a href="{{ path('app_taux_new') }}">Changer le Taux</a>#}
-{#                            </li>#}
-                            {#                        <li>#}
-                            {#                            <a href="/apps/invoice/add">Add</a>#}
-                            {#                        </li>#}
-                            {#                        <li>#}
-                            {#                            <a href="/apps/invoice/edit">Edit</a>#}
-                            {#                        </li>#}
-                        </ul>
-                    </li>
-                    <li class="menu nav-item">
-                        <button type="button" class="nav-link group"
-                                :class="{ 'active': activeDropdown === 'restaurant' }"
-                                @click="activeDropdown === 'restaurant' ? activeDropdown = null : activeDropdown = 'restaurant'">
-                            <div class="flex items-center">
-
-                                <svg class="group-hover:!text-primary" width="20" height="20"
-                                     viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"
-                                          d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
-                                          fill="currentColor" />
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                          d="M12 5.25C12.4142 5.25 12.75 5.58579 12.75 6V6.31673C14.3804 6.60867 15.75 7.83361 15.75 9.5C15.75 9.91421 15.4142 10.25 15 10.25C14.5858 10.25 14.25 9.91421 14.25 9.5C14.25 8.82154 13.6859 8.10339 12.75 7.84748V11.3167C14.3804 11.6087 15.75 12.8336 15.75 14.5C15.75 16.1664 14.3804 17.3913 12.75 17.6833V18C12.75 18.4142 12.4142 18.75 12 18.75C11.5858 18.75 11.25 18.4142 11.25 18V17.6833C9.61957 17.3913 8.25 16.1664 8.25 14.5C8.25 14.0858 8.58579 13.75 9 13.75C9.41421 13.75 9.75 14.0858 9.75 14.5C9.75 15.1785 10.3141 15.8966 11.25 16.1525V12.6833C9.61957 12.3913 8.25 11.1664 8.25 9.5C8.25 7.83361 9.61957 6.60867 11.25 6.31673V6C11.25 5.58579 11.5858 5.25 12 5.25ZM11.25 7.84748C10.3141 8.10339 9.75 8.82154 9.75 9.5C9.75 10.1785 10.3141 10.8966 11.25 11.1525V7.84748ZM14.25 14.5C14.25 13.8215 13.6859 13.1034 12.75 12.8475V16.1525C13.6859 15.8966 14.25 15.1785 14.25 14.5Z"
-                                          fill="currentColor" />
-                                </svg>
-                                <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Restaurant</span>
-                            </div>
-                            <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'restaurant' }">
-
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                          stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                        </button>
-                        <ul x-cloak x-show="activeDropdown === 'restaurant'" x-collapse
-                            class="sub-menu text-gray-500">
-                            <li>
-                                <a href="{{ path('app_table_index') }}">Tables</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('app_menu_admin_index') }}">Menu Restaurant</a>
-                            </li>
-                            {#                            <li>#}
-                            {#                                <a href="{{ path('app_taux_new') }}">Changer le Taux</a>#}
-                            {#                            </li>#}
-                            {#                        <li>#}
-                            {#                            <a href="/apps/invoice/add">Add</a>#}
-                            {#                        </li>#}
-                            {#                        <li>#}
-                            {#                            <a href="/apps/invoice/edit">Edit</a>#}
-                            {#                        </li>#}
-                        </ul>
-                    </li>
-                {% endif %}
-{#                <li class="menu nav-item">#}
-{#                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'facture' }"#}
-{#                            @click="activeDropdown === 'facture' ? activeDropdown = null : activeDropdown = 'facture'">#}
-{#                        <div class="flex items-center">#}
-
-{#                            <svg class="group-hover:!text-primary" width="20" height="20"#}
-{#                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">#}
-{#                                <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"#}
-{#                                      d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"#}
-{#                                      fill="currentColor" />#}
-{#                                <path fill-rule="evenodd" clip-rule="evenodd"#}
-{#                                      d="M12 5.25C12.4142 5.25 12.75 5.58579 12.75 6V6.31673C14.3804 6.60867 15.75 7.83361 15.75 9.5C15.75 9.91421 15.4142 10.25 15 10.25C14.5858 10.25 14.25 9.91421 14.25 9.5C14.25 8.82154 13.6859 8.10339 12.75 7.84748V11.3167C14.3804 11.6087 15.75 12.8336 15.75 14.5C15.75 16.1664 14.3804 17.3913 12.75 17.6833V18C12.75 18.4142 12.4142 18.75 12 18.75C11.5858 18.75 11.25 18.4142 11.25 18V17.6833C9.61957 17.3913 8.25 16.1664 8.25 14.5C8.25 14.0858 8.58579 13.75 9 13.75C9.41421 13.75 9.75 14.0858 9.75 14.5C9.75 15.1785 10.3141 15.8966 11.25 16.1525V12.6833C9.61957 12.3913 8.25 11.1664 8.25 9.5C8.25 7.83361 9.61957 6.60867 11.25 6.31673V6C11.25 5.58579 11.5858 5.25 12 5.25ZM11.25 7.84748C10.3141 8.10339 9.75 8.82154 9.75 9.5C9.75 10.1785 10.3141 10.8966 11.25 11.1525V7.84748ZM14.25 14.5C14.25 13.8215 13.6859 13.1034 12.75 12.8475V16.1525C13.6859 15.8966 14.25 15.1785 14.25 14.5Z"#}
-{#                                      fill="currentColor" />#}
-{#                            </svg>#}
-{#                            <span#}
-{#                                    class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Facture</span>#}
-{#                        </div>#}
-{#                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'facture' }">#}
-
-{#                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"#}
-{#                                 xmlns="http://www.w3.org/2000/svg">#}
-{#                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"#}
-{#                                      stroke-linecap="round" stroke-linejoin="round" />#}
-{#                            </svg>#}
-{#                        </div>#}
-{#                    </button>#}
-{#                    <ul x-cloak x-show="activeDropdown === 'facture'" x-collapse class="sub-menu text-gray-500">#}
-{#                        <li>#}
-{#                            <a href="{{ path("app_facture_index") }}">Liste des factures</a>#}
-{#                        </li>#}
-{#                        <li>#}
-{#                            <a href="{{ path("app_facture_new") }}">Nouvelle Facture</a>#}
-{#                        </li>#}
-{#                    </ul>#}
-{#                </li>#}
+                {# ===== Scolarité ===== #}
                 <li class="menu nav-item">
-                    <a href="{{ path('app_documentation') }}" class="nav-link group">
+                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'scolarite' }"
+                            @click="activeDropdown === 'scolarite' ? activeDropdown = null : activeDropdown = 'scolarite'">
                         <div class="flex items-center">
                             <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
                                  fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path opacity="0.5" d="M3 10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157C21 4.34315 21 6.22876 21 10V14C21 17.7712 21 19.6569 19.8284 20.8284C18.6569 22 16.7712 22 13 22H11C7.22876 22 5.34315 22 4.17157 20.8284C3 19.6569 3 17.7712 3 14V10Z" fill="currentColor"/>
                                 <path d="M8 12H16M8 8H16M8 16H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                             </svg>
-                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Documentation</span>
+                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Scolarité</span>
+                        </div>
+                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'scolarite' }">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </button>
+                    <ul x-cloak x-show="activeDropdown === 'scolarite'" x-collapse class="sub-menu text-gray-500">
+                        <li><a href="{{ path('app_classe_index') }}">Classes</a></li>
+                        <li><a href="{{ path('app_matiere_index') }}">Matières</a></li>
+                        <li><a href="{{ path('app_emploi_du_temps_index') }}">Emploi du temps</a></li>
+                    </ul>
+                </li>
+
+                {# ===== Évaluations ===== #}
+                <li class="menu nav-item">
+                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'evaluations' }"
+                            @click="activeDropdown === 'evaluations' ? activeDropdown = null : activeDropdown = 'evaluations'">
+                        <div class="flex items-center">
+                            <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.5" d="M16 3H8C5.79 3 4 4.79 4 7V19C4 20.1 4.9 21 6 21H18C19.1 21 20 20.1 20 19V7C20 4.79 18.21 3 16 3Z" fill="currentColor"/>
+                                <path d="M8 9H16M8 13H16M8 17H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M9 3V5H15V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Évaluations</span>
+                        </div>
+                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'evaluations' }">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </button>
+                    <ul x-cloak x-show="activeDropdown === 'evaluations'" x-collapse class="sub-menu text-gray-500">
+                        <li><a href="{{ path('app_examen_index') }}">Examens</a></li>
+                        <li><a href="{{ path('app_note_index') }}">Notes</a></li>
+                        <li><a href="{{ path('app_bulletin_index') }}">Bulletins</a></li>
+                    </ul>
+                </li>
+
+                {# ===== Présences ===== #}
+                <li class="menu nav-item">
+                    <a href="{{ path('app_presence_index') }}" class="nav-link group">
+                        <div class="flex items-center">
+                            <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.5" d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15.695 13.7L15.695 13.701M15.695 16.7L15.695 16.701M11.995 13.7L11.995 13.701M11.995 16.7L11.995 16.701M8.294 13.7L8.294 13.701M8.294 16.7L8.294 16.701" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Présences</span>
                         </div>
                     </a>
                 </li>
+
+                {# ===== Finance (ROLE_ADMIN uniquement) ===== #}
+                {% if is_granted('ROLE_ADMIN') %}
+                <li class="menu nav-item">
+                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'finance' }"
+                            @click="activeDropdown === 'finance' ? activeDropdown = null : activeDropdown = 'finance'">
+                        <div class="flex items-center">
+                            <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.5" d="M2 9C2 7.34 3.34 6 5 6H19C20.66 6 22 7.34 22 9V18C22 19.66 20.66 21 19 21H5C3.34 21 2 19.66 2 18V9Z" fill="currentColor"/>
+                                <path d="M2 10H22M6 15H8M11 15H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M7 3L5 6M17 3L19 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Finance</span>
+                        </div>
+                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'finance' }">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </button>
+                    <ul x-cloak x-show="activeDropdown === 'finance'" x-collapse class="sub-menu text-gray-500">
+                        <li><a href="{{ path('app_reporting_financier') }}">Tableau de bord financier</a></li>
+                        <li><a href="{{ path('app_reporting_recouvrement') }}">Recouvrement des frais</a></li>
+                        <li><a href="{{ path('app_frais_scolaire_index') }}">Frais scolaires</a></li>
+                        <li><a href="{{ path('app_type_frais_index') }}">Types de frais</a></li>
+                        <li><a href="{{ path('app_paiement_frais_index') }}">Paiements</a></li>
+                        <li><a href="{{ path('app_debit_index') }}">Recettes</a></li>
+                        <li><a href="{{ path('app_credit_index') }}">Dépenses</a></li>
+                        <li><a href="{{ path('app_taux_index') }}">Taux de change</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+
+                {# ===== Bibliothèque ===== #}
+                <li class="menu nav-item">
+                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'bibliotheque' }"
+                            @click="activeDropdown === 'bibliotheque' ? activeDropdown = null : activeDropdown = 'bibliotheque'">
+                        <div class="flex items-center">
+                            <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.5" d="M4 4C4 2.895 4.895 2 6 2H14L20 8V20C20 21.105 19.105 22 18 22H6C4.895 22 4 21.105 4 20V4Z" fill="currentColor"/>
+                                <path d="M14 2L20 8H14V2Z" fill="currentColor"/>
+                                <path d="M8 13H16M8 17H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Bibliothèque</span>
+                        </div>
+                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'bibliotheque' }">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </button>
+                    <ul x-cloak x-show="activeDropdown === 'bibliotheque'" x-collapse class="sub-menu text-gray-500">
+                        <li><a href="{{ path('app_livre_index') }}">Livres</a></li>
+                        <li><a href="{{ path('app_emprunt_livre_index') }}">Emprunts</a></li>
+                    </ul>
+                </li>
+
+                {# ===== Administration (ROLE_ADMIN uniquement) ===== #}
+                {% if is_granted('ROLE_ADMIN') %}
+                <li class="menu nav-item">
+                    <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'administration' }"
+                            @click="activeDropdown === 'administration' ? activeDropdown = null : activeDropdown = 'administration'">
+                        <div class="flex items-center">
+                            <svg class="group-hover:!text-primary" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.5" d="M12 2C9.243 2 7 4.243 7 7C7 9.757 9.243 12 12 12C14.757 12 17 9.757 17 7C17 4.243 14.757 2 12 2Z" fill="currentColor"/>
+                                <path opacity="0.5" d="M21 19V21H3V19C3 16.239 7.029 14 12 14C16.971 14 21 16.239 21 19Z" fill="currentColor"/>
+                                <path d="M12 2C9.243 2 7 4.243 7 7C7 9.757 9.243 12 12 12C14.757 12 17 9.757 17 7C17 4.243 14.757 2 12 2Z" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M21 19V21H3V19C3 16.239 7.029 14 12 14C16.971 14 21 16.239 21 19Z" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Administration</span>
+                        </div>
+                        <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'administration' }">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </button>
+                    <ul x-cloak x-show="activeDropdown === 'administration'" x-collapse class="sub-menu text-gray-500">
+                        <li><a href="{{ path('app_annee_academique_index') }}">Année académique</a></li>
+                        <li><a href="{{ path('app_user_index') }}">Utilisateurs</a></li>
+                        <li><a href="{{ path('app_audit_log_index') }}">Journal d'audit</a></li>
+                        <li><a href="{{ path('app_documentation') }}">Documentation</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+
             </ul>
         </div>
     </nav>

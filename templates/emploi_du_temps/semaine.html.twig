@@ -1,0 +1,86 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-3">
+        <div>
+            <h1>Emploi du temps — {{ classe.nom }}</h1>
+            <p class="text-sm text-gray-500">Année académique : {{ annee.libelle }}</p>
+        </div>
+        <div class="flex gap-2">
+            {% if is_granted('ROLE_SECRETAIRE') %}
+                <a class="btn btn-primary"
+                   href="{{ path('app_emploi_du_temps_new') }}?classeId={{ classe.id }}">
+                    Ajouter un créneau
+                </a>
+            {% endif %}
+            <a class="btn btn-secondary" href="{{ path('app_emploi_du_temps_index') }}?classeId={{ classe.id }}">
+                Liste
+            </a>
+        </div>
+    </div>
+</div>
+
+{% set jours = {1: 'Lundi', 2: 'Mardi', 3: 'Mercredi', 4: 'Jeudi', 5: 'Vendredi', 6: 'Samedi'} %}
+{% set colors = [
+    'bg-blue-100 border-blue-400 text-blue-800',
+    'bg-green-100 border-green-400 text-green-800',
+    'bg-purple-100 border-purple-400 text-purple-800',
+    'bg-orange-100 border-orange-400 text-orange-800',
+    'bg-pink-100 border-pink-400 text-pink-800',
+    'bg-teal-100 border-teal-400 text-teal-800',
+    'bg-yellow-100 border-yellow-400 text-yellow-800',
+    'bg-indigo-100 border-indigo-400 text-indigo-800',
+] %}
+
+{% if grouped is empty %}
+<div class="panel">
+    <p class="text-gray-500 text-center py-6">
+        Aucun créneau défini pour cette classe.
+        {% if is_granted('ROLE_SECRETAIRE') %}
+            <br>
+            <a href="{{ path('app_emploi_du_temps_new') }}?classeId={{ classe.id }}"
+               class="btn btn-primary mt-2">Ajouter un créneau</a>
+        {% endif %}
+    </p>
+</div>
+{% else %}
+<div class="panel overflow-x-auto">
+    <table class="table w-full" style="min-width: 700px;">
+        <thead>
+            <tr>
+                {% for num, nomJour in jours %}
+                    {% if grouped[num] is defined %}
+                        <th class="text-center bg-gray-50 border-b-2 border-primary">{{ nomJour }}</th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="align-top">
+                {% for num, nomJour in jours %}
+                    {% if grouped[num] is defined %}
+                        <td class="p-2 border-r last:border-r-0" style="vertical-align:top; min-width:140px;">
+                            {% for slot in grouped[num] %}
+                                {% set colorIdx = loop.index0 % colors|length %}
+                                <div class="mb-2 p-2 rounded border-l-4 {{ colors[colorIdx] }}">
+                                    <div class="font-semibold text-sm">{{ slot.matiere.nom }}</div>
+                                    <div class="text-xs mt-0.5">
+                                        {{ slot.heureDebut|date('H:i') }} – {{ slot.heureFin|date('H:i') }}
+                                    </div>
+                                    <div class="text-xs text-gray-600">{{ slot.enseignant.nomcomplet }}</div>
+                                    {% if slot.salle %}
+                                        <div class="text-xs text-gray-500">Salle : {{ slot.salle }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

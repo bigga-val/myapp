@@ -1,0 +1,29 @@
+{{ form_start(form) }}
+<div class="mb-3">
+    <label class="form-label">Nom de la classe</label>
+    {{ form_widget(form.nom, {'attr': {'class': 'form-input'}}) }}
+    {{ form_errors(form.nom) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Niveau</label>
+    {{ form_widget(form.niveau, {'attr': {'class': 'form-input'}}) }}
+    {{ form_errors(form.niveau) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Année académique</label>
+    {{ form_widget(form.anneeAcademique, {'attr': {'class': 'form-input'}}) }}
+    {{ form_errors(form.anneeAcademique) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Effectif maximum</label>
+    {{ form_widget(form.effectifMax, {'attr': {'class': 'form-input'}}) }}
+    {{ form_errors(form.effectifMax) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Salle</label>
+    {{ form_widget(form.salle, {'attr': {'class': 'form-input'}}) }}
+    {{ form_errors(form.salle) }}
+</div>
+<br>
+<button class="btn btn-primary" type="submit">Enregistrer</button>
+{{ form_end(form) }}

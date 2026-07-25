@@ -1,0 +1,59 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-4">
+        <div>
+            <h1 class="text-xl font-bold">Types de frais</h1>
+            <p class="text-sm text-gray-500 mt-0.5">{{ types|length }} type(s) défini(s)</p>
+        </div>
+        <a href="{{ path('app_type_frais_new') }}" class="btn btn-primary">+ Nouveau type</a>
+    </div>
+
+    {% if types is empty %}
+        <p class="text-gray-400 text-sm">Aucun type de frais défini.</p>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover" data-dt>
+                <thead>
+                    <tr>
+                        <th>Libellé</th>
+                        <th>Code</th>
+                        <th class="text-center">Ordre</th>
+                        <th class="text-center">Statut</th>
+                        <th class="no-export"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in types %}
+                    <tr>
+                        <td class="font-medium">{{ t.libelle }}</td>
+                        <td><code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{{ t.code }}</code></td>
+                        <td class="text-center text-gray-500">{{ t.ordre }}</td>
+                        <td class="text-center">
+                            {% if t.actif %}
+                                <span class="badge bg-success text-white">Actif</span>
+                            {% else %}
+                                <span class="badge bg-danger text-white">Inactif</span>
+                            {% endif %}
+                        </td>
+                        <td class="flex gap-1 justify-end">
+                            <a href="{{ path('app_type_frais_edit', {id: t.id}) }}"
+                               class="btn btn-warning btn-sm"
+                               data-tip="Modifier">✎</a>
+                            <form method="post" action="{{ path('app_type_frais_delete', {id: t.id}) }}"
+                                  data-confirm="Supprimer le type « {{ t.libelle }} » ?">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ t.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm" data-tip="Supprimer">✕</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

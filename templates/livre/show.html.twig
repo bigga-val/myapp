@@ -1,0 +1,110 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Fiche livre</h1>
+        <div class="flex gap-2">
+            {% if is_granted('ROLE_SECRETAIRE') %}
+                <a class="btn btn-primary" href="{{ path('app_livre_edit', {'id': livre.id}) }}">Modifier</a>
+                <form method="post" action="{{ path('app_livre_delete', {'id': livre.id}) }}" style="display:inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ livre.id) }}">
+                    <button class="btn btn-danger" type="submit" onclick="return confirm('Supprimer ce livre ?')">Supprimer</button>
+                </form>
+            {% endif %}
+            <a class="btn btn-secondary" href="{{ path('app_livre_index') }}">Retour</a>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="row">
+        <div class="col-md-8">
+            <h3 class="mb-3 font-semibold text-lg border-b pb-2">Informations</h3>
+            <dl class="row mb-4">
+                <dt class="col-sm-4 font-medium text-gray-600">Titre</dt>
+                <dd class="col-sm-8 font-semibold">{{ livre.titre }}</dd>
+
+                <dt class="col-sm-4 font-medium text-gray-600">Auteur</dt>
+                <dd class="col-sm-8">{{ livre.auteur }}</dd>
+
+                <dt class="col-sm-4 font-medium text-gray-600">ISBN</dt>
+                <dd class="col-sm-8">{{ livre.isbn ?? '—' }}</dd>
+
+                <dt class="col-sm-4 font-medium text-gray-600">Catégorie</dt>
+                <dd class="col-sm-8">{{ livre.categorie ?? '—' }}</dd>
+
+                <dt class="col-sm-4 font-medium text-gray-600">Année de publication</dt>
+                <dd class="col-sm-8">{{ livre.anneePublication ?? '—' }}</dd>
+
+                <dt class="col-sm-4 font-medium text-gray-600">Localisation</dt>
+                <dd class="col-sm-8">{{ livre.localisation ?? '—' }}</dd>
+
+                <dt class="col-sm-4 font-medium text-gray-600">Description</dt>
+                <dd class="col-sm-8">{{ livre.description ?? '—' }}</dd>
+
+                <dt class="col-sm-4 font-medium text-gray-600">Statut</dt>
+                <dd class="col-sm-8">
+                    {% if livre.actif %}
+                        <span class="px-2 py-1 rounded text-sm bg-green-100 text-green-800">Actif</span>
+                    {% else %}
+                        <span class="px-2 py-1 rounded text-sm bg-gray-100 text-gray-600">Inactif</span>
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 rounded-lg bg-blue-50 text-center">
+                <p class="text-gray-600 text-sm mb-1">Exemplaires totaux</p>
+                <p class="text-3xl font-bold text-blue-700">{{ livre.nombreExemplaires }}</p>
+                <hr class="my-3">
+                <p class="text-gray-600 text-sm mb-1">Disponibles</p>
+                <p class="text-3xl font-bold {{ disponibles > 0 ? 'text-green-600' : 'text-red-600' }}">{{ disponibles }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Emprunts en cours pour ce livre #}
+<div class="panel mt-4">
+    <div class="flex justify-between mb-3">
+        <h3 class="font-semibold text-lg">Emprunts en cours</h3>
+        {% if is_granted('ROLE_SECRETAIRE') %}
+            <a class="btn btn-primary" href="{{ path('app_emprunt_livre_new') }}">Nouvel emprunt</a>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Élève</th>
+                    <th>Date emprunt</th>
+                    <th>Date retour prévue</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for emprunt in empruntsEnCours %}
+                <tr>
+                    <td>{{ emprunt.emprunteur.nomComplet }}</td>
+                    <td>{{ emprunt.dateEmprunt ? emprunt.dateEmprunt|date('d/m/Y') : '—' }}</td>
+                    <td>{{ emprunt.dateRetourPrevue ? emprunt.dateRetourPrevue|date('d/m/Y') : '—' }}</td>
+                    <td>
+                        {% if emprunt.isEnRetard() %}
+                            <span class="px-2 py-1 rounded text-sm bg-red-100 text-red-800 font-semibold">EN RETARD</span>
+                        {% else %}
+                            <span class="px-2 py-1 rounded text-sm bg-orange-100 text-orange-800">En cours</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">Aucun emprunt en cours pour ce livre.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

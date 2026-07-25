@@ -1,0 +1,29 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Modifier inscription</h1>
+        <div class="flex gap-2">
+            <a class="btn btn-primary" href="{{ path('app_eleve_show', {'id': inscription.eleve.id}) }}">Fiche élève</a>
+            <a class="btn btn-primary" href="{{ path('app_inscription_index') }}">Voir la liste</a>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="mb-3 p-3 bg-gray-50 rounded">
+        <p class="font-medium">Élève : {{ inscription.eleve.nomComplet }}</p>
+        <p class="text-sm text-gray-500">Matricule : {{ inscription.eleve.matricule ?? '—' }}</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            {{ include('inscription/_form.html.twig') }}
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+
+{% endblock %}

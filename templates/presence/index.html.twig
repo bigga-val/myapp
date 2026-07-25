@@ -1,0 +1,117 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-3">
+        <h1>Présences</h1>
+        {% if classe %}
+            <a class="btn btn-primary"
+               href="{{ path('app_presence_saisie', {'classeId': classe.id}) }}?date={{ date|date('Y-m-d') }}"
+               data-tip="Saisir les présences du jour">
+                Saisir les présences
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+{% for type, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ type == 'success' ? 'success' : (type == 'error' ? 'danger' : type) }} mb-3">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="panel">
+    <form method="get" class="mb-4">
+        <div class="flex gap-2 items-center flex-wrap">
+            <label class="form-label mb-0">Classe :</label>
+            <select name="classeId" class="form-select w-auto">
+                <option value="">— Choisir une classe —</option>
+                {% for c in classes %}
+                    <option value="{{ c.id }}" {% if classeId == c.id ~ '' %}selected{% endif %}>
+                        {{ c.nom }}
+                    </option>
+                {% endfor %}
+            </select>
+            <label class="form-label mb-0">Date :</label>
+            <input type="date" name="date" class="form-input w-auto"
+                   value="{{ date|date('Y-m-d') }}">
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+        </div>
+    </form>
+
+    {% if classeId and presences is defined %}
+        {% if presences|length == 0 %}
+            <div class="p-4 text-gray-500 text-center">
+                Aucune présence enregistrée pour cette classe à cette date.
+                {% if classe %}
+                    <br>
+                    <a href="{{ path('app_presence_saisie', {'classeId': classe.id}) }}?date={{ date|date('Y-m-d') }}"
+                       class="btn btn-primary mt-2">Saisir les présences</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Élève</th>
+                            <th>Statut</th>
+                            <th>Motif</th>
+                            <th>Saisi par</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for presence in presences %}
+                        <tr>
+                            <td>
+                                <strong>{{ presence.eleve.nomComplet }}</strong>
+                            </td>
+                            <td>
+                                {% if presence.statut == 'present' %}
+                                    <span class="badge bg-success text-white px-2 py-1 rounded text-xs">Présent</span>
+                                {% elseif presence.statut == 'absent' %}
+                                    <span class="badge bg-danger text-white px-2 py-1 rounded text-xs">Absent</span>
+                                {% elseif presence.statut == 'retard' %}
+                                    <span class="badge bg-warning text-white px-2 py-1 rounded text-xs">Retard</span>
+                                {% elseif presence.statut == 'justifié' %}
+                                    <span class="badge bg-info text-white px-2 py-1 rounded text-xs">Justifié</span>
+                                {% else %}
+                                    <span class="badge bg-secondary text-white px-2 py-1 rounded text-xs">{{ presence.statut }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ presence.motif ?? '—' }}</td>
+                            <td>{{ presence.saisiePar ?? '—' }}</td>
+                            <td class="flex gap-1">
+                                {% if is_granted('ROLE_SECRETAIRE') %}
+                                    <a class="btn btn-primary btn-sm"
+                                       href="{{ path('app_presence_saisie', {'classeId': presence.classe.id}) }}?date={{ presence.date|date('Y-m-d') }}"
+                                       data-tip="Modifier">
+                                        Modifier
+                                    </a>
+                                    <form method="post"
+                                          action="{{ path('app_presence_delete', {'id': presence.id}) }}"
+                                          style="display:inline">
+                                        <input type="hidden" name="_token"
+                                               value="{{ csrf_token('delete' ~ presence.id) }}">
+                                        <button class="btn btn-danger btn-sm" type="submit" data-tip="Supprimer">Supprimer</button>
+                                    </form>
+                                {% endif %}
+                                <a class="btn btn-secondary btn-sm"
+                                   href="{{ path('app_presence_rapport', {'eleveId': presence.eleve.id}) }}"
+                                   data-tip="Voir le rapport">
+                                    Rapport
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-3">
+        <h1>Modifier un créneau</h1>
+        <div class="flex gap-2">
+            {% if edt.classe %}
+                <a class="btn btn-secondary"
+                   href="{{ path('app_emploi_du_temps_semaine', {'classeId': edt.classe.id}) }}">
+                    Vue semaine
+                </a>
+            {% endif %}
+            <a class="btn btn-secondary" href="{{ path('app_emploi_du_temps_index') }}">Retour</a>
+        </div>
+    </div>
+</div>
+
+{% for type, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ type == 'success' ? 'success' : (type == 'error' ? 'danger' : type) }} mb-3">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="panel">
+    {{ include('emploi_du_temps/_form.html.twig') }}
+</div>
+
+<div class="panel mt-3">
+    <form method="post"
+          action="{{ path('app_emploi_du_temps_delete', {'id': edt.id}) }}"
+          onsubmit="return confirm('Supprimer ce créneau ?')">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ edt.id) }}">
+        <button class="btn btn-danger" type="submit">Supprimer ce créneau</button>
+    </form>
+</div>
+
+{% endblock %}

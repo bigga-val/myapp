@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bulletin — {{ bulletin.eleve.nomComplet }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; font-size: 12px; color: #222; padding: 25px; }
+
+        .header { border-bottom: 3px solid #1a3a6b; padding-bottom: 12px; margin-bottom: 18px; }
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .school-name { font-size: 22px; font-weight: bold; color: #1a3a6b; }
+        .school-sub  { font-size: 11px; color: #555; margin-top: 2px; }
+        .doc-title   { text-align: right; }
+        .doc-title h1 { font-size: 18px; font-weight: bold; text-transform: uppercase; color: #1a3a6b; }
+        .doc-title p  { font-size: 11px; color: #555; }
+
+        .info-section { margin-bottom: 14px; }
+        .info-title { background: #1a3a6b; color: white; padding: 5px 10px; font-weight: bold; font-size: 12px; margin-bottom: 8px; }
+        .info-grid { display: flex; gap: 20px; flex-wrap: wrap; padding: 0 6px; }
+        .info-item { min-width: 160px; }
+        .info-label { color: #666; font-size: 10px; text-transform: uppercase; }
+        .info-value { font-weight: bold; font-size: 12px; }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+        table th { background: #1a3a6b; color: white; padding: 7px 8px; text-align: left; font-size: 11px; }
+        table td { padding: 6px 8px; border-bottom: 1px solid #ddd; font-size: 12px; }
+        table tr:nth-child(even) td { background: #f5f7fa; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        .summary-box { border: 2px solid #1a3a6b; padding: 12px 16px; margin-bottom: 20px; display: flex; gap: 30px; align-items: center; }
+        .summary-item { text-align: center; }
+        .summary-label { font-size: 10px; color: #666; text-transform: uppercase; }
+        .summary-value { font-size: 20px; font-weight: bold; color: #1a3a6b; }
+        .summary-mention { font-size: 15px; font-weight: bold; }
+
+        .footer { margin-top: 30px; display: flex; justify-content: space-between; }
+        .signature { text-align: center; width: 180px; }
+        .signature .line { border-top: 1px solid #333; margin-top: 40px; padding-top: 5px; font-size: 10px; color: #666; }
+
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-weight: bold; }
+        .badge-green  { background: #d1fae5; color: #065f46; }
+        .badge-teal   { background: #ccfbf1; color: #134e4a; }
+        .badge-blue   { background: #dbeafe; color: #1e40af; }
+        .badge-yellow { background: #fef9c3; color: #713f12; }
+        .badge-orange { background: #ffedd5; color: #9a3412; }
+        .badge-red    { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-top">
+            <div>
+                <div class="school-name">INSOFT MASOMO</div>
+                <div class="school-sub">Établissement d'enseignement</div>
+            </div>
+            <div class="doc-title">
+                <h1>Bulletin Scolaire</h1>
+                <p>
+                    {% if bulletin.periode == 1 %}1er Trimestre
+                    {% elseif bulletin.periode == 2 %}2ème Trimestre
+                    {% else %}3ème Trimestre{% endif %}
+                </p>
+                <p>Année académique : {{ bulletin.anneeAcademique.libelle }}</p>
+                <p>Édité le : {{ "now"|date("d/m/Y") }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <div class="info-title">Informations de l'élève</div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Nom complet</div>
+                <div class="info-value">{{ bulletin.eleve.nomComplet }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Matricule</div>
+                <div class="info-value">{{ bulletin.eleve.matricule ?? '—' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Classe</div>
+                <div class="info-value">{{ bulletin.classe.nom }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Niveau</div>
+                <div class="info-value">{{ bulletin.classe.niveau.label() }}</div>
+            </div>
+        </div>
+    </div>
+
+    <table border="1" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <th>Matière</th>
+                <th>Code</th>
+                <th class="text-center">Coef.</th>
+                <th class="text-center">Note</th>
+                <th class="text-center">/ Max</th>
+                <th class="text-center">Points coef.</th>
+                <th>Observations</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ligne in bulletin.donneesJson %}
+            <tr>
+                <td>{{ ligne.matiere }}</td>
+                <td>{{ ligne.code ?? '—' }}</td>
+                <td class="text-center">{{ ligne.coefficient }}</td>
+                <td class="text-center"><strong>{{ ligne.note|number_format(2) }}</strong></td>
+                <td class="text-center">{{ ligne.noteMax|number_format(2) }}</td>
+                <td class="text-center">{{ (ligne.note * ligne.coefficient)|number_format(2) }}</td>
+                <td>{{ ligne.observations ?? '' }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7" style="text-align:center; padding:10px;">Aucune note enregistrée.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="summary-box">
+        <div class="summary-item">
+            <div class="summary-label">Moyenne générale</div>
+            <div class="summary-value">
+                {{ bulletin.moyenneGenerale ? bulletin.moyenneGenerale|number_format(2) : '—' }} / 20
+            </div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">Rang dans la classe</div>
+            <div class="summary-value">{{ bulletin.rangClasse ? bulletin.rangClasse ~ 'e' : '—' }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">Mention</div>
+            <div class="summary-mention">
+                {% set mention = bulletin.mention %}
+                {% if mention == 'Excellent' %}
+                    <span class="badge badge-green">{{ mention }}</span>
+                {% elseif mention == 'Très Bien' %}
+                    <span class="badge badge-teal">{{ mention }}</span>
+                {% elseif mention == 'Bien' %}
+                    <span class="badge badge-blue">{{ mention }}</span>
+                {% elseif mention == 'Assez Bien' %}
+                    <span class="badge badge-yellow">{{ mention }}</span>
+                {% elseif mention == 'Passable' %}
+                    <span class="badge badge-orange">{{ mention }}</span>
+                {% elseif mention == 'Échec' %}
+                    <span class="badge badge-red">{{ mention }}</span>
+                {% else %}
+                    {{ mention ?? '—' }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="signature">
+            <div class="line">Signature du Titulaire</div>
+        </div>
+        <div class="signature">
+            <div class="line">Signature du Directeur</div>
+        </div>
+        <div class="signature">
+            <div class="line">Signature du Parent/Tuteur</div>
+        </div>
+    </div>
+
+</body>
+</html>

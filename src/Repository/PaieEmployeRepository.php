@@ -56,10 +56,30 @@ class PaieEmployeRepository extends ServiceEntityRepository
         return (float) ($qb->getQuery()->getSingleScalarResult() ?? 0);
     }
 
-    public function masseSalarialeMoisCourant(): float
+    /**
+     * Masse salariale mois par mois pour une année civile donnée.
+     * Retourne [1 => total_jan, ..., 12 => total_dec].
+     */
+    public function masseSalarialeParMois(int $annee): array
     {
-        $mois   = (int) date('n');
-        $annee  = (int) date('Y');
+        $results = $this->createQueryBuilder('pe')
+            ->select('p.MonthPay AS mois, SUM(pe.total) AS total')
+            ->join('pe.Paie', 'p')
+            ->where('p.YearPay = :annee')
+            ->setParameter('annee', $annee)
+            ->groupBy('p.MonthPay')
+            ->getQuery()
+            ->getResult();
+
+        $data = array_fill(1, 12, 0.0);
+        foreach ($results as $row) {
+            $data[(int) $row['mois']] = (float) $row['total'];
+        }
+        return $data;
+    }
+
+    public function masseSalarialeMois(int $annee, int $mois): float
+    {
         $result = $this->createQueryBuilder('pe')
             ->select('SUM(pe.total)')
             ->join('pe.Paie', 'p')
@@ -68,5 +88,11 @@ class PaieEmployeRepository extends ServiceEntityRepository
             ->setParameter('annee', $annee)
             ->getQuery()->getSingleScalarResult();
         return (float) ($result ?? 0);
+    }
+
+    /** @deprecated Utiliser masseSalarialeMois() */
+    public function masseSalarialeMoisCourant(): float
+    {
+        return $this->masseSalarialeMois((int) date('Y'), (int) date('n'));
     }
 }

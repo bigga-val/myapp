@@ -1,0 +1,35 @@
+{{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+
+<div>
+    {{ form_label(form.libelle) }}
+    {{ form_widget(form.libelle) }}
+    {{ form_errors(form.libelle) }}
+</div>
+
+<div class="grid grid-cols-2 gap-4">
+    <div>
+        {{ form_label(form.code) }}
+        {{ form_widget(form.code) }}
+        {{ form_errors(form.code) }}
+        <p class="text-xs text-gray-400 mt-1">Identifiant unique, sans espaces (ex: <code>inscription</code>).</p>
+    </div>
+    <div>
+        {{ form_label(form.ordre) }}
+        {{ form_widget(form.ordre) }}
+        {{ form_errors(form.ordre) }}
+        <p class="text-xs text-gray-400 mt-1">Ordre d'affichage dans les listes.</p>
+    </div>
+</div>
+
+<div class="flex items-center gap-2">
+    {{ form_widget(form.actif) }}
+    {{ form_label(form.actif) }}
+    {{ form_errors(form.actif) }}
+</div>
+
+<div class="flex gap-2 pt-2">
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <a href="{{ path('app_type_frais_index') }}" class="btn btn-secondary">Annuler</a>
+</div>
+
+{{ form_end(form) }}

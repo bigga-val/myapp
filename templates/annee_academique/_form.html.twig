@@ -1,0 +1,24 @@
+{{ form_start(form) }}
+<div class="mb-3">
+    <label class="form-label">Libellé</label>
+    {{ form_widget(form.libelle, {'attr': {'class': 'form-input'}}) }}
+    {{ form_errors(form.libelle) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Date de début</label>
+    {{ form_widget(form.dateDebut, {'attr': {'class': 'form-input'}}) }}
+    {{ form_errors(form.dateDebut) }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Date de fin</label>
+    {{ form_widget(form.dateFin, {'attr': {'class': 'form-input'}}) }}
+    {{ form_errors(form.dateFin) }}
+</div>
+<div class="mb-3 flex items-center gap-2">
+    {{ form_widget(form.isCurrent) }}
+    <label class="form-label mb-0">Année en cours</label>
+    {{ form_errors(form.isCurrent) }}
+</div>
+<br>
+<button class="btn btn-primary" type="submit">Enregistrer</button>
+{{ form_end(form) }}

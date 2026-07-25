@@ -1,0 +1,91 @@
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+{# Section 1: Informations personnelles #}
+<h3 class="mb-3 font-semibold text-lg border-b pb-2">Informations personnelles</h3>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.nom) }}</label>
+        {{ form_widget(form.nom, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.nom) }}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.postnom) }}</label>
+        {{ form_widget(form.postnom, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.postnom) }}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.prenom) }}</label>
+        {{ form_widget(form.prenom, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.prenom) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.sexe) }}</label>
+        {{ form_widget(form.sexe, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.sexe) }}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.dateNaissance) }}</label>
+        {{ form_widget(form.dateNaissance, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.dateNaissance) }}
+        <span class="field-hint">Format JJ/MM/AAAA</span>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">{{ form_label(form.lieuNaissance) }}</label>
+        {{ form_widget(form.lieuNaissance, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.lieuNaissance) }}
+    </div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">{{ form_label(form.adresse) }}</label>
+    {{ form_widget(form.adresse, {'attr': {'class': 'form-input', 'rows': 2}}) }}
+    {{ form_errors(form.adresse) }}
+</div>
+
+{# Section 2: Photo #}
+<h3 class="mb-3 mt-4 font-semibold text-lg border-b pb-2">Photo</h3>
+
+<div class="mb-3">
+    <label class="form-label">{{ form_label(form.photoFile) }}</label>
+    {{ form_widget(form.photoFile) }}
+    {{ form_errors(form.photoFile) }}
+    <small class="text-gray-500">Formats acceptés : JPEG, PNG, WebP. Taille max : 2 Mo.</small>
+</div>
+
+{# Section 3: Informations du tuteur #}
+<h3 class="mb-3 mt-4 font-semibold text-lg border-b pb-2">Informations du tuteur</h3>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.nomTuteur) }}</label>
+        {{ form_widget(form.nomTuteur, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.nomTuteur) }}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.relationTuteur) }}</label>
+        {{ form_widget(form.relationTuteur, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.relationTuteur) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.telephoneTuteur) }}</label>
+        {{ form_widget(form.telephoneTuteur, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.telephoneTuteur) }}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.emailTuteur) }}</label>
+        {{ form_widget(form.emailTuteur, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.emailTuteur) }}
+    </div>
+</div>
+
+<br>
+<button class="btn btn-primary" type="submit">Enregistrer</button>
+
+{{ form_end(form) }}

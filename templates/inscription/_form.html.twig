@@ -1,0 +1,46 @@
+{{ form_start(form) }}
+
+<div class="mb-3">
+    <label class="form-label">{{ form_label(form.eleve) }}</label>
+    {{ form_widget(form.eleve, {'attr': {'class': 'form-select'}}) }}
+    {{ form_errors(form.eleve) }}
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">Année académique</label>
+        <div class="form-input bg-blue-50 border border-blue-200 text-blue-800 font-semibold flex items-center gap-2">
+            📅 {{ form.vars.data.anneeAcademique ? form.vars.data.anneeAcademique.libelle : '—' }}
+            <span class="text-xs font-normal text-blue-500">(année active)</span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.classe) }}</label>
+        {{ form_widget(form.classe, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.classe) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.dateInscription) }}</label>
+        {{ form_widget(form.dateInscription, {'attr': {'class': 'form-input'}}) }}
+        {{ form_errors(form.dateInscription) }}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">{{ form_label(form.statut) }}</label>
+        {{ form_widget(form.statut, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.statut) }}
+    </div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">{{ form_label(form.observations) }}</label>
+    {{ form_widget(form.observations, {'attr': {'class': 'form-input', 'rows': 2}}) }}
+    {{ form_errors(form.observations) }}
+</div>
+
+<br>
+<button class="btn btn-primary" type="submit">Enregistrer</button>
+
+{{ form_end(form) }}

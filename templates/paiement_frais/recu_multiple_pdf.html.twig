@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Reçu groupé</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; color: #222; padding: 28px; }
+        .header { text-align: center; border-bottom: 2px solid #1a56db; padding-bottom: 14px; margin-bottom: 18px; }
+        .header .school-name { font-size: 20px; font-weight: bold; color: #1a56db; letter-spacing: 1px; }
+        .header .recu-title { font-size: 14px; font-weight: bold; margin-top: 5px; color: #374151; text-transform: uppercase; letter-spacing: 2px; }
+        .header .recu-date { font-size: 11px; color: #6b7280; margin-top: 4px; }
+        .section-title { font-weight: bold; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-bottom: 5px; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px; }
+        .info-grid { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+        .info-grid td { padding: 4px 6px; vertical-align: top; }
+        .info-grid td:first-child { width: 38%; color: #6b7280; font-size: 11px; }
+        .info-grid td:last-child { font-weight: 500; }
+        .frais-table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+        .frais-table th { background: #1a56db; color: #fff; padding: 6px 8px; font-size: 11px; text-align: left; }
+        .frais-table td { padding: 6px 8px; border-bottom: 1px solid #e5e7eb; font-size: 11px; }
+        .frais-table tr:last-child td { border-bottom: none; }
+        .frais-table .montant { text-align: right; font-weight: 600; color: #166534; }
+        .total-row td { background: #f0fdf4; font-weight: bold; border-top: 2px solid #86efac; }
+        .total-row .montant { font-size: 14px; color: #166534; }
+        .footer { margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 14px; }
+        .footer .merci { text-align: center; font-size: 13px; color: #374151; margin-bottom: 18px; }
+        .signatures { display: table; width: 100%; margin-top: 8px; }
+        .sig-col { display: table-cell; text-align: center; width: 50%; }
+        .sig-line { border-top: 1px solid #9ca3af; width: 140px; margin: 0 auto; margin-top: 38px; }
+        .sig-label { font-size: 10px; color: #6b7280; margin-top: 4px; }
+        .footer-note { font-size: 9px; color: #9ca3af; margin-top: 16px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="school-name">INSOFT MASOMO</div>
+    <div class="recu-title">Reçu de Paiement Groupé</div>
+    <div class="recu-date">Émis le {{ "now"|date("d/m/Y à H:i") }}</div>
+</div>
+
+<div class="section-title">Informations élève</div>
+<table class="info-grid">
+    <tr>
+        <td>Nom complet</td>
+        <td>{{ eleve.nomComplet }}</td>
+    </tr>
+    <tr>
+        <td>Matricule</td>
+        <td>{{ eleve.matricule ?? '—' }}</td>
+    </tr>
+    <tr>
+        <td>Date de paiement</td>
+        <td>{{ paiements[0].datePaiement ? paiements[0].datePaiement|date('d/m/Y') : '—' }}</td>
+    </tr>
+    <tr>
+        <td>Mode de paiement</td>
+        <td>
+            {% set mode = paiements[0].modePaiement %}
+            {% if mode == 'especes' %}Espèces
+            {% elseif mode == 'mobile_money' %}Mobile Money
+            {% elseif mode == 'virement' %}Virement bancaire
+            {% elseif mode == 'cheque' %}Chèque
+            {% else %}{{ mode }}{% endif %}
+        </td>
+    </tr>
+</table>
+
+<div class="section-title">Détail des frais payés</div>
+<table class="frais-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>N° Reçu</th>
+            <th>Frais</th>
+            <th>Année</th>
+            <th style="text-align:right;">Montant (FC)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set total = 0 %}
+        {% for p in paiements %}
+            {% set total = total + p.montantPaye %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td style="font-family: monospace; font-size: 10px; color: #6b7280;">{{ p.numeroRecu }}</td>
+                <td>{{ p.fraisScolaire.libelle }}</td>
+                <td>{{ p.fraisScolaire.anneeAcademique.libelle }}</td>
+                <td class="montant">{{ p.montantPaye|number_format(0, ',', ' ') }}</td>
+            </tr>
+        {% endfor %}
+        <tr class="total-row">
+            <td colspan="4" style="text-align: right; padding-right: 8px;">TOTAL</td>
+            <td class="montant">{{ total|number_format(0, ',', ' ') }}</td>
+        </tr>
+    </tbody>
+</table>
+
+{% if paiements[0].observations %}
+<table class="info-grid">
+    <tr>
+        <td>Observations</td>
+        <td>{{ paiements[0].observations }}</td>
+    </tr>
+</table>
+{% endif %}
+
+<div class="footer">
+    <div class="merci">Merci pour votre paiement.</div>
+    <div class="signatures">
+        <div class="sig-col">
+            <div class="sig-line"></div>
+            <div class="sig-label">Signature du parent / tuteur</div>
+        </div>
+        <div class="sig-col">
+            <div class="sig-line"></div>
+            <div class="sig-label">Signature du caissier / secrétaire</div>
+        </div>
+    </div>
+    <div class="footer-note">
+        Document généré le {{ "now"|date("d/m/Y à H:i") }} — INSOFT MASOMO
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-3">
+        <h1>Frais scolaires</h1>
+        {% if is_granted('ROLE_SECRETAIRE') %}
+            <a class="btn btn-primary" href="{{ path('app_frais_scolaire_new') }}">Ajouter un frais</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="panel">
+    <form method="get" class="mb-4 flex gap-2 items-end flex-wrap">
+        <div>
+            <label class="block text-sm font-medium mb-1">Filtrer par année académique</label>
+            <select name="anneeId" class="form-select">
+                <option value="">— Toutes les années —</option>
+                {% for annee in annees %}
+                    <option value="{{ annee.id }}" {% if anneeActive and anneeActive.id == annee.id %}selected{% endif %}>
+                        {{ annee.libelle }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+            {% if anneeActive %}
+                <a href="{{ path('app_frais_scolaire_index') }}" class="btn btn-secondary">Réinitialiser</a>
+            {% endif %}
+        </div>
+    </form>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success mb-3">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger mb-3">{{ message }}</div>
+    {% endfor %}
+
+    <div class="table-responsive">
+        <table class="table table-hover" data-dt>
+            <thead>
+                <tr>
+                    <th>Libellé</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    <th>Mois</th>
+                    <th>Classe</th>
+                    <th>Année</th>
+                    <th>Statut</th>
+                    <th class="no-export">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for f in frais %}
+                <tr>
+                    <td>{{ f.libelle }}</td>
+                    <td>
+                        {% if f.type %}
+                            {% set code = f.type.code %}
+                            {% if code == 'inscription' %}
+                                <span class="badge bg-blue-100 text-blue-800">{{ f.type.libelle }}</span>
+                            {% elseif code == 'mensuel' %}
+                                <span class="badge bg-green-100 text-green-800">{{ f.type.libelle }}</span>
+                            {% elseif code == 'examen' %}
+                                <span class="badge bg-purple-100 text-purple-800">{{ f.type.libelle }}</span>
+                            {% else %}
+                                <span class="badge bg-gray-100 text-gray-800">{{ f.type.libelle }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge bg-gray-100 text-gray-500">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="font-mono">{{ f.montant|number_format(2, ',', ' ') }}</td>
+                    <td>
+                        {% set moisNoms = {1: 'Jan', 2: 'Fév', 3: 'Mar', 4: 'Avr', 5: 'Mai', 6: 'Jun', 7: 'Jul', 8: 'Aoû', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Déc'} %}
+                        {{ f.mois ? moisNoms[f.mois] : '—' }}
+                    </td>
+                    <td>{{ f.classes is not empty ? f.classes|map(c => c.nom)|join(', ') : 'Toutes' }}</td>
+                    <td>{{ f.anneeAcademique.libelle }}</td>
+                    <td>
+                        {% if f.actif %}
+                            <span class="badge bg-success text-white">Actif</span>
+                        {% else %}
+                            <span class="badge bg-danger text-white">Inactif</span>
+                        {% endif %}
+                    </td>
+                    <td class="flex gap-1">
+                        {% if is_granted('ROLE_SECRETAIRE') %}
+                            <a class="btn btn-sm btn-primary" href="{{ path('app_frais_scolaire_edit', {'id': f.id}) }}" data-tip="Modifier">Modifier</a>
+                            <form method="post" action="{{ path('app_frais_scolaire_delete', {'id': f.id}) }}" style="display:inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ f.id) }}">
+                                <button class="btn btn-sm btn-danger" type="submit" data-tip="Supprimer">Supprimer</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center text-gray-500 py-4">Aucun frais scolaire trouvé.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

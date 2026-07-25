@@ -1,0 +1,153 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+{# ── En-tête ───────────────────────────────────────────────────────────────── #}
+<div class="panel">
+    <div class="flex flex-wrap justify-between items-center gap-3">
+        <div>
+            <h1 class="text-xl font-bold">Inscriptions</h1>
+            <p class="text-sm text-gray-500 mt-0.5">{{ nbTotal }} inscription(s)</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <form method="get" class="flex gap-2 items-center">
+                <select name="anneeId" class="form-select w-auto text-sm" onchange="this.form.submit()">
+                    <option value="">Toutes les années</option>
+                    {% for annee in annees %}
+                        <option value="{{ annee.id }}" {% if anneeId == annee.id ~ '' %}selected{% endif %}>
+                            {{ annee.libelle }}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if anneeId %}
+                    <a class="btn btn-secondary btn-sm" href="{{ path('app_inscription_index') }}">✕</a>
+                {% endif %}
+            </form>
+            {% if is_granted('ROLE_SECRETAIRE') %}
+                <a class="btn btn-primary" href="{{ path('app_inscription_new') }}">+ Nouvelle inscription</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{# ── Statistiques ──────────────────────────────────────────────────────────── #}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+
+    {# Total #}
+    <div class="panel text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Total inscrits</p>
+        <p class="text-4xl font-bold text-primary">{{ nbTotal }}</p>
+    </div>
+
+    {# Par niveau #}
+    <div class="panel">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-2">Par niveau</p>
+        {% for niveau, nb in parNiveau %}
+            <div class="flex justify-between items-center mb-1 text-sm">
+                <span class="text-gray-600">{{ niveau }}</span>
+                <span class="font-semibold">{{ nb }}</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1 mb-2">
+                <div class="h-1 rounded-full bg-primary" style="width: {{ nbTotal > 0 ? (nb / nbTotal * 100)|number_format(0) : 0 }}%"></div>
+            </div>
+        {% else %}
+            <p class="text-gray-400 text-sm">—</p>
+        {% endfor %}
+    </div>
+
+    {# Par statut #}
+    <div class="panel">
+        <p class="text-xs text-gray-400 uppercase tracking-wide mb-2">Par statut</p>
+        {% set statutColors = {
+            'actif':     'bg-green-100 text-green-800',
+            'transféré': 'bg-yellow-100 text-yellow-800',
+            'exclu':     'bg-red-100 text-red-800',
+            'diplômé':   'bg-blue-100 text-blue-800'
+        } %}
+        {% for statut, nb in parStatut %}
+            <div class="flex justify-between items-center mb-1.5">
+                <span class="px-2 py-0.5 rounded text-xs {{ statutColors[statut] ?? 'bg-gray-100 text-gray-700' }}">
+                    {{ statut|capitalize }}
+                </span>
+                <span class="text-sm font-semibold">{{ nb }}</span>
+            </div>
+        {% else %}
+            <p class="text-gray-400 text-sm">—</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+{# ── Tableau ───────────────────────────────────────────────────────────────── #}
+<div class="panel">
+    <div class="table-responsive">
+        <table class="table table-hover w-full" data-dt>
+            <thead>
+                <tr>
+                    <th>Élève</th>
+                    <th>Matricule</th>
+                    <th>Classe</th>
+                    <th>Niveau</th>
+                    <th>Année</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th class="no-export">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for inscription in inscriptions %}
+                {% set niveau = inscription.classe.niveau.value %}
+                <tr>
+                    <td>
+                        <a href="{{ path('app_eleve_show', {'id': inscription.eleve.id}) }}" class="font-medium hover:underline">
+                            {{ inscription.eleve.nomComplet }}
+                        </a>
+                    </td>
+                    <td class="font-mono text-xs text-gray-500">{{ inscription.eleve.matricule ?? '—' }}</td>
+                    <td>{{ inscription.classe.nom }}</td>
+                    <td data-order="{{ niveau }}">
+                        {% if niveau == 'maternelle' %}
+                            <span class="px-2 py-0.5 rounded text-xs bg-pink-100 text-pink-800">{{ inscription.classe.niveau.label() }}</span>
+                        {% elseif niveau == 'primaire' %}
+                            <span class="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800">{{ inscription.classe.niveau.label() }}</span>
+                        {% elseif niveau == 'secondaire' %}
+                            <span class="px-2 py-0.5 rounded text-xs bg-green-100 text-green-800">{{ inscription.classe.niveau.label() }}</span>
+                        {% else %}
+                            <span class="px-2 py-0.5 rounded text-xs bg-purple-100 text-purple-800">{{ inscription.classe.niveau.label() }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ inscription.anneeAcademique.libelle }}</td>
+                    <td data-order="{{ inscription.statut }}">
+                        {% if inscription.statut == 'actif' %}
+                            <span class="px-2 py-0.5 rounded text-xs bg-green-100 text-green-800">Actif</span>
+                        {% elseif inscription.statut == 'transféré' %}
+                            <span class="px-2 py-0.5 rounded text-xs bg-yellow-100 text-yellow-800">Transféré</span>
+                        {% elseif inscription.statut == 'exclu' %}
+                            <span class="px-2 py-0.5 rounded text-xs bg-red-100 text-red-800">Exclu</span>
+                        {% elseif inscription.statut == 'diplômé' %}
+                            <span class="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800">Diplômé</span>
+                        {% else %}
+                            <span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">{{ inscription.statut }}</span>
+                        {% endif %}
+                    </td>
+                    <td data-order="{{ inscription.dateInscription ? inscription.dateInscription|date('Y-m-d') : '' }}">
+                        {{ inscription.dateInscription ? inscription.dateInscription|date('d/m/Y') : '—' }}
+                    </td>
+                    <td data-export="">
+                        {% if is_granted('ROLE_SECRETAIRE') %}
+                            <a class="btn btn-warning btn-sm" href="{{ path('app_inscription_edit', {'id': inscription.id}) }}" data-tip="Modifier">✎</a>
+                            <form method="post" action="{{ path('app_inscription_delete', {'id': inscription.id}) }}" style="display:inline"
+                                  data-confirm="Supprimer cette inscription ?">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ inscription.id) }}">
+                                <button class="btn btn-danger btn-sm" type="submit" data-tip="Supprimer">✕</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}

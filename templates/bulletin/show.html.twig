@@ -1,0 +1,131 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <div>
+            <h1>Bulletin de {{ bulletin.eleve.nomComplet }}</h1>
+            <p class="text-sm text-gray-600">
+                {{ bulletin.classe.nom }} —
+                {% if bulletin.periode == 1 %}1er Trimestre
+                {% elseif bulletin.periode == 2 %}2ème Trimestre
+                {% else %}3ème Trimestre{% endif %}
+                — {{ bulletin.anneeAcademique.libelle }}
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <a class="btn btn-secondary" href="{{ path('app_bulletin_pdf', {'id': bulletin.id}) }}" target="_blank">Télécharger PDF</a>
+            {% if is_granted('ROLE_DIRECTEUR') and bulletin.statut != 'validé' %}
+                <form method="post" action="{{ path('app_bulletin_valider', {'id': bulletin.id}) }}" style="display:inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('valider' ~ bulletin.id) }}">
+                    <button class="btn btn-success" type="submit">Valider le bulletin</button>
+                </form>
+            {% endif %}
+            <a class="btn btn-primary" href="{{ path('app_bulletin_index') }}">Retour</a>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="flex gap-6 mb-4">
+        <div>
+            <span class="text-gray-500 text-sm">Élève :</span>
+            <strong class="block">{{ bulletin.eleve.nomComplet }}</strong>
+        </div>
+        <div>
+            <span class="text-gray-500 text-sm">Classe :</span>
+            <strong class="block">{{ bulletin.classe.nom }}</strong>
+        </div>
+        <div>
+            <span class="text-gray-500 text-sm">Matricule :</span>
+            <strong class="block font-mono">{{ bulletin.eleve.matricule ?? '—' }}</strong>
+        </div>
+        <div>
+            <span class="text-gray-500 text-sm">Statut :</span>
+            <strong class="block">
+                {% if bulletin.statut == 'validé' %}
+                    <span class="px-2 py-1 rounded text-sm bg-green-100 text-green-800">Validé</span>
+                {% elseif bulletin.statut == 'distribué' %}
+                    <span class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800">Distribué</span>
+                {% else %}
+                    <span class="px-2 py-1 rounded text-sm bg-gray-100 text-gray-600">Brouillon</span>
+                {% endif %}
+            </strong>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Matière</th>
+                    <th>Code</th>
+                    <th>Coefficient</th>
+                    <th>Note</th>
+                    <th>/ Max</th>
+                    <th>Points coef.</th>
+                    <th>Observations</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for ligne in bulletin.donneesJson %}
+                <tr>
+                    <td>{{ ligne.matiere }}</td>
+                    <td><span class="font-mono text-sm text-gray-500">{{ ligne.code ?? '—' }}</span></td>
+                    <td>{{ ligne.coefficient }}</td>
+                    <td><strong>{{ ligne.note|number_format(2) }}</strong></td>
+                    <td>{{ ligne.noteMax|number_format(2) }}</td>
+                    <td>{{ (ligne.note * ligne.coefficient)|number_format(2) }}</td>
+                    <td class="text-sm text-gray-600">{{ ligne.observations ?? '—' }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7">Aucune note dans ce bulletin.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 p-4 bg-gray-50 rounded flex gap-8 items-center">
+        <div>
+            <span class="text-gray-500 text-sm">Moyenne générale</span>
+            <p class="text-2xl font-bold">
+                {{ bulletin.moyenneGenerale ? bulletin.moyenneGenerale|number_format(2) : '—' }} / 20
+            </p>
+        </div>
+        <div>
+            <span class="text-gray-500 text-sm">Rang dans la classe</span>
+            <p class="text-2xl font-bold">{{ bulletin.rangClasse ? bulletin.rangClasse ~ 'e' : '—' }}</p>
+        </div>
+        <div>
+            <span class="text-gray-500 text-sm">Mention</span>
+            <p class="text-xl font-bold">
+                {% set mention = bulletin.mention %}
+                {% if mention == 'Excellent' %}
+                    <span class="px-3 py-1 rounded bg-green-100 text-green-800">{{ mention }}</span>
+                {% elseif mention == 'Très Bien' %}
+                    <span class="px-3 py-1 rounded bg-teal-100 text-teal-800">{{ mention }}</span>
+                {% elseif mention == 'Bien' %}
+                    <span class="px-3 py-1 rounded bg-blue-100 text-blue-800">{{ mention }}</span>
+                {% elseif mention == 'Assez Bien' %}
+                    <span class="px-3 py-1 rounded bg-yellow-100 text-yellow-800">{{ mention }}</span>
+                {% elseif mention == 'Passable' %}
+                    <span class="px-3 py-1 rounded bg-orange-100 text-orange-800">{{ mention }}</span>
+                {% elseif mention == 'Échec' %}
+                    <span class="px-3 py-1 rounded bg-red-100 text-red-800">{{ mention }}</span>
+                {% else %}
+                    {{ mention ?? '—' }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    {% if bulletin.genereAt %}
+    <p class="text-xs text-gray-400 mt-2">
+        Généré le {{ bulletin.genereAt|date('d/m/Y à H:i') }} par {{ bulletin.generePar ?? '—' }}
+    </p>
+    {% endif %}
+</div>
+
+{% endblock %}

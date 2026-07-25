@@ -1,0 +1,87 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Bibliothèque — Livres</h1>
+        {% if is_granted('ROLE_SECRETAIRE') %}
+            <a class="btn btn-primary" href="{{ path('app_livre_new') }}">Ajouter un livre</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="panel">
+    <form method="get" class="mb-4">
+        <div class="flex gap-2">
+            <input
+                type="text"
+                name="q"
+                value="{{ q }}"
+                placeholder="Rechercher par titre ou auteur..."
+                class="form-input w-full max-w-md"
+            >
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            {% if q %}
+                <a class="btn btn-secondary" href="{{ path('app_livre_index') }}">Réinitialiser</a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover" data-dt>
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Auteur</th>
+                    <th>ISBN</th>
+                    <th>Catégorie</th>
+                    <th>Exemplaires</th>
+                    <th>Localisation</th>
+                    <th>Statut</th>
+                    <th class="no-export">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for livre in livres %}
+                <tr>
+                    <td class="font-semibold">{{ livre.titre }}</td>
+                    <td>{{ livre.auteur }}</td>
+                    <td>
+                        {% if livre.isbn %}
+                            <span class="font-mono text-sm">{{ livre.isbn }}</span>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ livre.categorie ?? '—' }}</td>
+                    <td class="text-center">{{ livre.nombreExemplaires }}</td>
+                    <td>{{ livre.localisation ?? '—' }}</td>
+                    <td>
+                        {% if livre.actif %}
+                            <span class="px-2 py-1 rounded text-sm bg-green-100 text-green-800">Actif</span>
+                        {% else %}
+                            <span class="px-2 py-1 rounded text-sm bg-gray-100 text-gray-600">Inactif</span>
+                        {% endif %}
+                    </td>
+                    <td class="flex gap-1">
+                        <a class="btn btn-primary" href="{{ path('app_livre_show', {'id': livre.id}) }}" data-tip="Voir le détail">Voir</a>
+                        {% if is_granted('ROLE_SECRETAIRE') %}
+                            <a class="btn btn-primary" href="{{ path('app_livre_edit', {'id': livre.id}) }}" data-tip="Modifier">Modifier</a>
+                            <form method="post" action="{{ path('app_livre_delete', {'id': livre.id}) }}" style="display:inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ livre.id) }}">
+                                <button class="btn btn-danger" type="submit" data-tip="Supprimer">Supprimer</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8">Aucun livre trouvé.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

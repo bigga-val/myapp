@@ -1,0 +1,9 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <h1 class="mb-4">Modifier : {{ frais.libelle }}</h1>
+    {% include 'frais_scolaire/_form.html.twig' %}
+</div>
+
+{% endblock %}

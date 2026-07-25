@@ -1,0 +1,71 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Saisie des notes — {{ classe.nom }} — Trimestre {{ periode }}</h1>
+        <div class="flex gap-2">
+            <a class="btn btn-primary" href="{{ path('app_note_index') }}">Retour aux notes</a>
+        </div>
+    </div>
+    <p class="text-sm text-gray-600">Année académique : <strong>{{ annee.libelle }}</strong></p>
+</div>
+
+<div class="panel">
+    {% if inscriptions|length == 0 %}
+        <p class="text-gray-500">Aucun élève inscrit dans cette classe.</p>
+    {% elseif matieres|length == 0 %}
+        <p class="text-gray-500">Aucune matière définie pour le niveau {{ classe.niveau.label() }}.</p>
+    {% else %}
+    <form method="post">
+        <div class="table-responsive">
+            <table class="table table-hover" style="min-width: max-content;">
+                <thead>
+                    <tr>
+                        <th style="min-width:180px;">Élève</th>
+                        {% for matiere in matieres %}
+                            <th style="min-width:120px; text-align:center;">
+                                {{ matiere.nom }}<br>
+                                <small class="text-gray-500 font-normal">coef {{ matiere.coefficient }}</small>
+                            </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for inscription in inscriptions %}
+                    {% set eleve = inscription.eleve %}
+                    <tr>
+                        <td>
+                            <strong>{{ eleve.nomComplet }}</strong><br>
+                            <small class="text-gray-500 font-mono">{{ eleve.matricule ?? '—' }}</small>
+                        </td>
+                        {% for matiere in matieres %}
+                            {% set existingNote = noteMap[eleve.id][matiere.id] is defined ? noteMap[eleve.id][matiere.id] : null %}
+                            <td style="text-align:center;">
+                                <input
+                                    type="number"
+                                    name="notes[{{ eleve.id }}][{{ matiere.id }}]"
+                                    min="0"
+                                    max="20"
+                                    step="0.5"
+                                    value="{{ existingNote ? existingNote.valeur : '' }}"
+                                    style="width:80px; text-align:center; border:1px solid #ccc; border-radius:4px; padding:4px;"
+                                    placeholder="—"
+                                >
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Enregistrer toutes les notes</button>
+            <a href="{{ path('app_note_index') }}" class="btn btn-secondary ml-2">Annuler</a>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+{% endblock %}
